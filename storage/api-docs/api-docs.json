@@ -1,0 +1,458 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Layanan Pemesanan Lapangan Futsal",
+    "version": "1.0.0",
+    "description": "OpenAPI 3.0 JSON untuk layanan pemesanan lapangan futsal — User, Admin, Field, Booking, Payment."
+  },
+  "servers": [
+    {
+      "url": "https://api.example.com/v1",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:3000/v1",
+      "description": "Local server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "error" },
+          "message": { "type": "string", "example": "Invalid request" },
+          "errors": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": ["username", "email", "password"],
+        "properties": {
+          "userId": { "type": "integer", "example": 1 },
+          "username": { "type": "string", "example": "johndoe" },
+          "email": { "type": "string", "format": "email", "example": "john@example.com" },
+          "password": { "type": "string", "example": "P@ssw0rd!" },
+          "phoneNumber": { "type": "string", "example": "+628123456789" },
+          "role": { "type": "string", "example": "user" }
+        }
+      },
+      "Admin": {
+        "type": "object",
+        "required": ["username", "email", "password"],
+        "properties": {
+          "adminId": { "type": "integer", "example": 1 },
+          "username": { "type": "string", "example": "admin1" },
+          "email": { "type": "string", "format": "email", "example": "admin@example.com" },
+          "password": { "type": "string", "example": "AdminP@ss" },
+          "phoneNumber": { "type": "string", "example": "+628987654321" },
+          "role": { "type": "string", "example": "admin" }
+        }
+      },
+      "Field": {
+        "type": "object",
+        "required": ["adminId", "fieldName", "pricePerHour"],
+        "properties": {
+          "fieldId": { "type": "integer", "example": 10 },
+          "adminId": { "type": "integer", "example": 1 },
+          "fieldName": { "type": "string", "example": "Lapangan A" },
+          "pricePerHour": { "type": "number", "format": "double", "example": 150000.0 },
+          "status": { "type": "string", "example": "available" }
+        }
+      },
+      "Booking": {
+        "type": "object",
+        "required": ["userId", "fieldId", "bookingDate", "startTime", "endTime"],
+        "properties": {
+          "bookingId": { "type": "integer", "example": 100 },
+          "userId": { "type": "integer", "example": 2 },
+          "fieldId": { "type": "integer", "example": 10 },
+          "bookingDate": { "type": "string", "format": "date-time", "example": "2025-10-22T18:00:00Z" },
+          "startTime": { "type": "string", "example": "18:00" },
+          "endTime": { "type": "string", "example": "20:00" },
+          "totalPayment": { "type": "number", "format": "double", "example": 300000.0 },
+          "bookingStatus": { "type": "string", "example": "pending" }
+        }
+      },
+      "Payment": {
+        "type": "object",
+        "required": ["bookingId", "paymentStatus"],
+        "properties": {
+          "paymentId": { "type": "integer", "example": 500 },
+          "bookingId": { "type": "integer", "example": 100 },
+          "paymentProof": { "type": "string", "example": "https://storage.example.com/proofs/abc123.jpg" },
+          "paymentStatus": { "type": "string", "example": "paid" },
+          "paymentDate": { "type": "string", "format": "date-time", "example": "2025-10-22T19:10:00Z" }
+        }
+      },
+      "AuthRequest": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string" }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": { "type": "string", "example": "jwt.token.here" },
+          "tokenType": { "type": "string", "example": "Bearer" },
+          "expiresIn": { "type": "integer", "example": 3600 }
+        }
+      }
+    }
+  },
+  "tags": [
+    { "name": "Auth", "description": "Authentication endpoints" },
+    { "name": "Users", "description": "End points for users" },
+    { "name": "Admins", "description": "End points for admins" },
+    { "name": "Fields", "description": "Lapangan management" },
+    { "name": "Bookings", "description": "Booking endpoints" },
+    { "name": "Payments", "description": "Payment endpoints" }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login (User/Admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AuthRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login success",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    },
+
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get list of users",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Array of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/User" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "summary": "Create new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/User" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } }
+          },
+          "400": { "description": "Bad Request", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+
+    "/users/{userId}": {
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get user by id",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "User found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } },
+          "404": { "description": "Not Found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Update user",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } }
+        },
+        "responses": {
+          "200": { "description": "User updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } },
+          "400": { "description": "Bad Request", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete user",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "User deleted" },
+          "404": { "description": "Not Found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+
+    "/admins": {
+      "get": {
+        "tags": ["Admins"],
+        "summary": "Get list of admins",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Array of admins", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Admin" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Admins"],
+        "summary": "Create admin",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Admin" } } } },
+        "responses": {
+          "201": { "description": "Admin created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Admin" } } } },
+          "400": { "description": "Bad Request", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+
+    "/fields": {
+      "get": {
+        "tags": ["Fields"],
+        "summary": "Get list of fields (lapangan)",
+        "responses": {
+          "200": { "description": "Array of fields", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Field" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Fields"],
+        "summary": "Create field (admin only)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Field" } } }
+        },
+        "responses": {
+          "201": { "description": "Field created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Field" } } } },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+
+    "/fields/{fieldId}": {
+      "parameters": [
+        { "name": "fieldId", "in": "path", "required": true, "schema": { "type": "integer" } }
+      ],
+      "get": {
+        "tags": ["Fields"],
+        "summary": "Get field by id",
+        "responses": {
+          "200": { "description": "Field found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Field" } } } },
+          "404": { "description": "Not Found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      },
+      "put": {
+        "tags": ["Fields"],
+        "summary": "Update field (admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Field" } } } },
+        "responses": {
+          "200": { "description": "Field updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Field" } } } },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Fields"],
+        "summary": "Delete field (admin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "Field deleted" },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+
+    "/bookings": {
+      "get": {
+        "tags": ["Bookings"],
+        "summary": "Get list of bookings (filterable)",
+        "parameters": [
+          { "name": "userId", "in": "query", "schema": { "type": "integer" } },
+          { "name": "fieldId", "in": "query", "schema": { "type": "integer" } },
+          { "name": "status", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Array of bookings", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Booking" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Bookings"],
+        "summary": "Create a booking (user)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "fieldId", "bookingDate", "startTime", "endTime"],
+                "properties": {
+                  "userId": { "type": "integer" },
+                  "fieldId": { "type": "integer" },
+                  "bookingDate": { "type": "string", "format": "date-time" },
+                  "startTime": { "type": "string" },
+                  "endTime": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Booking created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Booking" } } } },
+          "400": { "description": "Bad Request", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+
+    "/bookings/{bookingId}": {
+      "parameters": [
+        { "name": "bookingId", "in": "path", "required": true, "schema": { "type": "integer" } }
+      ],
+      "get": {
+        "tags": ["Bookings"],
+        "summary": "Get booking by id",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Booking found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Booking" } } } },
+          "404": { "description": "Not Found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      },
+      "put": {
+        "tags": ["Bookings"],
+        "summary": "Update booking status (admin/user)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "bookingStatus": { "type": "string" } } } } }
+        },
+        "responses": {
+          "200": { "description": "Booking updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Booking" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Bookings"],
+        "summary": "Cancel booking",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "Booking cancelled" }
+        }
+      }
+    },
+
+    "/payments": {
+      "get": {
+        "tags": ["Payments"],
+        "summary": "Get payments (admin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Array of payments", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Payment" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Create payment for booking (user uploads proof)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["bookingId", "paymentStatus"],
+                "properties": {
+                  "bookingId": { "type": "integer" },
+                  "paymentProof": { "type": "string", "description": "URL or base64 reference to proof" },
+                  "paymentStatus": { "type": "string", "example": "paid" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Payment created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Payment" } } } },
+          "400": { "description": "Bad Request", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+
+    "/payments/{paymentId}/verify": {
+      "parameters": [
+        { "name": "paymentId", "in": "path", "required": true, "schema": { "type": "integer" } }
+      ],
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Admin verifies/rejects a payment",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": { "type": "string", "description": "verify | reject", "example": "verify" },
+                  "note": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Payment verification result", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Payment" } } } },
+          "403": { "description": "Forbidden (not admin)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    }
+  },
+  "security": []
+}
