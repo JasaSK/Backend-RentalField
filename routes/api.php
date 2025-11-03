@@ -6,4 +6,4 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+Route::post('/verify', [AuthController::class, 'verifyCode']);

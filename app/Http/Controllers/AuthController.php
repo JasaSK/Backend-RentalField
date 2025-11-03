@@ -50,7 +50,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function verifyEmail(Request $request)
+    public function verifyCode(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
@@ -62,19 +62,28 @@ class AuthController extends Controller
             ->first();
 
         if (!$user) {
-            return response()->json(['message' => 'Kode salah atau email tidak ditemukan.'], 400);
+            return response()->json([
+                'message' => 'Kode verifikasi salah atau email tidak ditemukan.'
+            ], 400);
         }
 
-        if (Carbon::now()->greaterThan($user->verification_code_expires_at)) {
-            return response()->json(['message' => 'Kode sudah kadaluarsa.'], 400);
+        // Cek apakah kode sudah kadaluarsa
+        if (!$user->verification_code_expires_at || Carbon::now()->greaterThan($user->verification_code_expires_at)) {
+            return response()->json([
+                'message' => 'Kode verifikasi sudah kadaluarsa.'
+            ], 400);
         }
 
+        // Update status verifikasi
         $user->update([
             'email_verified_at' => now(),
             'verification_code' => null,
             'verification_code_expires_at' => null,
         ]);
 
-        return response()->json(['message' => 'Email berhasil diverifikasi!']);
+        return response()->json([
+            'message' => 'Email berhasil diverifikasi!',
+            'user' => $user,
+        ]);
     }
 }
