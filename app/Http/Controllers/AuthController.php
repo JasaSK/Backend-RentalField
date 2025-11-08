@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 use Illuminate\Support\Facades\Mail;
+use App\Models\User;
 use Carbon\Carbon;
 use App\Mail\VerifyEmail;
 
@@ -16,9 +16,19 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:6',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:6|confirmed', // gunakan konfirmasi password
             'role' => 'required|in:admin,user,superadmin',
+        ], [
+            'name.required' => 'Nama wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'role.required' => 'Role wajib diisi.',
+            'role.in' => 'Role hanya boleh admin, user, atau superadmin.',
         ]);
 
         $code = rand(100000, 999999);
@@ -32,29 +42,31 @@ class AuthController extends Controller
             'verification_code_expires_at' => Carbon::now()->addMinutes(10),
         ]);
 
-        // Buat URL verifikasi
         $verifyUrl = url('/verify/' . $user->verification_code);
 
-        // Kirim email dengan view 'verify.blade.php'
         Mail::send('verify', [
             'user' => $user,
-            'code' => $code, // ← ini penting
+            'code' => $code,
             'verifyUrl' => $verifyUrl,
         ], function ($message) use ($user) {
-            $message->to($user->email);
-            $message->subject('Kode Verifikasi Akun Anda');
+            $message->to($user->email)
+                    ->subject('Kode Verifikasi Akun Anda');
         });
 
         return response()->json([
-            'message' => 'Registrasi berhasil. Silakan periksa email untuk verifikasi.'
-        ]);
+            'message' => 'Registrasi berhasil. Silakan periksa email Anda untuk verifikasi akun.'
+        ], 201);
     }
 
     public function verifyCode(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'code' => 'required|string',
+            'email' => 'required|string|email',
+            'code' => 'required|digits:6',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'code.required' => 'Kode verifikasi wajib diisi.',
+            'code.digits' => 'Kode verifikasi harus 6 digit angka.',
         ]);
 
         $user = User::where('email', $request->email)
@@ -62,19 +74,13 @@ class AuthController extends Controller
             ->first();
 
         if (!$user) {
-            return response()->json([
-                'message' => 'Kode verifikasi salah atau email tidak ditemukan.'
-            ], 400);
+            return response()->json(['message' => 'Kode verifikasi salah atau email tidak ditemukan.'], 400);
         }
 
-        // Cek apakah kode sudah kadaluarsa
-        if (!$user->verification_code_expires_at || Carbon::now()->greaterThan($user->verification_code_expires_at)) {
-            return response()->json([
-                'message' => 'Kode verifikasi sudah kadaluarsa.'
-            ], 400);
+        if (Carbon::now()->greaterThan($user->verification_code_expires_at)) {
+            return response()->json(['message' => 'Kode verifikasi sudah kadaluarsa.'], 400);
         }
 
-        // Update status verifikasi
         $user->update([
             'email_verified_at' => now(),
             'verification_code' => null,
@@ -86,39 +92,48 @@ class AuthController extends Controller
             'user' => $user,
         ]);
     }
+
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => 'required|email',
+            'email' => 'required|string|email',
             'password' => 'required|string|min:6',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 6 karakter.',
         ]);
 
-        // Cari user berdasarkan email
         $user = User::where('email', $credentials['email'])->first();
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json(['message' => 'Email atau password salah.'], 401);
         }
 
-        // Cek apakah email sudah diverifikasi
         if (is_null($user->email_verified_at)) {
             return response()->json(['message' => 'Email belum diverifikasi. Silakan verifikasi terlebih dahulu.'], 403);
         }
 
-        // Buat token API (jika pakai sanctum)
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Login berhasil!',
             'user' => $user,
             'token' => $token,
-            'role' => $user->role
+            'role' => $user->role,
         ]);
     }
 
     public function forgotPassword(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
+        $request->validate([
+            'email' => 'required|string|email',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+        ]);
+
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
@@ -126,29 +141,35 @@ class AuthController extends Controller
         }
 
         $resetCode = rand(100000, 999999);
-        $user->reset_code = $resetCode;
-        $user->reset_code_expires_at = Carbon::now()->addMinutes(10);
-        $user->save();
+        $user->update([
+            'reset_code' => $resetCode,
+            'reset_code_expires_at' => Carbon::now()->addMinutes(10),
+        ]);
 
-        Mail::raw("Kode reset password kamu adalah: $resetCode (berlaku 10 menit)", function ($message) use ($user) {
+        Mail::raw("Kode reset password Anda adalah: $resetCode (berlaku 10 menit)", function ($message) use ($user) {
             $message->to($user->email)
-                ->subject('Kode Reset Password');
+                    ->subject('Kode Reset Password');
         });
 
-        return response()->json(['message' => 'Kode reset password telah dikirim ke email.']);
+        return response()->json(['message' => 'Kode reset password telah dikirim ke email Anda.']);
     }
 
-    // 2️⃣ Verifikasi kode reset
     public function verifyResetCode(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'reset_code' => 'required|string'
+            'email' => 'required|string|email',
+            'reset_code' => 'required|digits:6',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'reset_code.required' => 'Kode reset wajib diisi.',
+            'reset_code.digits' => 'Kode reset harus 6 digit angka.',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)
+                    ->where('reset_code', $request->reset_code)
+                    ->first();
 
-        if (!$user || !$user->reset_code || $user->reset_code !== $request->reset_code) {
+        if (!$user) {
             return response()->json(['message' => 'Kode reset tidak valid.'], 400);
         }
 
@@ -159,18 +180,26 @@ class AuthController extends Controller
         return response()->json(['message' => 'Kode reset valid.']);
     }
 
-    // 3️⃣ Ganti password setelah kode valid
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'reset_code' => 'required|string',
-            'password' => 'required|string|min:6|confirmed'
+            'email' => 'required|string|email',
+            'reset_code' => 'required|digits:6',
+            'password' => 'required|string|min:6|confirmed',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'reset_code.required' => 'Kode reset wajib diisi.',
+            'reset_code.digits' => 'Kode reset harus 6 digit angka.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)
+                    ->where('reset_code', $request->reset_code)
+                    ->first();
 
-        if (!$user || $user->reset_code !== $request->reset_code) {
+        if (!$user) {
             return response()->json(['message' => 'Kode reset tidak valid.'], 400);
         }
 
@@ -178,10 +207,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'Kode reset telah kadaluarsa.'], 400);
         }
 
-        $user->password = Hash::make($request->password);
-        $user->reset_code = null;
-        $user->reset_code_expires_at = null;
-        $user->save();
+        $user->update([
+            'password' => Hash::make($request->password),
+            'reset_code' => null,
+            'reset_code_expires_at' => null,
+        ]);
 
         return response()->json(['message' => 'Password berhasil direset.']);
     }
