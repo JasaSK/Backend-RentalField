@@ -17,6 +17,7 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
+            'no_telp' => 'required|string|min:10|max:15|unique:users,no_telp',
             'password' => 'required|string|min:6|confirmed', // gunakan konfirmasi password
             'role' => 'required|in:admin,user,superadmin',
         ], [
@@ -24,6 +25,10 @@ class AuthController extends Controller
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah terdaftar.',
+            'no_telp.required' => 'Nomor telepon wajib diisi.',
+            'no_telp.min' => 'Nomor telepon minimal 10 digit.',
+            'no_telp.max' => 'Nomor telepon maksimal 15 digit.',
+            'no_telp.unique' => 'Nomor telepon sudah terdaftar.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
@@ -36,6 +41,7 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'no_telp' => $validated['no_telp'],
             'password' => bcrypt($validated['password']),
             'role' => $validated['role'],
             'verification_code' => $code,
@@ -50,7 +56,7 @@ class AuthController extends Controller
             'verifyUrl' => $verifyUrl,
         ], function ($message) use ($user) {
             $message->to($user->email)
-                    ->subject('Kode Verifikasi Akun Anda');
+                ->subject('Kode Verifikasi Akun Anda');
         });
 
         return response()->json([
@@ -148,7 +154,7 @@ class AuthController extends Controller
 
         Mail::raw("Kode reset password Anda adalah: $resetCode (berlaku 10 menit)", function ($message) use ($user) {
             $message->to($user->email)
-                    ->subject('Kode Reset Password');
+                ->subject('Kode Reset Password');
         });
 
         return response()->json(['message' => 'Kode reset password telah dikirim ke email Anda.']);
@@ -166,8 +172,8 @@ class AuthController extends Controller
         ]);
 
         $user = User::where('email', $request->email)
-                    ->where('reset_code', $request->reset_code)
-                    ->first();
+            ->where('reset_code', $request->reset_code)
+            ->first();
 
         if (!$user) {
             return response()->json(['message' => 'Kode reset tidak valid.'], 400);
@@ -196,8 +202,8 @@ class AuthController extends Controller
         ]);
 
         $user = User::where('email', $request->email)
-                    ->where('reset_code', $request->reset_code)
-                    ->first();
+            ->where('reset_code', $request->reset_code)
+            ->first();
 
         if (!$user) {
             return response()->json(['message' => 'Kode reset tidak valid.'], 400);

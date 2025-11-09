@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('no_telp')->unique();
             $table->string('password');
             $table->string('role')->default('user'); // role: user, admin, superadmin
             $table->string('verification_code')->nullable();
