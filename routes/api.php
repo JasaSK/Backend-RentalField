@@ -7,7 +7,7 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/verify', [AuthController::class, 'verifyCode']);
+Route::post('1/verify', [AuthController::class, 'verifyCode']);
 Route::post('/login', [AuthController::class, 'login']);
 
 

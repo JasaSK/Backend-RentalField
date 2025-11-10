@@ -16,19 +16,17 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'no_telp' => 'required|string|min:10|max:15|unique:users,no_telp',
-            'password' => 'required|string|min:6|confirmed', // gunakan konfirmasi password
+            'email' => 'required|string|email|max:255',
+            'no_telp' => 'required|string|min:10|max:15',
+            'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:admin,user,superadmin',
         ], [
             'name.required' => 'Nama wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
-            'email.unique' => 'Email sudah terdaftar.',
             'no_telp.required' => 'Nomor telepon wajib diisi.',
             'no_telp.min' => 'Nomor telepon minimal 10 digit.',
             'no_telp.max' => 'Nomor telepon maksimal 15 digit.',
-            'no_telp.unique' => 'Nomor telepon sudah terdaftar.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
@@ -36,20 +34,47 @@ class AuthController extends Controller
             'role.in' => 'Role hanya boleh admin, user, atau superadmin.',
         ]);
 
+        // Cek apakah sudah ada user dengan email / no_telp ini
+        $existingUser = User::where('email', $validated['email'])
+            ->orWhere('no_telp', $validated['no_telp'])
+            ->first();
+
         $code = rand(100000, 999999);
+        $verifyUrl = url('/verify/' . $code);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'no_telp' => $validated['no_telp'],
-            'password' => bcrypt($validated['password']),
-            'role' => $validated['role'],
-            'verification_code' => $code,
-            'verification_code_expires_at' => Carbon::now()->addMinutes(10),
-        ]);
+        if ($existingUser) {
+            // Jika akun sudah diverifikasi
+            if ($existingUser->email_verified_at) {
+                return response()->json([
+                    'message' => 'Email atau nomor telepon sudah terdaftar dan terverifikasi.'
+                ], 400);
+            }
 
-        $verifyUrl = url('/verify/' . $user->verification_code);
+            // Jika belum diverifikasi, update datanya
+            $existingUser->update([
+                'name' => $validated['name'],
+                'no_telp' => $validated['no_telp'],
+                'password' => bcrypt($validated['password']),
+                'role' => $validated['role'],
+                'verification_code' => $code,
+                'verification_code_expires_at' => now()->addMinutes(10),
+            ]);
 
+            $user = $existingUser;
+        } else {
+            // Jika belum ada user sama sekali, buat baru
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'no_telp' => $validated['no_telp'],
+                'password' => bcrypt($validated['password']),
+                'role' => $validated['role'],
+                'verification_code' => $code,
+                'verification_code_expires_at' => now()->addMinutes(10),
+            ]);
+        }
+
+        // Kirim email verifikasi
         Mail::send('verify', [
             'user' => $user,
             'code' => $code,
@@ -63,6 +88,7 @@ class AuthController extends Controller
             'message' => 'Registrasi berhasil. Silakan periksa email Anda untuk verifikasi akun.'
         ], 201);
     }
+
 
     public function verifyCode(Request $request)
     {
