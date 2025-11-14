@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Gallery;
 use Illuminate\Http\Request;
 
-class GaleryController extends Controller
+class GalleryController extends Controller
 {
     public function index()
     {
@@ -17,14 +17,12 @@ class GaleryController extends Controller
                 'message' => 'Data galery kosong',
                 'data' => []
             ], 404);
-
-
-            return response()->json([
-                'success' => true,
-                'message' => 'List data galery',
-                'data' => $galeries
-            ], 200);
         }
+        return response()->json([
+            'success' => true,
+            'message' => 'List data galery',
+            'data' => $galeries
+        ], 200);
     }
 
     public function show($id)

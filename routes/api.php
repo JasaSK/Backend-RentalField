@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\FieldController;
+use App\Http\Controllers\GalleryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
@@ -33,5 +34,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/banner/{id}', [BannerController::class, 'update']);
     Route::delete('/banner/{id}', [BannerController::class, 'destroy']);
 
-
+    Route::get('/gallery', [GalleryController::class, 'index']);
+    Route::get('/gallery/{id}', [GalleryController::class, 'show']);
+    Route::post('/gallery', [GalleryController::class, 'store']);
+    Route::put('/gallery/{id}', [GalleryController::class, 'update']);
+    Route::delete('/gallery/{id}', [GalleryController::class, 'destroy']);
 });

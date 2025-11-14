@@ -40,19 +40,20 @@ class BannerController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'image' => 'required|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ], [
-            'title.required' => 'Judul banner wajib diisi.',
-            'title.string' => 'Judul banner harus berupa teks.',
-            'title.max' => 'Judul banner maksimal 255 karakter.',
+            'name.required' => 'Judul banner wajib diisi.',
+            'name.string' => 'Judul banner harus berupa teks.',
+            'name.max' => 'Judul banner maksimal 255 karakter.',
 
             'description.required' => 'Deskripsi banner wajib diisi.',
             'description.string' => 'Deskripsi banner harus berupa teks.',
 
-            'image.required' => 'Gambar banner wajib diisi.',
-            'image.string' => 'Gambar banner harus berupa teks.',
+            'image.image' => 'Gambar banner harus berupa file gambar.',
+            'image.mimes' => 'Gambar banner harus berformat jpg, jpeg, atau png.',
+            'image.max' => 'Ukuran gambar banner maksimal 2MB.',
         ]);
 
         $imagePath = null;
@@ -61,7 +62,7 @@ class BannerController extends Controller
         }
 
         $banner = Banner::create([
-            'title' => $request->title,
+            'name' => $request->name,
             'description' => $request->description,
             'image' => $request->image,
         ]);
@@ -82,19 +83,20 @@ class BannerController extends Controller
         }
 
         $request->validate([
-            'title' => 'sometimes|required|string|max:255',
+            'name' => 'sometimes|required|string|max:255',
             'description' => 'sometimes|required|string',
-            'image' => 'sometimes|required|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ], [
-            'title.required' => 'Judul banner wajib diisi.',
-            'title.string' => 'Judul banner harus berupa teks.',
-            'title.max' => 'Judul banner maksimal 255 karakter.',
+            'name.required' => 'Judul banner wajib diisi.',
+            'name.string' => 'Judul banner harus berupa teks.',
+            'name.max' => 'Judul banner maksimal 255 karakter.',
 
             'description.required' => 'Deskripsi banner wajib diisi.',
             'description.string' => 'Deskripsi banner harus berupa teks.',
 
-            'image.required' => 'Gambar banner wajib diisi.',
-            'image.string' => 'Gambar banner harus berupa teks.',
+            'image.image' => 'Gambar banner harus berupa file gambar.',
+            'image.mimes' => 'Gambar banner harus berformat jpg, jpeg, atau png.',
+            'image.max' => 'Ukuran gambar banner maksimal 2MB.',
         ]);
 
         if ($request->hasFile('image')) {
@@ -102,7 +104,7 @@ class BannerController extends Controller
             $request->merge(['image' => $imagePath]);
         }
 
-        $banner->update($request->only(['title', 'description', 'image']));
+        $banner->update($request->only(['name', 'description', 'image']));
 
 
         return response()->json([

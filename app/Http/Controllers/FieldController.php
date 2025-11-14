@@ -98,9 +98,6 @@ class FieldController extends Controller
         ], 200);
     }
 
-    /**
-     * Update data lapangan
-     */
     public function update(Request $request, $id)
     {
         $field = Field::find($id);
@@ -171,9 +168,6 @@ class FieldController extends Controller
         ], 200);
     }
 
-    /**
-     * Hapus lapangan
-     */
     public function destroy($id)
     {
         $field = Field::find($id);
