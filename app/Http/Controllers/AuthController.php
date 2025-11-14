@@ -87,7 +87,6 @@ class AuthController extends Controller
             'message' => 'Registrasi berhasil. Silakan periksa email Anda untuk verifikasi akun.'
         ], 201);
     }
-    public function sendcode() {}
 
     public function verifyCode(Request $request)
     {

@@ -8,7 +8,5 @@ use PhpParser\Node\Stmt\Return_;
 
 class UserController extends Controller
 {
-    public function index(){
-        return view('halaman1');
-    }
+    //
 }
