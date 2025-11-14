@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use Carbon\Carbon;
-use App\Mail\VerifyEmail;
 
 class AuthController extends Controller
 {
@@ -88,7 +87,7 @@ class AuthController extends Controller
             'message' => 'Registrasi berhasil. Silakan periksa email Anda untuk verifikasi akun.'
         ], 201);
     }
-
+    public function sendcode() {}
 
     public function verifyCode(Request $request)
     {
@@ -123,6 +122,44 @@ class AuthController extends Controller
             'message' => 'Email berhasil diverifikasi!',
             'user' => $user,
         ]);
+    }
+
+    public function resendCode(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Email tidak ditemukan.'], 404);
+        }
+
+        // Cegah spam: minimal 1 menit antar pengiriman
+        if ($user->last_email_sent_at && Carbon::parse($user->last_email_sent_at)->diffInSeconds(now()) < 60) {
+            $wait = 60 - Carbon::parse($user->last_email_sent_at)->diffInSeconds(now());
+            return response()->json(['message' => "Tunggu $wait detik sebelum mengirim ulang kode."], 429);
+        }
+
+        // Buat kode baru
+        $verificationCode = random_int(100000, 999999);
+
+        $user->update([
+            'verification_code' => $verificationCode,
+            'verification_code_expires_at' => now()->addMinutes(10),
+            'last_email_sent_at' => now(),
+        ]);
+
+        // Kirim email (contoh sederhana)
+        Mail::raw("Kode verifikasi Anda adalah: $verificationCode", function ($message) use ($user) {
+            $message->to($user->email)
+                ->subject('Kode Verifikasi Akun Anda');
+        });
+
+        return response()->json(['message' => 'Kode verifikasi baru telah dikirim ke email Anda.']);
     }
 
     public function login(Request $request)
