@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\FieldController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\ScheduleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
@@ -39,4 +40,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/gallery', [GalleryController::class, 'store']);
     Route::put('/gallery/{id}', [GalleryController::class, 'update']);
     Route::delete('/gallery/{id}', [GalleryController::class, 'destroy']);
+
+    Route::get('/schedule', [ScheduleController::class, 'index']);
+    Route::get('/schedule/{id}', [ScheduleController::class, 'show']);
+    Route::post('/schedule', [ScheduleController::class, 'store']);
+    Route::put('/schedule/{id}', [ScheduleController::class, 'update']);
+    Route::delete('/schedule/{id}', [ScheduleController::class, 'destroy']);
 });

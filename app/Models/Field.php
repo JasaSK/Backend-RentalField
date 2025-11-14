@@ -22,19 +22,18 @@ class Field extends Model
         'status',
     ];
 
-    /**
-     * Accessor: format harga agar lebih mudah dibaca (opsional)
-     */
     public function getFormattedPriceAttribute()
     {
         return 'Rp ' . number_format($this->price_per_hour, 0, ',', '.');
     }
 
-    /**
-     * Scope: ambil hanya lapangan yang tersedia
-     */
     public function scopeAvailable($query)
     {
         return $query->where('status', 'available');
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
     }
 }
