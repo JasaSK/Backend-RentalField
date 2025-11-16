@@ -36,4 +36,9 @@ class Field extends Model
     {
         return $this->hasMany(Schedule::class);
     }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
 }

@@ -5,6 +5,7 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\FieldController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ScheduleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -53,4 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/booking', [BookingController::class, 'store']);
     Route::put('/booking/{id}', [BookingController::class, 'update']);
     Route::delete('/booking/{id}', [BookingController::class, 'destroy']);
+
 });
+Route::post('/payment/create/{booking_id}', [PaymentController::class, 'createPayment']);
+Route::post('/payment/midtrans-callback', [PaymentController::class, 'midtransCallback']);

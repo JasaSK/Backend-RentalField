@@ -17,4 +17,14 @@ class Booking extends Model
         'code_booking',
         'total_price'
     ];
+
+    public function field()
+    {
+        return $this->belongsTo(Field::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

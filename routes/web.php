@@ -3,6 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use Carbon\Carbon;
+// contoh untuk L5-Swagger
+Route::get('/', function () {
+    return view('beranda');
+});
 
 Route::get('/verify/{code}', function ($code) {
     $user = User::where('verification_code', $code)->first();
