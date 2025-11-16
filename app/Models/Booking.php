@@ -14,5 +14,7 @@ class Booking extends Model
         'start_time',
         'end_time',
         'status',
+        'code_booking',
+        'total_price'
     ];
 }

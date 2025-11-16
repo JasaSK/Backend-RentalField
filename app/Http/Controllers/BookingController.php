@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\Field;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class BookingController extends Controller
 {
@@ -61,11 +62,9 @@ class BookingController extends Controller
             'end_time.required' => 'Waktu selesai tidak boleh kosong.',
             'end_time.date_format' => 'Format waktu selesai tidak valid (HH:MM).',
             'end_time.after' => 'Waktu selesai harus setelah waktu mulai.',
-
-
         ]);
 
-        // Cek booking bentrok
+        // Cek bentrok booking lain
         $conflict = Booking::where('field_id', $request->field_id)
             ->where('date', $request->date)
             ->where(function ($query) use ($request) {
@@ -81,7 +80,7 @@ class BookingController extends Controller
             ], 409);
         }
 
-        // Cek maintenance bentrok
+        // Cek maintenance
         $maintenanceConflict = Schedule::where('field_id', $request->field_id)
             ->where('date', $request->date)
             ->where(function ($query) use ($request) {
@@ -97,7 +96,7 @@ class BookingController extends Controller
             ], 409);
         }
 
-        // Cek status lapangan
+        // Cek lapangan
         $field = Field::find($request->field_id);
         if ($field->status !== 'available') {
             return response()->json([
@@ -106,7 +105,7 @@ class BookingController extends Controller
             ], 400);
         }
 
-        // Validasi jam buka - jam tutup lapangan
+        // Cek jam buka
         if ($request->start_time < $field->open_time) {
             return response()->json([
                 'success' => false,
@@ -114,6 +113,7 @@ class BookingController extends Controller
             ], 400);
         }
 
+        // Cek jam tutup
         if ($request->end_time > $field->close_time) {
             return response()->json([
                 'success' => false,
@@ -121,8 +121,7 @@ class BookingController extends Controller
             ], 400);
         }
 
-
-        // Cek tanggal minimal hari ini
+        // Cek tanggal
         if ($request->date < now()->toDateString()) {
             return response()->json([
                 'success' => false,
@@ -130,8 +129,22 @@ class BookingController extends Controller
             ], 400);
         }
 
+        // Generate booking code
+        $bookingCode = 'BK-' . strtoupper(Str::random(8));
+
+        // Hitung total harga
+        $duration = (strtotime($request->end_time) - strtotime($request->start_time)) / 3600;
+        $totalPrice = $field->price_per_hour * $duration;
+
+        // Build data
+        $data = $request->all();
+        $data['code_booking'] = $bookingCode;
+        $data['status'] = 'pending';
+        $data['total_price'] = $totalPrice;
+
         // Create booking
-        $booking = Booking::create($request->all());
+        $booking = Booking::create($data);
+
 
         return response()->json([
             'success' => true,
@@ -180,8 +193,10 @@ class BookingController extends Controller
             ]
         );
 
+        // CEK BENTROK (kecuali dengan dirinya sendiri)
         $conflict = Booking::where('field_id', $request->field_id)
             ->where('date', $request->date)
+            ->where('id', '!=', $booking->id)  // ← penting!
             ->where(function ($query) use ($request) {
                 $query->where('start_time', '<', $request->end_time)
                     ->where('end_time', '>', $request->start_time);
@@ -195,7 +210,7 @@ class BookingController extends Controller
             ], 409);
         }
 
-        // Cek maintenance bentrok
+        // CEK MAINTENANCE
         $maintenanceConflict = Schedule::where('field_id', $request->field_id)
             ->where('date', $request->date)
             ->where(function ($query) use ($request) {
@@ -211,16 +226,9 @@ class BookingController extends Controller
             ], 409);
         }
 
-        // Cek status lapangan
+        // CEK JAM BUKA & TUTUP
         $field = Field::find($request->field_id);
-        if ($field->status !== 'available') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Lapangan sedang off / maintenance'
-            ], 400);
-        }
 
-        // Validasi jam buka - jam tutup lapangan
         if ($request->start_time < $field->open_time) {
             return response()->json([
                 'success' => false,
@@ -235,17 +243,17 @@ class BookingController extends Controller
             ], 400);
         }
 
+        // HITUNG ULANG TOTAL HARGA
+        $duration = (strtotime($request->end_time) - strtotime($request->start_time)) / 3600;
+        $totalPrice = $field->price_per_hour * $duration;
 
-        // Cek tanggal minimal hari ini
-        if ($request->date < now()->toDateString()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Tidak boleh booking tanggal yang sudah lewat'
-            ], 400);
-        }
+        // DATA UPDATE
+        $data = $request->all();
+        $data['total_price'] = $totalPrice;
 
-        // Create booking
-        $booking = Booking::create($request->all());
+        // UPDATE DATA
+        $booking->update($data);
+
 
         return response()->json([
             'success' => true,

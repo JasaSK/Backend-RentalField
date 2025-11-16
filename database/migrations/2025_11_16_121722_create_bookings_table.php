@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
+            $table->string('code_booking')->unique();
 
             $table->unsignedBigInteger('field_id');
             $table->unsignedBigInteger('user_id');
@@ -21,7 +22,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('fields')
                 ->onDelete('cascade');
-                
+
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
@@ -30,6 +31,7 @@ return new class extends Migration
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
+            $table->integer('total_price');
             $table->enum('status', ['pending', 'approved', 'cancelled'])->default('pending');
             $table->timestamps();
         });
