@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BannerController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\FieldController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ScheduleController;
@@ -46,4 +47,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/schedule', [ScheduleController::class, 'store']);
     Route::put('/schedule/{id}', [ScheduleController::class, 'update']);
     Route::delete('/schedule/{id}', [ScheduleController::class, 'destroy']);
+
+    Route::get('/booking', [BookingController::class, 'index']);
+    Route::get('/booking/{id}', [BookingController::class, 'show']);
+    Route::post('/booking', [BookingController::class, 'store']);
+    Route::put('/booking/{id}', [BookingController::class, 'update']);
+    Route::delete('/booking/{id}', [BookingController::class, 'destroy']);
 });
