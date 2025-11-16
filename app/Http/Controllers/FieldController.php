@@ -27,8 +27,8 @@ class FieldController extends Controller
                 'description' => 'required|string',
                 'price_per_hour' => 'required|integer',
                 'duration' => 'required|integer',
-                'open_time' => 'required',
-                'close_time' => 'required',
+                'open_time' => 'required|date_format:H:i',
+                'close_time' => 'required|date_format:H:i|after:open_time',
                 'status' => 'required|in:available,off',
                 'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             ],
@@ -47,7 +47,10 @@ class FieldController extends Controller
                 'duration.integer' => 'Durasi harus berupa angka.',
 
                 'open_time.required' => 'Jam buka wajib diisi.',
+                'open_time.date_format' => 'Format waktu buka tidak valid (HH:MM).',
                 'close_time.required' => 'Jam tutup wajib diisi.',
+                'close_time.after' => 'Jam tutup harus setelah jam buka.',
+                'close_time.date_format' => 'Format waktu tutup tidak valid (HH:MM).',
 
                 'status.required' => 'Status lapangan wajib diisi.',
                 'status.in' => 'Status harus bernilai "available" atau "off".',
@@ -109,39 +112,45 @@ class FieldController extends Controller
             ], 404);
         }
 
-        $request->validate([
-            'name' => 'sometimes|required|string|max:100',
-            'description' => 'sometimes|required|string',
-            'price_per_hour' => 'sometimes|required|integer',
-            'duration' => 'sometimes|required|integer',
-            'open_time' => 'sometimes|required',
-            'close_time' => 'sometimes|required',
-            'status' => 'sometimes|required|in:available,off',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ], [
-            'name.required' => 'Nama lapangan wajib diisi.',
-            'name.string' => 'Nama lapangan harus berupa teks.',
-            'name.max' => 'Nama lapangan maksimal 100 karakter.',
+        $request->validate(
+            [
+                'name' => 'required|string|max:100',
+                'description' => 'required|string',
+                'price_per_hour' => 'required|integer',
+                'duration' => 'required|integer',
+                'open_time' => 'required|date_format:H:i',
+                'close_time' => 'required|date_format:H:i|after:open_time',
+                'status' => 'required|in:available,off',
+                'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            ],
+            [
+                'name.required' => 'Nama lapangan wajib diisi.',
+                'name.string' => 'Nama lapangan harus berupa teks.',
+                'name.max' => 'Nama lapangan maksimal 100 karakter.',
 
-            'description.required' => 'Deskripsi lapangan wajib diisi.',
-            'description.string' => 'Deskripsi harus berupa teks.',
+                'description.required' => 'Deskripsi lapangan wajib diisi.',
+                'description.string' => 'Deskripsi harus berupa teks.',
 
-            'price_per_hour.required' => 'Harga per jam wajib diisi.',
-            'price_per_hour.integer' => 'Harga per jam harus berupa angka.',
+                'price_per_hour.required' => 'Harga per jam wajib diisi.',
+                'price_per_hour.integer' => 'Harga per jam harus berupa angka.',
 
-            'duration.required' => 'Durasi wajib diisi.',
-            'duration.integer' => 'Durasi harus berupa angka.',
+                'duration.required' => 'Durasi wajib diisi.',
+                'duration.integer' => 'Durasi harus berupa angka.',
 
-            'open_time.required' => 'Jam buka wajib diisi.',
-            'close_time.required' => 'Jam tutup wajib diisi.',
+                'open_time.required' => 'Jam buka wajib diisi.',
+                'open_time.date_format' => 'Format waktu buka tidak valid (HH:MM).',
+                'close_time.required' => 'Jam tutup wajib diisi.',
+                'close_time.after' => 'Jam tutup harus setelah jam buka.',
+                'close_time.date_format' => 'Format waktu tutup tidak valid (HH:MM).',
 
-            'status.required' => 'Status lapangan wajib diisi.',
-            'status.in' => 'Status harus bernilai "available" atau "off".',
+                'status.required' => 'Status lapangan wajib diisi.',
+                'status.in' => 'Status harus bernilai "available" atau "off".',
 
-            'image.image' => 'File yang diunggah harus berupa gambar.',
-            'image.mimes' => 'Gambar harus berformat JPG, JPEG, atau PNG.',
-            'image.max' => 'Ukuran gambar maksimal 2MB.',
-        ]);
+                'image.image' => 'File yang diunggah harus berupa gambar.',
+                'image.mimes' => 'Gambar harus berformat JPG, JPEG, atau PNG.',
+                'image.max' => 'Ukuran gambar maksimal 2MB.',
+            ]
+        );
 
         // Update image jika ada
         if ($request->hasFile('image')) {
