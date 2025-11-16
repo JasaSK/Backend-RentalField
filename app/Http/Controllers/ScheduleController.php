@@ -66,7 +66,7 @@ class ScheduleController extends Controller
         ]);
 
         // Ambil data field untuk pengecekan jam operasional
-        $field = \App\Models\Field::find($request->field_id);
+        $field = Field::find($request->field_id);
 
         // 1. Validasi maintenance harus dalam jam buka - tutup
         if ($request->start_time < $field->open_time || $request->end_time > $field->close_time) {
@@ -134,7 +134,7 @@ class ScheduleController extends Controller
         $end_time = $request->end_time ?? $schedule->end_time;
 
         // Ambil data field
-        $field = \App\Models\Field::find($field_id);
+        $field = Field::find($field_id);
 
         // 1. Cek apakah waktu maintenance masih dalam jam operasional
         if ($start_time < $field->open_time || $end_time > $field->close_time) {
