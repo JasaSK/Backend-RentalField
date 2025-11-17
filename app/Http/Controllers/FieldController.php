@@ -8,6 +8,28 @@ use Illuminate\Support\Facades\Storage;
 
 class FieldController extends Controller
 {
+
+    public function search(Request $request)
+    {
+        $query = Field::query();
+
+        if ($request->has('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $fields = $query->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Hasil pencarian lapangan',
+            'data' => $fields
+        ], 200);
+    }
+
     public function index()
     {
         $fields = Field::all();
@@ -24,6 +46,7 @@ class FieldController extends Controller
         $request->validate(
             [
                 'name' => 'required|string|max:100',
+                'category_field_id' => 'required|exists:category_fields,id',
                 'description' => 'required|string',
                 'price_per_hour' => 'required|integer',
                 'duration' => 'required|integer',
@@ -31,11 +54,15 @@ class FieldController extends Controller
                 'close_time' => 'required|date_format:H:i|after:open_time',
                 'status' => 'required|in:available,off',
                 'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
             ],
             [
                 'name.required' => 'Nama lapangan wajib diisi.',
                 'name.string' => 'Nama lapangan harus berupa teks.',
                 'name.max' => 'Nama lapangan maksimal 100 karakter.',
+
+                'category_field_id.required' => 'Kategori lapangan wajib diisi.',
+                'category_field_id.exists' => 'Kategori lapangan tidak ditemukan.',
 
                 'description.required' => 'Deskripsi lapangan wajib diisi.',
                 'description.string' => 'Deskripsi harus berupa teks.',
@@ -69,6 +96,7 @@ class FieldController extends Controller
 
         $field = Field::create([
             'name' => $request->name,
+            'category_field_id' => $request->category_field_id,
             'description' => $request->description,
             'price_per_hour' => $request->price_per_hour,
             'duration' => $request->duration,
@@ -115,6 +143,7 @@ class FieldController extends Controller
         $request->validate(
             [
                 'name' => 'required|string|max:100',
+                'category_field_id' => 'required|exists:category_fields,id',
                 'description' => 'required|string',
                 'price_per_hour' => 'required|integer',
                 'duration' => 'required|integer',
@@ -127,6 +156,9 @@ class FieldController extends Controller
                 'name.required' => 'Nama lapangan wajib diisi.',
                 'name.string' => 'Nama lapangan harus berupa teks.',
                 'name.max' => 'Nama lapangan maksimal 100 karakter.',
+
+                'category_field_id.required' => 'Kategori lapangan wajib diisi.',
+                'category_field_id.exists' => 'Kategori lapangan tidak ditemukan.',
 
                 'description.required' => 'Deskripsi lapangan wajib diisi.',
                 'description.string' => 'Deskripsi harus berupa teks.',
@@ -162,6 +194,7 @@ class FieldController extends Controller
 
         $field->update($request->only([
             'name',
+            'category_field_id',
             'description',
             'price_per_hour',
             'duration',

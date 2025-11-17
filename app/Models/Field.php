@@ -13,6 +13,7 @@ class Field extends Model
 
     protected $fillable = [
         'name',
+        'category_field_id',
         'image',
         'description',
         'price_per_hour',
@@ -40,5 +41,10 @@ class Field extends Model
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function categoryField()
+    {
+        return $this->belongsTo(CategoryField::class);
     }
 }
