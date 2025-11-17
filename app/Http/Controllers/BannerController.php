@@ -42,6 +42,7 @@ class BannerController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
+            'status' => 'required|in:active,non-active',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ], [
             'name.required' => 'Judul banner wajib diisi.',
@@ -50,6 +51,9 @@ class BannerController extends Controller
 
             'description.required' => 'Deskripsi banner wajib diisi.',
             'description.string' => 'Deskripsi banner harus berupa teks.',
+
+            'status.required' => 'Status banner wajib diisi.',
+            'status.in' => 'Status banner harus berupa "active" atau "non-active".',
 
             'image.image' => 'Gambar banner harus berupa file gambar.',
             'image.mimes' => 'Gambar banner harus berformat jpg, jpeg, atau png.',
@@ -64,8 +68,11 @@ class BannerController extends Controller
         $banner = Banner::create([
             'name' => $request->name,
             'description' => $request->description,
-            'image' => $request->image,
+            'status' => $request->status,
+            'image' => $imagePath,
+
         ]);
+        // $banner->image = $imagePath ? url('storage/' . $imagePath) : null;
 
         return response()->json([
             'success' => true,
@@ -85,6 +92,7 @@ class BannerController extends Controller
         $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'description' => 'sometimes|required|string',
+            'status' => 'sometimes|required|in:active,non-active',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ], [
             'name.required' => 'Judul banner wajib diisi.',
@@ -93,6 +101,9 @@ class BannerController extends Controller
 
             'description.required' => 'Deskripsi banner wajib diisi.',
             'description.string' => 'Deskripsi banner harus berupa teks.',
+
+            'status.required' => 'Status banner wajib diisi.',
+            'status.in' => 'Status banner harus berupa "active" atau "non-active".',
 
             'image.image' => 'Gambar banner harus berupa file gambar.',
             'image.mimes' => 'Gambar banner harus berformat jpg, jpeg, atau png.',
@@ -104,7 +115,7 @@ class BannerController extends Controller
             $request->merge(['image' => $imagePath]);
         }
 
-        $banner->update($request->only(['name', 'description', 'image']));
+        $banner->update($request->only(['name', 'description', 'image', 'status']));
 
 
         return response()->json([

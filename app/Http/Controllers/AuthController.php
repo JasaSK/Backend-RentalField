@@ -110,7 +110,6 @@ class AuthController extends Controller
         if (Carbon::now()->greaterThan($user->verification_code_expires_at)) {
             return response()->json(['message' => 'Kode verifikasi sudah kadaluarsa.'], 400);
         }
-
         $user->update([
             'email_verified_at' => now(),
             'verification_code' => null,
