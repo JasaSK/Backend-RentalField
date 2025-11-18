@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Gallery;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
@@ -142,6 +143,10 @@ class GalleryController extends Controller
                 'success' => false,
                 'message' => 'Galery tidak ditemukan',
             ], 404);
+        }
+
+        if ($galery->image && Storage::disk('public')->exists($galery->image)) {
+            Storage::disk('public')->delete($galery->image);
         }
 
         $galery->delete();

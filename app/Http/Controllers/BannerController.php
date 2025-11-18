@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Banner;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BannerController extends Controller
 {
@@ -94,42 +95,39 @@ class BannerController extends Controller
             'description' => 'sometimes|required|string',
             'status' => 'sometimes|required|in:active,non-active',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ], [
-            'name.required' => 'Judul banner wajib diisi.',
-            'name.string' => 'Judul banner harus berupa teks.',
-            'name.max' => 'Judul banner maksimal 255 karakter.',
-
-            'description.required' => 'Deskripsi banner wajib diisi.',
-            'description.string' => 'Deskripsi banner harus berupa teks.',
-
-            'status.required' => 'Status banner wajib diisi.',
-            'status.in' => 'Status banner harus berupa "active" atau "non-active".',
-
-            'image.image' => 'Gambar banner harus berupa file gambar.',
-            'image.mimes' => 'Gambar banner harus berformat jpg, jpeg, atau png.',
-            'image.max' => 'Ukuran gambar banner maksimal 2MB.',
         ]);
+
+        $data = $request->only(['name', 'description', 'status']);
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('banners', 'public');
-            $request->merge(['image' => $imagePath]);
+            $data['image'] = $imagePath; // pastikan string path disimpan
         }
 
-        $banner->update($request->only(['name', 'description', 'image', 'status']));
+        $banner->update($data); // pakai update langsung
 
+        $bannerArray = $banner->toArray();
+        if (!empty($banner->image)) {
+            $bannerArray['image'] = url('storage/' . $banner->image);
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Banner berhasil diperbarui',
-            'data' => $banner
+            'data' => $bannerArray
         ], 200);
     }
+
     public function destroy($id)
     {
         $banner = Banner::find($id);
 
         if (!$banner) {
             return response()->json(['message' => 'Banner tidak ditemukan'], 404);
+        }
+
+        if ($banner->image && Storage::disk('public')->exists($banner->image)) {
+            Storage::disk('public')->delete($banner->image);
         }
 
         $banner->delete();
