@@ -12,7 +12,7 @@
     <div style="background-color:#13810A; padding:20px 0; text-align:center;">
         <h1 style="color:#ffffff; font-size:24px; margin:0;">Your Email Verification Code</h1>
     </div>
-
+    {{-- ini coba commit --}}
     <!-- Main Container -->
     <div
         style="max-width:600px; background-color:#ffffff; margin:40px auto; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1); padding:30px; text-align:center;">
