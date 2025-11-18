@@ -95,6 +95,20 @@ class BannerController extends Controller
             'description' => 'sometimes|required|string',
             'status' => 'sometimes|required|in:active,non-active',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ],[
+            'name.required' => 'Judul banner wajib diisi.',
+            'name.string' => 'Judul banner harus berupa teks.',
+            'name.max' => 'Judul banner maksimal 255 karakter.',
+
+            'description.required' => 'Deskripsi banner wajib diisi.',
+            'description.string' => 'Deskripsi banner harus berupa teks.',
+
+            'status.required' => 'Status banner wajib diisi.',
+            'status.in' => 'Status banner harus berupa "active" atau "non-active".',
+
+            'image.image' => 'Gambar banner harus berupa file gambar.',
+            'image.mimes' => 'Gambar banner harus berformat jpg, jpeg, atau png.',
+            'image.max' => 'Ukuran gambar banner maksimal 2MB.',
         ]);
 
         // Ambil semua data yang boleh diupdate
