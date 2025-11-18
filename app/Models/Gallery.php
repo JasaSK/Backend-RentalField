@@ -11,5 +11,11 @@ class Gallery extends Model
         'name',
         'description',
         'image',
+        'category_gallery_id',
     ];
+
+    public function categoryGallery()
+    {
+        return $this->belongsTo(CategoryGallery::class, 'category_gallery_id');
+    }
 }

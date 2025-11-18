@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('galleries', function (Blueprint $table) {
+        Schema::create('category_galleries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_gallery_id')->constrained('category_galleries')->onDelete('cascade');
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->string('image')->nullable();
+            $table->string('name', 100);
             $table->timestamps();
         });
     }
@@ -26,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('category_galleries');
     }
 };

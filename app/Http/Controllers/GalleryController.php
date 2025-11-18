@@ -19,6 +19,7 @@ class GalleryController extends Controller
                 'data' => []
             ], 404);
         }
+        $galeries->load('categoryGallery');
         return response()->json([
             'success' => true,
             'message' => 'List data galery',
@@ -37,6 +38,7 @@ class GalleryController extends Controller
                 'data' => null
             ], 404);
         }
+        $galery->load('categoryGallery');
 
         return response()->json([
             'success' => true,
@@ -52,6 +54,7 @@ class GalleryController extends Controller
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'image' => 'nullable|image|max:2048',
+                'category_gallery_id' => 'required|exists:category_galleries,id',
             ],
             [
                 'name.required' => 'Nama galery wajib diisi.',
@@ -62,6 +65,9 @@ class GalleryController extends Controller
 
                 'image.image' => 'File yang diunggah harus berupa gambar.',
                 'image.max' => 'Ukuran gambar maksimal 2MB.',
+
+                'category_gallery_id.required' => 'Kategori galery wajib diisi.',
+                'category_gallery_id.exists' => 'Kategori galery tidak ditemukan.',
             ]
         );
 
@@ -74,7 +80,10 @@ class GalleryController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'image' => $imagePath,
+            'category_gallery_id' => $request->category_gallery_id,
         ]);
+
+        $galery->load('categoryGallery');
 
         return response()->json([
             'success' => true,
@@ -99,6 +108,7 @@ class GalleryController extends Controller
                 'name' => 'sometimes|required|string|max:255',
                 'description' => 'sometimes|nullable|string',
                 'image' => 'sometimes|nullable|image|max:2048',
+                'category_gallery_id' => 'sometimes|required|exists:category_galleries,id',
             ],
             [
                 'name.required' => 'Nama galery wajib diisi.',
@@ -109,28 +119,37 @@ class GalleryController extends Controller
 
                 'image.image' => 'File yang diunggah harus berupa gambar.',
                 'image.max' => 'Ukuran gambar maksimal 2MB.',
+
+                'category_gallery_id.required' => 'Kategori galery wajib diisi.',
+                'category_gallery_id.exists' => 'Kategori galery tidak ditemukan.',
             ]
         );
 
+        $data = $request->only(['name', 'description', 'category_gallery_id']);
+
         if ($request->hasFile('image')) {
+            // Hapus gambar lama jika ada
+            if ($galery->image && Storage::disk('public')->exists($galery->image)) {
+                Storage::disk('public')->delete($galery->image);
+            }
+            // Simpan gambar baru
             $imagePath = $request->file('image')->store('galleries', 'public');
             $galery->image = $imagePath;
         }
 
-        if ($request->has('name')) {
-            $galery->name = $request->name;
+        $galery->update($data);
+
+        $galery->load('categoryGallery');
+        $galeryArray = $galery->toArray();
+        if ($galery->image) {
+            $galeryArray['image_url'] = url('storage/' . $galery->image);
+        } else {
+            $galeryArray['image_url'] = null;
         }
-
-        if ($request->has('description')) {
-            $galery->description = $request->description;
-        }
-
-        $galery->save();
-
         return response()->json([
             'success' => true,
             'message' => 'Galery berhasil diperbarui',
-            'data' => $galery
+            'data' => $galeryArray
         ], 200);
     }
 

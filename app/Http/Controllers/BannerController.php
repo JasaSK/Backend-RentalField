@@ -97,13 +97,19 @@ class BannerController extends Controller
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $data = $request->only(['name', 'description', 'status']);
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('banners', 'public');
-            $data['image'] = $imagePath; // pastikan string path disimpan
-        }
+            // Hapus gambar lama jika ada
+            if ($banner->image && Storage::disk('public')->exists($banner->image)) {
+                Storage::disk('public')->delete($banner->image);
+            }
 
+            // Simpan gambar baru
+            $imagePath = $request->file('image')->store('banners', 'public');
+            $data['image'] = $imagePath;
+        }
+        
+        $data = $request->only(['name', 'description', 'status']);
         $banner->update($data); // pakai update langsung
 
         $bannerArray = $banner->toArray();
