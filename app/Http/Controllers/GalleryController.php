@@ -125,27 +125,34 @@ class GalleryController extends Controller
             ]
         );
 
+        // Ambil data yang boleh diupdate
         $data = $request->only(['name', 'description', 'category_gallery_id']);
 
+        // Jika ada gambar, proses upload
         if ($request->hasFile('image')) {
+
             // Hapus gambar lama jika ada
             if ($galery->image && Storage::disk('public')->exists($galery->image)) {
                 Storage::disk('public')->delete($galery->image);
             }
-            // Simpan gambar baru
+
+            // Upload baru
             $imagePath = $request->file('image')->store('galleries', 'public');
-            $galery->image = $imagePath;
+
+            // Masukkan ke $data agar ikut diupdate
+            $data['image'] = $imagePath;
         }
 
+        // Update gallery sekali saja
         $galery->update($data);
 
+        // Load relasi category
         $galery->load('categoryGallery');
+
+        // Format response
         $galeryArray = $galery->toArray();
-        if ($galery->image) {
-            $galeryArray['image_url'] = url('storage/' . $galery->image);
-        } else {
-            $galeryArray['image_url'] = null;
-        }
+        $galeryArray['image_url'] = $galery->image ? url('storage/' . $galery->image) : null;
+
         return response()->json([
             'success' => true,
             'message' => 'Galery berhasil diperbarui',
