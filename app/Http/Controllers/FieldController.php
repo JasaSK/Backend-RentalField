@@ -22,6 +22,7 @@ class FieldController extends Controller
         }
 
         $fields = $query->get();
+        $fields->load('categoryField');
 
         return response()->json([
             'success' => true,
@@ -34,6 +35,14 @@ class FieldController extends Controller
     {
         $fields = Field::all();
 
+        if ($fields->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data lapangan kosong',
+                'data' => []
+            ], 404);
+        }
+        $fields->load('categoryField');
         return response()->json([
             'success' => true,
             'message' => 'List data lapangan',
@@ -49,10 +58,9 @@ class FieldController extends Controller
                 'category_field_id' => 'required|exists:category_fields,id',
                 'description' => 'required|string',
                 'price_per_hour' => 'required|integer',
-                'duration' => 'required|integer',
                 'open_time' => 'required|date_format:H:i',
                 'close_time' => 'required|date_format:H:i|after:open_time',
-                'status' => 'required|in:available,off',
+                'status' => 'required|in:available,closed,maintenance,booked,pending',
                 'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
 
             ],
@@ -70,9 +78,6 @@ class FieldController extends Controller
                 'price_per_hour.required' => 'Harga per jam wajib diisi.',
                 'price_per_hour.integer' => 'Harga per jam harus berupa angka.',
 
-                'duration.required' => 'Durasi wajib diisi.',
-                'duration.integer' => 'Durasi harus berupa angka.',
-
                 'open_time.required' => 'Jam buka wajib diisi.',
                 'open_time.date_format' => 'Format waktu buka tidak valid (HH:MM).',
                 'close_time.required' => 'Jam tutup wajib diisi.',
@@ -80,7 +85,7 @@ class FieldController extends Controller
                 'close_time.date_format' => 'Format waktu tutup tidak valid (HH:MM).',
 
                 'status.required' => 'Status lapangan wajib diisi.',
-                'status.in' => 'Status harus bernilai "available" atau "off".',
+                'status.in' => 'Status harus bernilai "available", "closed", "maintenance", "booked", atau "pending".',
 
                 'image.image' => 'File yang diunggah harus berupa gambar.',
                 'image.mimes' => 'Gambar harus berformat JPG, JPEG, atau PNG.',
@@ -91,7 +96,7 @@ class FieldController extends Controller
         // Upload image jika ada
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('uploads/fields', 'public');
+            $imagePath = $request->file('image')->store('fields', 'public');
         }
 
         $field = Field::create([
@@ -99,12 +104,13 @@ class FieldController extends Controller
             'category_field_id' => $request->category_field_id,
             'description' => $request->description,
             'price_per_hour' => $request->price_per_hour,
-            'duration' => $request->duration,
             'open_time' => $request->open_time,
             'close_time' => $request->close_time,
             'status' => $request->status,
             'image' => $imagePath,
         ]);
+
+        $field->load('categoryField');
 
         return response()->json([
             'success' => true,
@@ -122,6 +128,8 @@ class FieldController extends Controller
                 'message' => 'Lapangan tidak ditemukan'
             ], 404);
         }
+
+        $field->load('categoryField');
 
         return response()->json([
             'success' => true,
@@ -144,12 +152,11 @@ class FieldController extends Controller
             [
                 'name' => 'required|string|max:100',
                 'category_field_id' => 'required|exists:category_fields,id',
-                'description' => 'required|string',
                 'price_per_hour' => 'required|integer',
                 'duration' => 'required|integer',
                 'open_time' => 'required|date_format:H:i',
                 'close_time' => 'required|date_format:H:i|after:open_time',
-                'status' => 'required|in:available,off',
+                'status' => 'required|in:avalilable,closed,maintenance,booked,pending',
                 'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             ],
             [
@@ -166,9 +173,6 @@ class FieldController extends Controller
                 'price_per_hour.required' => 'Harga per jam wajib diisi.',
                 'price_per_hour.integer' => 'Harga per jam harus berupa angka.',
 
-                'duration.required' => 'Durasi wajib diisi.',
-                'duration.integer' => 'Durasi harus berupa angka.',
-
                 'open_time.required' => 'Jam buka wajib diisi.',
                 'open_time.date_format' => 'Format waktu buka tidak valid (HH:MM).',
                 'close_time.required' => 'Jam tutup wajib diisi.',
@@ -176,7 +180,7 @@ class FieldController extends Controller
                 'close_time.date_format' => 'Format waktu tutup tidak valid (HH:MM).',
 
                 'status.required' => 'Status lapangan wajib diisi.',
-                'status.in' => 'Status harus bernilai "available" atau "off".',
+                'status.in' => 'Status harus bernilai "available", "closed", "maintenance", "booked", atau "pending".',
 
                 'image.image' => 'File yang diunggah harus berupa gambar.',
                 'image.mimes' => 'Gambar harus berformat JPG, JPEG, atau PNG.',
@@ -189,7 +193,7 @@ class FieldController extends Controller
             if ($field->image && Storage::disk('public')->exists($field->image)) {
                 Storage::disk('public')->delete($field->image);
             }
-            $field->image = $request->file('image')->store('uploads/fields', 'public');
+            $field->image = $request->file('image')->store('fields', 'public');
         }
 
         $field->update($request->only([
@@ -197,11 +201,11 @@ class FieldController extends Controller
             'category_field_id',
             'description',
             'price_per_hour',
-            'duration',
             'open_time',
             'close_time',
             'status'
         ]));
+        $field->load('categoryField');
 
         return response()->json([
             'success' => true,
@@ -226,6 +230,8 @@ class FieldController extends Controller
         }
 
         $field->delete();
+
+        $field->load('categoryField');
 
         return response()->json([
             'success' => true,

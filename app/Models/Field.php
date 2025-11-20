@@ -17,7 +17,6 @@ class Field extends Model
         'image',
         'description',
         'price_per_hour',
-        'duration',
         'open_time',
         'close_time',
         'status',

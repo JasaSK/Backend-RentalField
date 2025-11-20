@@ -28,27 +28,27 @@ Route::get('/banners/{id}', [BannerController::class, 'show']);
 Route::get('/galleries', [GalleryController::class, 'index']);
 Route::get('/galleries/{id}', [GalleryController::class, 'show']);
 
-Route::get('/field', [FieldController::class, 'index']);
-Route::get('/field/{id}', [FieldController::class, 'show']);
+Route::get('/fields', [FieldController::class, 'index']);
+Route::get('/fields/{id}', [FieldController::class, 'show']);
 
 Route::get('/schedule', [ScheduleController::class, 'index']);
 Route::get('/schedule/{id}', [ScheduleController::class, 'show']);
 
-Route::get('/category-field', [CategoryFieldController::class, 'index']);
-Route::get('/category-field/{id}', [CategoryFieldController::class, 'show']);
+Route::get('/category-fields', [CategoryFieldController::class, 'index']);
+Route::get('/category-fields/{id}', [CategoryFieldController::class, 'show']);
 
 Route::get('/category-gallery', [CategoryGalleryController::class, 'index']);
 Route::get('/category-gallery/{id}', [CategoryGalleryController::class, 'show']);
 
 Route::middleware(['auth:sanctum', RoleMiddleware::class . ':admin'])->group(function () {
 
-    Route::post('/category-field', [CategoryFieldController::class, 'store']);
-    Route::put('/category-field/{id}', [CategoryFieldController::class, 'update']);
-    Route::delete('/category-field/{id}', [CategoryFieldController::class, 'destroy']);
+    Route::post('/category-fields', [CategoryFieldController::class, 'store']);
+    Route::put('/category-fields/{id}', [CategoryFieldController::class, 'update']);
+    Route::delete('/category-fields/{id}', [CategoryFieldController::class, 'destroy']);
 
-    Route::post('/field', [FieldController::class, 'store']);
-    Route::put('/field/{id}', [FieldController::class, 'update']);
-    Route::delete('/field/{id}', [FieldController::class, 'destroy']);
+    Route::post('/fields', [FieldController::class, 'store']);
+    Route::put('/fields/{id}', [FieldController::class, 'update']);
+    Route::delete('/fields/{id}', [FieldController::class, 'destroy']);
 
     Route::post('/banners', [BannerController::class, 'store']);
     Route::put('/banners/{id}', [BannerController::class, 'update']);

@@ -65,11 +65,11 @@ class PaymentController extends Controller
         $booking = Booking::find($booking_id);
 
         if ($status == 'settlement') {
-            $booking->status = 'approved'; // atau 'paid' kalau mau
+            $booking->status = 'approved'; 
         } elseif ($status == 'pending') {
             $booking->status = 'pending';
         } else {
-            $booking->status = 'cancelled'; // misal failed
+            $booking->status = 'cancelled';
         }
 
         $booking->save();

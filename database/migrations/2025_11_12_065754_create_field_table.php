@@ -18,10 +18,9 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->text('description');
             $table->integer('price_per_hour');
-            $table->integer('duration');
             $table->time('open_time');
-            $table->time('close_time'); 
-            $table->enum('status', ['available', 'off'])->default('available');
+            $table->time('close_time');
+            $table->enum('status', ['available', 'maintenance', 'booked', 'closed', 'pending'])->default('available');
             $table->timestamps();
         });
     }

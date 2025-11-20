@@ -15,7 +15,7 @@
     <!-- Main Container -->
     <div
         style="max-width:600px; background-color:#ffffff; margin:40px auto; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1); padding:30px; text-align:center;">
-        <p style="color:#333; font-size:16px; margin-bottom:15px;">Halo, <strong>{{ $user->n    ame }}</strong> 👋</p>
+        <p style="color:#333; font-size:16px; margin-bottom:15px;">Halo, <strong>{{ $user->name }}</strong> 👋</p>
 
         <p style="color:#555; margin-bottom:20px;">
             Terima kasih telah mendaftar di <span style="color:#13810A; font-weight:bold;">EZFutsal</span>.
