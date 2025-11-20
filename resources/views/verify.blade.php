@@ -7,7 +7,7 @@
     <title>Email Verification | EZFutsal</title>
 </head>
 
-<body style="background-color:#f7f7f7; font-family: Arial, sans-serif; margin:0; padding:0;">
+<body style="background-color:#f7f7f7; font-family: Arial, sans-seri    f; margin:0; padding:0;">
     <!-- Header -->
     <div style="background-color:#13810A; padding:20px 0; text-align:center;">
         <h1 style="color:#ffffff; font-size:24px; margin:0;">Your Email Verification Code</h1>
@@ -15,7 +15,7 @@
     <!-- Main Container -->
     <div
         style="max-width:600px; background-color:#ffffff; margin:40px auto; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1); padding:30px; text-align:center;">
-        <p style="color:#333; font-size:16px; margin-bottom:15px;">Halo, <strong>{{ $user->name }}</strong> 👋</p>
+        <p style="color:#333; font-size:16px; margin-bottom:15px;">Halo, <strong>{{ $user->n    ame }}</strong> 👋</p>
 
         <p style="color:#555; margin-bottom:20px;">
             Terima kasih telah mendaftar di <span style="color:#13810A; font-weight:bold;">EZFutsal</span>.
