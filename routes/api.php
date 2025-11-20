@@ -40,7 +40,7 @@ Route::get('/category-fields/{id}', [CategoryFieldController::class, 'show']);
 Route::get('/category-gallery', [CategoryGalleryController::class, 'index']);
 Route::get('/category-gallery/{id}', [CategoryGalleryController::class, 'show']);
 
-Route::middleware(['auth:sanctum', RoleMiddleware::class . ':admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
     Route::post('/category-fields', [CategoryFieldController::class, 'store']);
     Route::put('/category-fields/{id}', [CategoryFieldController::class, 'update']);

@@ -153,10 +153,9 @@ class FieldController extends Controller
                 'name' => 'required|string|max:100',
                 'category_field_id' => 'required|exists:category_fields,id',
                 'price_per_hour' => 'required|integer',
-                'duration' => 'required|integer',
                 'open_time' => 'required|date_format:H:i',
                 'close_time' => 'required|date_format:H:i|after:open_time',
-                'status' => 'required|in:avalilable,closed,maintenance,booked,pending',
+                'status' => 'required|in:available,closed,maintenance,booked,pending',
                 'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             ],
             [
@@ -166,9 +165,6 @@ class FieldController extends Controller
 
                 'category_field_id.required' => 'Kategori lapangan wajib diisi.',
                 'category_field_id.exists' => 'Kategori lapangan tidak ditemukan.',
-
-                'description.required' => 'Deskripsi lapangan wajib diisi.',
-                'description.string' => 'Deskripsi harus berupa teks.',
 
                 'price_per_hour.required' => 'Harga per jam wajib diisi.',
                 'price_per_hour.integer' => 'Harga per jam harus berupa angka.',
