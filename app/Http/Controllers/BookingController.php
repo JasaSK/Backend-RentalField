@@ -20,7 +20,7 @@ class BookingController extends Controller
                 'message' => 'No bookings found'
             ], 404);
         }
-
+        $bookings->load('user', 'field');
         return response()->json($bookings);
     }
 
