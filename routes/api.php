@@ -30,6 +30,7 @@ Route::get('/galleries/{id}', [GalleryController::class, 'show']);
 
 Route::get('/fields', [FieldController::class, 'index']);
 Route::get('/fields/{id}', [FieldController::class, 'show']);
+Route::post('/fields/search', [FieldController::class, 'search']);
 
 Route::get('/schedule', [ScheduleController::class, 'index']);
 Route::get('/schedule/{id}', [ScheduleController::class, 'show']);

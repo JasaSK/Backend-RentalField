@@ -13,16 +13,36 @@ class FieldController extends Controller
     {
         $query = Field::query();
 
-        if ($request->has('name')) {
-            $query->where('name', 'like', '%' . $request->name . '%');
+        // Filter tipe lapangan
+        if ($request->filled('category_field_id')) {
+            $query->where('category_field_id', $request->category_field_id);
         }
 
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
+        if ($request->filled('open_time') || $request->filled('close_time')) {
+            $query->where(function ($q) use ($request) {
+                if ($request->filled('open_time') && $request->filled('close_time')) {
+                    $q->where('open_time', '<', $request->close_time)
+                        ->where('close_time', '>', $request->open_time);
+                } elseif ($request->filled('open_time')) {
+                    $q->where('close_time', '>', $request->open_time);
+                } elseif ($request->filled('close_time')) {
+                    $q->where('open_time', '<', $request->close_time);
+                }
+            });
+        }
+        // dd($request->all());
+        $fields = $query->with('categoryField')->get();
+
+        if ($fields->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lapangan tidak ditemukan',
+                'data' => []
+            ], 200);
         }
 
-        $fields = $query->get();
-        $fields->load('categoryField');
+        // Jika cuma ingin 1 data saja bisa pakai first()
+        // $field = $fields->first();
 
         return response()->json([
             'success' => true,
