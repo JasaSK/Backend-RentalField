@@ -26,54 +26,76 @@ class PaymentController extends Controller
     {
         $booking = Booking::findOrFail($booking_id);
 
-        // payload Snap
         $params = [
             'transaction_details' => [
-                'order_id' => 'BOOK-' . $booking->id . '-' . time(),
-                'gross_amount' => $booking->total_price,
+                'order_id' => $booking->code_booking,      // 🔥 GUNAKAN INI
+                'gross_amount' => (int) $booking->total_price,
             ],
-            'enabled_payments' => ['qris'],  // QRIS only
+            'enabled_payments' => ['qris'],
             'customer_details' => [
                 'first_name' => $booking->user->name,
                 'email' => $booking->user->email,
             ],
         ];
 
-        $snapToken = Snap::getSnapToken($params);
-
-        return response()->json([
-            'snap_token' => $snapToken
-        ]);
+        try {
+            $snapToken = Snap::getSnapToken($params);
+            return response()->json(['snap_token' => $snapToken]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'params_sent' => $params
+            ], 500);
+        }
     }
 
-    // CALLBACK
+    public function createQrisPayment($booking_id)
+    {
+        $booking = Booking::findOrFail($booking_id);
+
+        // Pastikan order_id selalu unik
+        $orderId = $booking->code_booking . '-' . uniqid();
+
+        $params = [
+            "payment_type" => "qris",
+            "transaction_details" => [
+                "order_id" => $orderId,
+                "gross_amount" => (int) $booking->total_price,
+            ],
+        ];
+
+        try {
+            $response = \Midtrans\CoreApi::charge($params);
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
     public function midtransCallback(Request $request)
     {
-        $orderId = $request->order_id;
-        $status = $request->transaction_status;
-        $fraud = $request->fraud_status;
+        $orderId = $request->order_id; // contoh: BK-YNGE5GQG
 
-        // get booking id
-        $booking_id = explode('-', $orderId)[1];
-        $booking = Booking::find($booking_id);
+        $booking = Booking::where('code_booking', $orderId)->first();
 
         if (!$booking) {
             return response()->json(['message' => 'Booking not found'], 404);
         }
 
-        $booking_id = explode('-', $orderId)[1];
-        $booking = Booking::find($booking_id);
+        $status = $request->transaction_status;
 
-        if ($status == 'settlement') {
-            $booking->status = 'approved'; // atau 'paid' kalau mau
-        } elseif ($status == 'pending') {
+        if ($status === 'settlement') {
+            $booking->status = 'approved';
+        } elseif ($status === 'pending') {
             $booking->status = 'pending';
         } else {
-            $booking->status = 'cancelled'; // misal failed
+            $booking->status = 'cancelled';
         }
 
         $booking->save();
-
 
         return response()->json(['message' => 'Callback processed']);
     }
