@@ -40,8 +40,16 @@ Route::get('/category-fields/{id}', [CategoryFieldController::class, 'show']);
 
 Route::get('/category-gallery', [CategoryGalleryController::class, 'index']);
 Route::get('/category-gallery/{id}', [CategoryGalleryController::class, 'show']);
+Route::middleware(['auth:sanctum'])->group(function () {
+
+    Route::get('/booking/{id}', [BookingController::class, 'show']);
+    Route::post('/booking', [BookingController::class, 'store']);
+    Route::put('/booking/{id}', [BookingController::class, 'update']);
+    Route::delete('/booking/{id}', [BookingController::class, 'destroy']);
+});
 
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::get('/booking', [BookingController::class, 'index']);
 
     Route::post('/category-fields', [CategoryFieldController::class, 'store']);
     Route::put('/category-fields/{id}', [CategoryFieldController::class, 'update']);
@@ -66,12 +74,6 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::post('/schedule', [ScheduleController::class, 'store']);
     Route::put('/schedule/{id}', [ScheduleController::class, 'update']);
     Route::delete('/schedule/{id}', [ScheduleController::class, 'destroy']);
-
-    Route::get('/booking', [BookingController::class, 'index']);
-    Route::get('/booking/{id}', [BookingController::class, 'show']);
-    Route::post('/booking', [BookingController::class, 'store']);
-    Route::put('/booking/{id}', [BookingController::class, 'update']);
-    Route::delete('/booking/{id}', [BookingController::class, 'destroy']);
 });
 Route::post('/payment/create/{booking_id}', [PaymentController::class, 'createPayment']);
 Route::post('/payment/midtrans-callback', [PaymentController::class, 'midtransCallback']);

@@ -34,7 +34,7 @@ class BookingController extends Controller
                 'message' => 'Booking not found'
             ], 404);
         }
-
+        $booking->load('user', 'field');
         return response()->json($booking);
     }
 
@@ -145,7 +145,7 @@ class BookingController extends Controller
         // Create booking
         $booking = Booking::create($data);
 
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Booking created successfully',
