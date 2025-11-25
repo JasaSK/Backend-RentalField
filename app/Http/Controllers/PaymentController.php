@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Midtrans\Snap;
 use Midtrans\Config;
 use App\Models\Booking;
 
@@ -13,39 +12,11 @@ class PaymentController extends Controller
     {
         Config::$serverKey   = env('MIDTRANS_SERVER_KEY');
         Config::$isProduction = env('MIDTRANS_IS_PRODUCTION') === 'true';
-        Config::$isSanitized  = env('MIDTRANS_IS_SANITIZED') === 'true';
-        Config::$is3ds        = env('MIDTRANS_IS_3DS') === 'true';
+        Config::$isSanitized  = true;
+        Config::$is3ds        = false;
 
         if (!Config::$serverKey) {
             throw new \Exception("ServerKey Midtrans belum diset di .env");
-        }
-    }
-
-
-    public function createPayment($booking_id)
-    {
-        $booking = Booking::findOrFail($booking_id);
-
-        $params = [
-            'transaction_details' => [
-                'order_id' => $booking->code_booking,      // 🔥 GUNAKAN INI
-                'gross_amount' => (int) $booking->total_price,
-            ],
-            'enabled_payments' => ['qris'],
-            'customer_details' => [
-                'first_name' => $booking->user->name,
-                'email' => $booking->user->email,
-            ],
-        ];
-
-        try {
-            $snapToken = Snap::getSnapToken($params);
-            return response()->json(['snap_token' => $snapToken]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage(),
-                'params_sent' => $params
-            ], 500);
         }
     }
 
@@ -53,7 +24,7 @@ class PaymentController extends Controller
     {
         $booking = Booking::findOrFail($booking_id);
 
-        // Pastikan order_id selalu unik
+        // Order ID harus unik untuk QRIS
         $orderId = $booking->code_booking . '-' . uniqid();
 
         $params = [
@@ -66,6 +37,13 @@ class PaymentController extends Controller
 
         try {
             $response = \Midtrans\CoreApi::charge($params);
+
+            // Simpan order_id unik agar callback bisa dilacak
+            $booking->update([
+                'payment_order_id' => $orderId,
+                'status' => 'pending'
+            ]);
+
             return response()->json($response);
         } catch (\Exception $e) {
             return response()->json([
@@ -74,12 +52,12 @@ class PaymentController extends Controller
         }
     }
 
-
     public function midtransCallback(Request $request)
     {
-        $orderId = $request->order_id; // contoh: BK-YNGE5GQG
+        // Untuk QRIS, order_id berbentuk: CODEBOOKING-UNIQID
+        $orderId = $request->order_id;
 
-        $booking = Booking::where('code_booking', $orderId)->first();
+        $booking = Booking::where('payment_order_id', $orderId)->first();
 
         if (!$booking) {
             return response()->json(['message' => 'Booking not found'], 404);
