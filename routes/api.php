@@ -76,4 +76,4 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::delete('/schedule/{id}', [ScheduleController::class, 'destroy']);
 });
 Route::post('/payment/create-qris/{booking_id}', [PaymentController::class, 'createQrisPayment']);
-Route::post('/payment/midtrans-callback', [PaymentController::class, 'midtransCallback']);
+Route::post('/payment/midtrans/callback', [PaymentController::class, 'midtransCallback']);

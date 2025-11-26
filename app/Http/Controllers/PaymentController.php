@@ -58,37 +58,39 @@ class PaymentController extends Controller
     // CALLBACK
     public function midtransCallback(Request $request)
     {
+        // \Log::info('MIDTRANS CALLBACK RECEIVED', $request->all());
+
         $serverKey = config('services.midtrans.server_key');
 
-        $orderId   = $request->order_id;
-        $status    = $request->transaction_status;
-        $signature = $request->signature_key;
+        $orderId      = $request->order_id;
+        $statusCode   = $request->status_code;  // Midtrans pasti kirim
+        $grossAmount  = $request->gross_amount;
+        $signatureKey = $request->signature_key;
 
-        $grossAmount = (string) intval($request->gross_amount);
-
+        // Generate signature
         $expectedSignature = hash(
             'sha512',
             $orderId .
-                $request->status_code .
+                $statusCode .
                 $grossAmount .
                 $serverKey
         );
 
-        if ($signature !== $expectedSignature) {
+        if ($signatureKey !== $expectedSignature) {
             return response()->json(['message' => 'Invalid signature'], 403);
         }
 
-        // CARI BOOKING DARI payment_order_id
+        // Cari booking
         $booking = Booking::where('payment_order_id', $orderId)->first();
 
         if (!$booking) {
             return response()->json(['message' => 'Booking not found'], 404);
         }
 
-        // UPDATE STATUS
-        if (in_array($status, ['settlement', 'capture'])) {
+        // Update status
+        if (in_array($request->transaction_status, ['settlement', 'capture'])) {
             $booking->status = 'approved';
-        } elseif ($status === 'pending') {
+        } elseif ($request->transaction_status === 'pending') {
             $booking->status = 'pending';
         } else {
             $booking->status = 'cancelled';
