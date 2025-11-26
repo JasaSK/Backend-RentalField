@@ -141,6 +141,8 @@ class BookingController extends Controller
         $data['code_booking'] = $bookingCode;
         $data['status'] = 'pending';
         $data['total_price'] = $totalPrice;
+        $data['payment_order_id'] = null;
+
 
         // Create booking
         $booking = Booking::create($data);

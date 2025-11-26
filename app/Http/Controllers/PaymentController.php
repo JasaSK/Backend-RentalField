@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Midtrans\Config;
 use App\Models\Booking;
+use Illuminate\Support\Facades\Http;
 
 class PaymentController extends Controller
 {
     public function __construct()
     {
-        Config::$serverKey   = env('MIDTRANS_SERVER_KEY');
-        Config::$isProduction = env('MIDTRANS_IS_PRODUCTION') === 'true';
+        Config::$serverKey   = config('services.midtrans.server_key');
+        Config::$isProduction = config('services.midtrans.is_production', false);
         Config::$isSanitized  = true;
         Config::$is3ds        = false;
 
@@ -22,50 +23,70 @@ class PaymentController extends Controller
 
     public function createQrisPayment($booking_id)
     {
-        $booking = Booking::findOrFail($booking_id);
+        $booking = Booking::find($booking_id);
 
-        // Order ID harus unik untuk QRIS
+        if (!$booking) {
+            return response()->json(['message' => 'Booking tidak ditemukan'], 404);
+        }
+
+        // BUAT order_id unik
         $orderId = $booking->code_booking . '-' . uniqid();
 
-        $params = [
-            "payment_type" => "qris",
-            "transaction_details" => [
-                "order_id" => $orderId,
-                "gross_amount" => (int) $booking->total_price,
+        // SIMPAN KE DATABASE
+        $booking->update([
+            'payment_order_id' => $orderId
+        ]);
+
+        $payload = [
+            'payment_type' => 'qris',
+            'transaction_details' => [
+                'order_id' => $orderId,
+                'gross_amount' => $booking->total_price
             ],
+            'qris' => [
+                'acquirer' => 'gopay'
+            ]
         ];
 
-        try {
-            $response = \Midtrans\CoreApi::charge($params);
+        // CALL MIDTRANS API
+        $response = Http::withBasicAuth(config('services.midtrans.server_key'), '')
+            ->post('https://api.sandbox.midtrans.com/v2/charge', $payload);
 
-            // Simpan order_id unik agar callback bisa dilacak
-            $booking->update([
-                'payment_order_id' => $orderId,
-                'status' => 'pending'
-            ]);
-
-            return response()->json($response);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return $response->json();
     }
 
+    // CALLBACK
     public function midtransCallback(Request $request)
     {
-        // Untuk QRIS, order_id berbentuk: CODEBOOKING-UNIQID
-        $orderId = $request->order_id;
+        $serverKey = config('services.midtrans.server_key');
 
+        $orderId   = $request->order_id;
+        $status    = $request->transaction_status;
+        $signature = $request->signature_key;
+
+        $grossAmount = (string) intval($request->gross_amount);
+
+        $expectedSignature = hash(
+            'sha512',
+            $orderId .
+                $request->status_code .
+                $grossAmount .
+                $serverKey
+        );
+
+        if ($signature !== $expectedSignature) {
+            return response()->json(['message' => 'Invalid signature'], 403);
+        }
+
+        // CARI BOOKING DARI payment_order_id
         $booking = Booking::where('payment_order_id', $orderId)->first();
 
         if (!$booking) {
             return response()->json(['message' => 'Booking not found'], 404);
         }
 
-        $status = $request->transaction_status;
-
-        if ($status === 'settlement') {
+        // UPDATE STATUS
+        if (in_array($status, ['settlement', 'capture'])) {
             $booking->status = 'approved';
         } elseif ($status === 'pending') {
             $booking->status = 'pending';
@@ -75,6 +96,10 @@ class PaymentController extends Controller
 
         $booking->save();
 
-        return response()->json(['message' => 'Callback processed']);
+        return response()->json([
+            'message' => 'Callback processed',
+            'order_id' => $orderId,
+            'status' => $booking->status
+        ]);
     }
 }

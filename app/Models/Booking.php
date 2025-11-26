@@ -15,7 +15,8 @@ class Booking extends Model
         'end_time',
         'status',
         'code_booking',
-        'total_price'
+        'total_price',
+        'payment_order_id'
     ];
 
     public function field()
