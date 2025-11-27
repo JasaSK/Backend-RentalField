@@ -9,6 +9,7 @@ use App\Http\Controllers\FieldController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\TicketController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +47,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/booking', [BookingController::class, 'store']);
     Route::put('/booking/{id}', [BookingController::class, 'update']);
     Route::delete('/booking/{id}', [BookingController::class, 'destroy']);
+    Route::get('/booking-history', [BookingController::class, 'history']);
 });
 
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
@@ -77,3 +79,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 });
 Route::post('/payment/create-qris/{booking_id}', [PaymentController::class, 'createQrisPayment']);
 Route::post('/payment/midtrans/callback', [PaymentController::class, 'midtransCallback']);
+
+Route::get('/ticket/{id}', [TicketController::class, 'showTicket']);
+Route::get('/booking/{id}/ticket', [TicketController::class, 'downloadTicket']);
+Route::post('/ticket/verify', [TicketController::class, 'verifyTicket']);

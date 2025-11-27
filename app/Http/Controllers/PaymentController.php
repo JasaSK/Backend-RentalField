@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Midtrans\Config;
 use App\Models\Booking;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
@@ -32,10 +33,6 @@ class PaymentController extends Controller
         // BUAT order_id unik
         $orderId = $booking->code_booking . '-' . uniqid();
 
-        // SIMPAN KE DATABASE
-        $booking->update([
-            'payment_order_id' => $orderId
-        ]);
 
         $payload = [
             'payment_type' => 'qris',
@@ -51,6 +48,11 @@ class PaymentController extends Controller
         // CALL MIDTRANS API
         $response = Http::withBasicAuth(config('services.midtrans.server_key'), '')
             ->post('https://api.sandbox.midtrans.com/v2/charge', $payload);
+        // SIMPAN KE DATABASE
+        $booking->update([
+            'payment_order_id' => $orderId,
+            'qris_url' => $response['actions'][0]['url'] ?? null
+        ]);
 
         return $response->json();
     }
@@ -95,6 +97,11 @@ class PaymentController extends Controller
         } else {
             $booking->status = 'cancelled';
         }
+
+        $booking->update([
+            'status' => $booking->status,
+            'ticket_code' => $booking->ticket_code ?? strtoupper(Str::random(10)),
+        ]);
 
         $booking->save();
 

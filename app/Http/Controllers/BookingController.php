@@ -8,6 +8,8 @@ use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+
+
 class BookingController extends Controller
 {
     public function index()
@@ -280,6 +282,36 @@ class BookingController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Booking deleted successfully'
+        ], 200);
+    }
+    // Tambahkan di BookingController
+    public function history(Request $request)
+    {
+        // Ambil user_id dari user yang login (misal pakai session atau auth)
+        $user = $request->user(); // jika pakai auth:api atau sanctum
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User belum login'
+            ], 401);
+        }
+
+        // Ambil booking milik user tersebut
+        $bookings = Booking::where('user_id', $user->id)
+            ->with('field')
+            ->orderBy('date', 'desc')
+            ->get();
+
+        if ($bookings->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada booking untuk user ini'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $bookings
         ], 200);
     }
 }

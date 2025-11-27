@@ -16,10 +16,19 @@ class Booking extends Model
         'status',
         'code_booking',
         'total_price',
-        'payment_order_id'
+        'payment_order_id',
+        'ticket_code',
+        'qris_url'
     ];
 
-    public function field()
+
+/*************  ✨ Windsurf Command ⭐  *************/
+    /**
+     * Get the field that owns the Booking
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+/*******  3b8bbb9b-a7e6-41b9-8ac0-4b53e598be36  *******/    public function field()
     {
         return $this->belongsTo(Field::class);
     }
