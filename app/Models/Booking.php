@@ -20,15 +20,7 @@ class Booking extends Model
         'ticket_code',
         'qris_url'
     ];
-
-
-/*************  ✨ Windsurf Command ⭐  *************/
-    /**
-     * Get the field that owns the Booking
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-/*******  3b8bbb9b-a7e6-41b9-8ac0-4b53e598be36  *******/    public function field()
+   public function field()
     {
         return $this->belongsTo(Field::class);
     }

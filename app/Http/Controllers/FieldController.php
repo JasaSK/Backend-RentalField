@@ -13,36 +13,69 @@ class FieldController extends Controller
     {
         $query = Field::query();
 
-        // Filter tipe lapangan
+        // Filter kategori lapangan
         if ($request->filled('category_field_id')) {
             $query->where('category_field_id', $request->category_field_id);
         }
 
-        if ($request->filled('open_time') || $request->filled('close_time')) {
-            $query->where(function ($q) use ($request) {
-                if ($request->filled('open_time') && $request->filled('close_time')) {
-                    $q->where('open_time', '<', $request->close_time)
-                        ->where('close_time', '>', $request->open_time);
-                } elseif ($request->filled('open_time')) {
-                    $q->where('close_time', '>', $request->open_time);
-                } elseif ($request->filled('close_time')) {
-                    $q->where('open_time', '<', $request->close_time);
+        // Ambil jam pencarian (boleh kosong)
+        $searchStart = $request->open_time;
+        $searchEnd = $request->close_time;
+
+        // Ambil tanggal pencarian, default hari ini
+        $searchDate = $request->tanggal_main ?? now()->toDateString();
+
+        // Ambil data lapangan beserta relasi
+        $fields = $query->with(['categoryField', 'schedules', 'bookings'])->get();
+
+        $fields = $fields->map(function ($field) use ($searchStart, $searchEnd, $searchDate) {
+
+            $status = 'available'; // default
+
+            // Cek jika jam tersedia, apakah di luar jam operasional
+            if ($searchStart && $searchEnd) {
+                if ($searchStart < $field->open_time || $searchEnd > $field->close_time) {
+                    $status = 'closed';
                 }
-            });
-        }
-        // dd($request->all());
-        $fields = $query->with('categoryField')->get();
+            }
 
-        if ($fields->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Lapangan tidak ditemukan',
-                'data' => []
-            ], 200);
-        }
+            // Cek maintenance hanya jika jam diisi
+            $maintenance = false;
+            if ($searchStart && $searchEnd) {
+                $maintenance = $field->schedules()
+                    ->where('date', $searchDate)
+                    ->where(function ($q) use ($searchStart, $searchEnd) {
+                        $q->where(function ($q2) use ($searchStart, $searchEnd) {
+                            $q2->where('start_time', '<', $searchEnd)
+                                ->where('end_time', '>', $searchStart);
+                        });
+                    })->exists();
+            }
 
-        // Jika cuma ingin 1 data saja bisa pakai first()
-        // $field = $fields->first();
+            if ($maintenance) {
+                $status = 'maintenance';
+            }
+
+            // Cek booking hanya jika jam diisi
+            $booking = false;
+            if ($searchStart && $searchEnd) {
+                $booking = $field->bookings()
+                    ->where('date', $searchDate)
+                    ->where(function ($q) use ($searchStart, $searchEnd) {
+                        $q->where(function ($q2) use ($searchStart, $searchEnd) {
+                            $q2->where('start_time', '<', $searchEnd)
+                                ->where('end_time', '>', $searchStart);
+                        });
+                    })->exists();
+            }
+
+            if ($booking) {
+                $status = 'booked';
+            }
+
+            $field->status_now = $status;
+            return $field;
+        });
 
         return response()->json([
             'success' => true,
@@ -50,6 +83,9 @@ class FieldController extends Controller
             'data' => $fields
         ], 200);
     }
+
+
+
 
     public function index()
     {
