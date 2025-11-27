@@ -84,9 +84,6 @@ class FieldController extends Controller
         ], 200);
     }
 
-
-
-
     public function index()
     {
         $fields = Field::all();

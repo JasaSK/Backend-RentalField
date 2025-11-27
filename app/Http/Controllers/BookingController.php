@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\Field;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 
@@ -107,21 +108,26 @@ class BookingController extends Controller
             ], 400);
         }
 
-        // Cek jam buka
-        if ($request->start_time < $field->open_time) {
+        $startTime = Carbon::parse($request->start_time);
+        $openTime  = Carbon::parse($field->open_time);
+
+        if ($startTime->lt($openTime)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Booking tidak boleh sebelum lapangan dibuka (' . $field->open_time . ')'
             ], 400);
         }
 
-        // Cek jam tutup
-        if ($request->end_time > $field->close_time) {
+        $endTime = Carbon::parse($request->end_time);
+        $closeTime = Carbon::parse($field->close_time);
+
+        if ($endTime->gt($closeTime)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Booking tidak boleh melewati jam tutup lapangan (' . $field->close_time . ')'
             ], 400);
         }
+
 
         // Cek tanggal
         if ($request->date < now()->toDateString()) {
@@ -313,5 +319,55 @@ class BookingController extends Controller
             'success' => true,
             'data' => $bookings
         ], 200);
+    }
+
+    // Tambahkan ini di BookingController.php
+    public function bookedHours(Request $request, $fieldId)
+    {
+        $request->validate([
+            'date' => 'required|date'
+        ], [
+            'date.required' => 'Tanggal harus diisi',
+            'date.date' => 'Format tanggal tidak valid'
+        ]);
+
+        $date = $request->date;
+
+        // Ambil semua booking untuk lapangan dan tanggal tersebut
+        $bookings = Booking::where('field_id', $fieldId)
+            ->where('date', $date)
+            ->get();
+
+        $bookedHours = [];
+        foreach ($bookings as $booking) {
+            $start = strtotime($booking->start_time);
+            $end = strtotime($booking->end_time);
+            for ($time = $start; $time < $end; $time += 3600) {
+                $bookedHours[] = date('H:i', $time);
+            }
+        }
+
+        // Ambil semua maintenance untuk lapangan dan tanggal tersebut
+        $maintenances = Schedule::where('field_id', $fieldId)
+            ->where('date', $date)
+            ->get();
+
+        foreach ($maintenances as $schedule) {
+            $start = strtotime($schedule->start_time);
+            $end = strtotime($schedule->end_time);
+            for ($time = $start; $time < $end; $time += 3600) {
+                $bookedHours[] = date('H:i', $time);
+            }
+        }
+
+        // Hilangkan duplikat dan urutkan
+        $bookedHours = array_unique($bookedHours);
+        sort($bookedHours);
+
+        return response()->json([
+            'success' => true,
+            'date' => $date,
+            'booked_hours' => $bookedHours
+        ]);
     }
 }
