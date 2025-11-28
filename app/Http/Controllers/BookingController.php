@@ -305,7 +305,7 @@ class BookingController extends Controller
         // Ambil booking milik user tersebut
         $bookings = Booking::where('user_id', $user->id)
             ->with('field')
-            ->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->get();
 
         if ($bookings->isEmpty()) {
