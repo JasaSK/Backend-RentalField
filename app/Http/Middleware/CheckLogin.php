@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+class CheckLogin
+{
+    public function handle(Request $request, Closure $next)
+    {
+        // cek login
+        if (!session()->has('user_id')) {
+            return redirect()->route('page.admin.login')
+                ->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        // cek role admin
+        if (session('role') !== 'admin') {
+            abort(403, 'Unauthorized');
+        }
+
+        return $next($request);
+    }
+}

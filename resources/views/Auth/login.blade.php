@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Login | EZFutsal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body class="bg-white flex flex-col items-center min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-300">
+        <div class="flex justify-between items-center px-6 md:px-12 py-4">
+            <h1 class="text-xl md:text-3xl font-bold text-[#13810A]">EZFutsal</h1>
+        </div>
+    </nav>
+
+    <div class="h-28"></div> <!-- Spacer navbar -->
+
+    <!-- CARD LOGIN -->
+    <div class="relative w-[95%] max-w-[970px] h-auto md:h-[520px] rounded-2xl overflow-hidden shadow-2xl bg-white">
+        <!-- Background hanya tampil di tablet/desktop -->
+        <div class="hidden md:block absolute inset-0 bg-[url('/aset/login-bg.jpg')] bg-cover bg-center"></div>
+
+        <!-- Teks sambutan -->
+        <div
+            class="hidden md:block absolute bottom-8 left-[60px] md:left-[100px] text-white text-lg md:text-xl font-semibold drop-shadow-lg max-w-sm leading-relaxed">
+            Welcome back! Let's make today <br>
+            <span class="pl-6">productive and smooth.</span>
+        </div>
+
+        <!-- FORM LOGIN -->
+        <div
+            class="relative md:absolute md:top-6 md:right-6 md:bottom-6 bg-[#13810A]/65 md:backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full md:w-[360px] text-white flex flex-col justify-center items-center transition-all duration-300">
+
+            <div class="flex flex-col items-center w-full">
+                <!-- Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mt-2 md:mt-6 mb-1" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+
+                <h2 class="text-2xl font-bold mb-6">Login</h2>
+
+                <form action="{{ route('admin.login') }}" method="POST" class="w-full flex flex-col gap-4">
+                    @csrf
+
+                    <!-- Email -->
+                    <div>
+                        <label class="block mb-1 text-sm">Email</label>
+                        <input type="text" name="email" placeholder="Masukkan Email"
+                            class="w-full p-2 rounded-md text-black placeholder-gray-400 focus:ring-2 focus:ring-green-400 outline-none">
+                        @error('email')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label class="block mb-1 text-sm">Password</label>
+                        <input type="password" name="password" placeholder="Masukkan Password"
+                            class="w-full p-2 rounded-md text-black placeholder-gray-400 focus:ring-2 focus:ring-green-400 outline-none">
+                        @error('password')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Remember me & Forgot password -->
+                    <div class="flex justify-between items-center text-sm mt-1 w-full px-1 gap-4">
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" class="accent-green-500">
+                            <span>Remember me</span>
+                        </label>
+                        {{-- <a href="{{ url('beranda/forgotpassword') }}" class="hover:underline">Forgot password?</a> --}}
+                    </div>
+
+                    <!-- Belum punya akun -->
+                    <p class="text-center text-sm leading-tight mt-2">
+                        Belum memiliki akun? <br>
+                        {{-- <a href="{{ route('PageRegister') }}" class="underline text-blue-300 hover:text-blue-400">Daftar
+                            sekarang</a> --}}
+                    </p>
+
+                    <!-- Tombol Login -->
+                    <div class="flex justify-center mt-4">
+                        <button type="submit"
+                            class="bg-white text-[#13810A] font-bold py-2.5 px-6 rounded-md hover:bg-gray-100 transition w-fit">
+                            Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @include('admin.layouts.script')
+</body>
+
+</html>

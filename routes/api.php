@@ -10,7 +10,6 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\TicketController;
-use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 
 

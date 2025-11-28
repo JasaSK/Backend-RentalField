@@ -26,7 +26,6 @@ class User extends Model
         'password',
         'remember_token',
         'verification_code',
-
     ];
 
     protected $casts = [
