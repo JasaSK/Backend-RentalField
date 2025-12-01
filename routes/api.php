@@ -47,48 +47,49 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/booking/{id}', [BookingController::class, 'show']);
     Route::post('/booking', [BookingController::class, 'store']);
-    Route::put('/booking/{id}', [BookingController::class, 'update']);
     Route::delete('/booking/{id}', [BookingController::class, 'destroy']);
     Route::get('/booking-history', [BookingController::class, 'history']);
-
-    // User Ajukan Refund
+    //    
+    Route::put('/booking/{id}', [BookingController::class, 'update']);
+    //
+    
     Route::post('/refund/request', [RefundController::class, 'requestRefund']);
     Route::get('/refund/user', [RefundController::class, 'getRefund']);
     Route::get('/refund/all', [RefundController::class, 'getAllRefund']);
     Route::post('/refund/accept/{id}', [RefundController::class, 'acceptRefund']);
     Route::post('/refund/reject/{id}', [RefundController::class, 'rejectRefund']);
+
+    Route::post('/payment/create-qris/{booking_id}', [PaymentController::class, 'createQrisPayment']);
+
+    Route::get('/ticket/{id}', [TicketController::class, 'showTicket']);
+    Route::get('/booking/{id}/ticket', [TicketController::class, 'downloadTicket']);
 });
-
-Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
-    Route::get('/booking', [BookingController::class, 'index']);
-
-    Route::post('/category-fields', [CategoryFieldController::class, 'store']);
-    Route::put('/category-fields/{id}', [CategoryFieldController::class, 'update']);
-    Route::delete('/category-fields/{id}', [CategoryFieldController::class, 'destroy']);
-
-    Route::post('/fields', [FieldController::class, 'store']);
-    Route::put('/fields/{id}', [FieldController::class, 'update']);
-    Route::delete('/fields/{id}', [FieldController::class, 'destroy']);
-
-    Route::post('/banners', [BannerController::class, 'store']);
-    Route::put('/banners/{id}', [BannerController::class, 'update']);
-    Route::delete('/banners/{id}', [BannerController::class, 'destroy']);
-
-    Route::post('/category-gallery', [CategoryGalleryController::class, 'store']);
-    Route::put('/category-gallery/{id}', [CategoryGalleryController::class, 'update']);
-    Route::delete('/category-gallery/{id}', [CategoryGalleryController::class, 'destroy']);
-
-    Route::post('/galleries', [GalleryController::class, 'store']);
-    Route::put('/galleries/{id}', [GalleryController::class, 'update']);
-    Route::delete('/galleries/{id}', [GalleryController::class, 'destroy']);
-
-    Route::post('/schedule', [ScheduleController::class, 'store']);
-    Route::put('/schedule/{id}', [ScheduleController::class, 'update']);
-    Route::delete('/schedule/{id}', [ScheduleController::class, 'destroy']);
-});
-Route::post('/payment/create-qris/{booking_id}', [PaymentController::class, 'createQrisPayment']);
 Route::post('/payment/midtrans/callback', [PaymentController::class, 'midtransCallback']);
-
-Route::get('/ticket/{id}', [TicketController::class, 'showTicket']);
-Route::get('/booking/{id}/ticket', [TicketController::class, 'downloadTicket']);
 Route::post('/ticket/verify', [TicketController::class, 'verifyTicket']);
+// Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+//     Route::get('/booking', [BookingController::class, 'index']);
+
+//     Route::post('/category-fields', [CategoryFieldController::class, 'store']);
+//     Route::put('/category-fields/{id}', [CategoryFieldController::class, 'update']);
+//     Route::delete('/category-fields/{id}', [CategoryFieldController::class, 'destroy']);
+
+//     Route::post('/fields', [FieldController::class, 'store']);
+//     Route::put('/fields/{id}', [FieldController::class, 'update']);
+//     Route::delete('/fields/{id}', [FieldController::class, 'destroy']);
+
+//     Route::post('/banners', [BannerController::class, 'store']);
+//     Route::put('/banners/{id}', [BannerController::class, 'update']);
+//     Route::delete('/banners/{id}', [BannerController::class, 'destroy']);
+
+//     Route::post('/category-gallery', [CategoryGalleryController::class, 'store']);
+//     Route::put('/category-gallery/{id}', [CategoryGalleryController::class, 'update']);
+//     Route::delete('/category-gallery/{id}', [CategoryGalleryController::class, 'destroy']);
+
+//     Route::post('/galleries', [GalleryController::class, 'store']);
+//     Route::put('/galleries/{id}', [GalleryController::class, 'update']);
+//     Route::delete('/galleries/{id}', [GalleryController::class, 'destroy']);
+
+//     Route::post('/schedule', [ScheduleController::class, 'store']);
+//     Route::put('/schedule/{id}', [ScheduleController::class, 'update']);
+//     Route::delete('/schedule/{id}', [ScheduleController::class, 'destroy']);
+// });
