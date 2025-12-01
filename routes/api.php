@@ -52,15 +52,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/booking-history', [BookingController::class, 'history']);
 
     // User Ajukan Refund
-    Route::post('/refund/request/{bookingId}', [RefundController::class, 'requestRefund']);
-
-    // Admin — Approve & Process
-    Route::post('/refund/approve/{id}', [RefundController::class, 'approveRefund']);
-    Route::post('/refund/process/{id}', [RefundController::class, 'processRefund']);
-
-    // Admin — List & Detail
-    Route::get('/refunds', [RefundController::class, 'index']);
-    Route::get('/refunds/{id}', [RefundController::class, 'show']);
+    Route::post('/refund/request', [RefundController::class, 'requestRefund']);
+    Route::get('/refund/user', [RefundController::class, 'getRefund']);
+    Route::get('/refund/all', [RefundController::class, 'getAllRefund']);
+    Route::post('/refund/accept/{id}', [RefundController::class, 'acceptRefund']);
+    Route::post('/refund/reject/{id}', [RefundController::class, 'rejectRefund']);
 });
 
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {

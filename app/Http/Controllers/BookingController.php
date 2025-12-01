@@ -70,6 +70,7 @@ class BookingController extends Controller
         // Cek bentrok booking lain
         $conflict = Booking::where('field_id', $request->field_id)
             ->where('date', $request->date)
+            ->whereNotIn('status', ['canceled', 'refunded'])
             ->where(function ($query) use ($request) {
                 $query->where('start_time', '<', $request->end_time)
                     ->where('end_time', '>', $request->start_time);

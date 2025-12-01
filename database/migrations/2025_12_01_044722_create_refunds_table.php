@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->unsignedInteger('amount_paid');
-            $table->unsignedInteger('refund_amount');
+            $table->unsignedInteger('refund_amount')->nullable();
+            $table->string('refund_method')->nullable();
+            $table->string('account_number');
             $table->text('reason')->nullable();
             $table->enum('refund_status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();

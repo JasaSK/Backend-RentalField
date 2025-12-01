@@ -14,8 +14,12 @@ class Refund extends Model
         'amount_paid',
         'refund_amount',
         'reason',
+        'refund_method',
+        'account_number',
         'refund_status',
+        'proof',
     ];
+
 
     public function booking()
     {
