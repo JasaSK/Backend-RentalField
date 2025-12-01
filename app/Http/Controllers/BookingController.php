@@ -9,36 +9,42 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
-
-
 class BookingController extends Controller
 {
     public function index()
     {
-        $bookings = Booking::all();
+        $bookings = Booking::with('user', 'field')->get();
 
-        if (! $bookings) {
+        if ($bookings->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No bookings found'
+                'message' => 'Tidak ada data booking'
             ], 404);
         }
-        $bookings->load('user', 'field');
-        return response()->json($bookings);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar semua booking',
+            'data' => $bookings
+        ], 200);
     }
 
     public function show($id)
     {
-        $booking = Booking::find($id);
+        $booking = Booking::with('user', 'field')->find($id);
 
-        if (! $booking) {
+        if (!$booking) {
             return response()->json([
                 'success' => false,
-                'message' => 'Booking not found'
+                'message' => 'Booking tidak ditemukan'
             ], 404);
         }
-        $booking->load('user', 'field');
-        return response()->json($booking);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail booking',
+            'data' => $booking
+        ], 200);
     }
 
     public function store(Request $request)
@@ -50,29 +56,24 @@ class BookingController extends Controller
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
         ], [
-            'field_id.required' => 'Field ID tidak boleh kosong.',
-            'field_id.exists' => 'Field tidak ditemukan.',
-
-            'user_id.required' => 'User ID tidak boleh kosong.',
-            'user_id.exists' => 'User tidak ditemukan.',
-
-            'date.required' => 'Tanggal tidak boleh kosong.',
-            'date.date' => 'Format tanggal tidak valid.',
-
-            'start_time.required' => 'Waktu mulai tidak boleh kosong.',
-            'start_time.date_format' => 'Format waktu mulai tidak valid (HH:MM).',
-
-            'end_time.required' => 'Waktu selesai tidak boleh kosong.',
-            'end_time.date_format' => 'Format waktu selesai tidak valid (HH:MM).',
-            'end_time.after' => 'Waktu selesai harus setelah waktu mulai.',
+            'field_id.required' => 'Field ID wajib diisi',
+            'field_id.exists' => 'Field tidak ditemukan',
+            'user_id.required' => 'User ID wajib diisi',
+            'user_id.exists' => 'User tidak ditemukan',
+            'date.required' => 'Tanggal wajib diisi',
+            'date.date' => 'Format tanggal tidak valid',
+            'start_time.required' => 'Waktu mulai wajib diisi',
+            'start_time.date_format' => 'Format waktu mulai tidak valid (HH:MM)',
+            'end_time.required' => 'Waktu selesai wajib diisi',
+            'end_time.date_format' => 'Format waktu selesai tidak valid (HH:MM)',
+            'end_time.after' => 'Waktu selesai harus setelah waktu mulai'
         ]);
 
-        // Cek bentrok booking lain
         $conflict = Booking::where('field_id', $request->field_id)
             ->where('date', $request->date)
             ->whereNotIn('status', ['canceled', 'refunded'])
-            ->where(function ($query) use ($request) {
-                $query->where('start_time', '<', $request->end_time)
+            ->where(function ($q) use ($request) {
+                $q->where('start_time', '<', $request->end_time)
                     ->where('end_time', '>', $request->start_time);
             })
             ->exists();
@@ -84,11 +85,10 @@ class BookingController extends Controller
             ], 409);
         }
 
-        // Cek maintenance
         $maintenanceConflict = Schedule::where('field_id', $request->field_id)
             ->where('date', $request->date)
-            ->where(function ($query) use ($request) {
-                $query->where('start_time', '<', $request->end_time)
+            ->where(function ($q) use ($request) {
+                $q->where('start_time', '<', $request->end_time)
                     ->where('end_time', '>', $request->start_time);
             })
             ->exists();
@@ -100,37 +100,29 @@ class BookingController extends Controller
             ], 409);
         }
 
-        // Cek lapangan
         $field = Field::find($request->field_id);
+
         if ($field->status !== 'available') {
             return response()->json([
                 'success' => false,
-                'message' => 'Lapangan sedang off / maintenance'
+                'message' => 'Lapangan sedang tidak tersedia'
             ], 400);
         }
 
-        $startTime = Carbon::parse($request->start_time);
-        $openTime  = Carbon::parse($field->open_time);
-
-        if ($startTime->lt($openTime)) {
+        if (Carbon::parse($request->start_time)->lt(Carbon::parse($field->open_time))) {
             return response()->json([
                 'success' => false,
                 'message' => 'Booking tidak boleh sebelum lapangan dibuka (' . $field->open_time . ')'
             ], 400);
         }
 
-        $endTime = Carbon::parse($request->end_time);
-        $closeTime = Carbon::parse($field->close_time);
-
-        if ($endTime->gt($closeTime)) {
+        if (Carbon::parse($request->end_time)->gt(Carbon::parse($field->close_time))) {
             return response()->json([
                 'success' => false,
                 'message' => 'Booking tidak boleh melewati jam tutup lapangan (' . $field->close_time . ')'
             ], 400);
         }
 
-
-        // Cek tanggal
         if ($request->date < now()->toDateString()) {
             return response()->json([
                 'success' => false,
@@ -138,78 +130,56 @@ class BookingController extends Controller
             ], 400);
         }
 
-        // Generate booking code
         $bookingCode = 'BK-' . strtoupper(Str::random(8));
-
-        // Hitung total harga
         $duration = (strtotime($request->end_time) - strtotime($request->start_time)) / 3600;
         $totalPrice = $field->price_per_hour * $duration;
 
-        // Build data
         $data = $request->all();
         $data['code_booking'] = $bookingCode;
         $data['status'] = 'pending';
         $data['total_price'] = $totalPrice;
         $data['payment_order_id'] = null;
 
-
-        // Create booking
         $booking = Booking::create($data);
-
 
         return response()->json([
             'success' => true,
-            'message' => 'Booking created successfully',
-            'data' => $booking->load('user', 'field'),
+            'message' => 'Booking berhasil dibuat',
+            'data' => $booking->load('user', 'field')
         ], 201);
     }
-
 
     public function update(Request $request, $id)
     {
         $booking = Booking::find($id);
 
-        if (! $booking) {
+        if (!$booking) {
             return response()->json([
                 'success' => false,
-                'message' => 'Booking not found'
+                'message' => 'Booking tidak ditemukan'
             ], 404);
         }
 
-        $request->validate(
-            [
-                'field_id' => 'sometimes|exists:fields,id',
-                'user_id' => 'sometimes|exists:users,id',
-                'date' => 'sometimes|date',
-                'start_time' => 'sometimes|date_format:H:i',
-                'end_time' => 'sometimes|date_format:H:i|after:start_time',
-            ],
-            [
-                'field_id.required' => 'Field ID tidak boleh kosong.',
-                'field_id.exists' => 'Field tidak ditemukan.',
+        $request->validate([
+            'field_id' => 'sometimes|exists:fields,id',
+            'user_id' => 'sometimes|exists:users,id',
+            'date' => 'sometimes|date',
+            'start_time' => 'sometimes|date_format:H:i',
+            'end_time' => 'sometimes|date_format:H:i|after:start_time',
+        ], [
+            'field_id.exists' => 'Field tidak ditemukan',
+            'user_id.exists' => 'User tidak ditemukan',
+            'date.date' => 'Format tanggal tidak valid',
+            'start_time.date_format' => 'Format waktu mulai tidak valid (HH:MM)',
+            'end_time.date_format' => 'Format waktu selesai tidak valid (HH:MM)',
+            'end_time.after' => 'Waktu selesai harus setelah waktu mulai'
+        ]);
 
-                'user_id.required' => 'User ID tidak boleh kosong.',
-                'user_id.exists' => 'User tidak ditemukan.',
-
-                'date.required' => 'Tanggal tidak boleh kosong.',
-                'date.date' => 'Format tanggal tidak valid.',
-
-                'start_time.required' => 'Waktu mulai tidak boleh kosong.',
-                'start_time.date_format' => 'Format waktu mulai tidak valid (HH:MM).',
-
-                'end_time.required' => 'Waktu selesai tidak boleh kosong.',
-                'end_time.date_format' => 'Format waktu selesai tidak valid (HH:MM).',
-                'end_time.after' => 'Waktu selesai harus setelah waktu mulai.',
-
-            ]
-        );
-
-        // CEK BENTROK (kecuali dengan dirinya sendiri)
         $conflict = Booking::where('field_id', $request->field_id)
             ->where('date', $request->date)
-            ->where('id', '!=', $booking->id)  // ← penting!
-            ->where(function ($query) use ($request) {
-                $query->where('start_time', '<', $request->end_time)
+            ->where('id', '!=', $booking->id)
+            ->where(function ($q) use ($request) {
+                $q->where('start_time', '<', $request->end_time)
                     ->where('end_time', '>', $request->start_time);
             })
             ->exists();
@@ -221,11 +191,10 @@ class BookingController extends Controller
             ], 409);
         }
 
-        // CEK MAINTENANCE
         $maintenanceConflict = Schedule::where('field_id', $request->field_id)
             ->where('date', $request->date)
-            ->where(function ($query) use ($request) {
-                $query->where('start_time', '<', $request->end_time)
+            ->where(function ($q) use ($request) {
+                $q->where('start_time', '<', $request->end_time)
                     ->where('end_time', '>', $request->start_time);
             })
             ->exists();
@@ -237,38 +206,35 @@ class BookingController extends Controller
             ], 409);
         }
 
-        // CEK JAM BUKA & TUTUP
         $field = Field::find($request->field_id);
 
-        if ($request->start_time < $field->open_time) {
+        if ($request->start_time && $request->start_time < $field->open_time) {
             return response()->json([
                 'success' => false,
                 'message' => 'Booking tidak boleh sebelum lapangan dibuka (' . $field->open_time . ')'
             ], 400);
         }
 
-        if ($request->end_time > $field->close_time) {
+        if ($request->end_time && $request->end_time > $field->close_time) {
             return response()->json([
                 'success' => false,
                 'message' => 'Booking tidak boleh melewati jam tutup lapangan (' . $field->close_time . ')'
             ], 400);
         }
 
-        // HITUNG ULANG TOTAL HARGA
         $duration = (strtotime($request->end_time) - strtotime($request->start_time)) / 3600;
         $totalPrice = $field->price_per_hour * $duration;
 
-        // DATA UPDATE
         $data = $request->all();
-        $data['total_price'] = $totalPrice;
+        if ($request->start_time && $request->end_time) {
+            $data['total_price'] = $totalPrice;
+        }
 
-        // UPDATE DATA
         $booking->update($data);
-
 
         return response()->json([
             'success' => true,
-            'message' => 'Booking updated successfully',
+            'message' => 'Booking berhasil diperbarui',
             'data' => $booking
         ], 200);
     }
@@ -277,10 +243,10 @@ class BookingController extends Controller
     {
         $booking = Booking::find($id);
 
-        if (! $booking) {
+        if (!$booking) {
             return response()->json([
                 'success' => false,
-                'message' => 'Booking not found'
+                'message' => 'Booking tidak ditemukan'
             ], 404);
         }
 
@@ -288,14 +254,14 @@ class BookingController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Booking deleted successfully'
+            'message' => 'Booking berhasil dihapus'
         ], 200);
     }
-    // Tambahkan di BookingController
+
     public function history(Request $request)
     {
-        // Ambil user_id dari user yang login (misal pakai session atau auth)
-        $user = $request->user(); // jika pakai auth:api atau sanctum
+        $user = $request->user();
+
         if (!$user) {
             return response()->json([
                 'success' => false,
@@ -303,7 +269,6 @@ class BookingController extends Controller
             ], 401);
         }
 
-        // Ambil booking milik user tersebut
         $bookings = Booking::where('user_id', $user->id)
             ->with('field')
             ->orderBy('created_at', 'desc')
@@ -318,11 +283,11 @@ class BookingController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'Daftar booking untuk user ini',
             'data' => $bookings
         ], 200);
     }
 
-    // Tambahkan ini di BookingController.php
     public function bookedHours(Request $request, $fieldId)
     {
         $request->validate([
@@ -333,13 +298,12 @@ class BookingController extends Controller
         ]);
 
         $date = $request->date;
+        $bookedHours = [];
 
-        // Ambil semua booking untuk lapangan dan tanggal tersebut
         $bookings = Booking::where('field_id', $fieldId)
             ->where('date', $date)
             ->get();
 
-        $bookedHours = [];
         foreach ($bookings as $booking) {
             $start = strtotime($booking->start_time);
             $end = strtotime($booking->end_time);
@@ -348,7 +312,6 @@ class BookingController extends Controller
             }
         }
 
-        // Ambil semua maintenance untuk lapangan dan tanggal tersebut
         $maintenances = Schedule::where('field_id', $fieldId)
             ->where('date', $date)
             ->get();
@@ -361,7 +324,6 @@ class BookingController extends Controller
             }
         }
 
-        // Hilangkan duplikat dan urutkan
         $bookedHours = array_unique($bookedHours);
         sort($bookedHours);
 
@@ -369,6 +331,6 @@ class BookingController extends Controller
             'success' => true,
             'date' => $date,
             'booked_hours' => $bookedHours
-        ]);
+        ], 200);
     }
 }
