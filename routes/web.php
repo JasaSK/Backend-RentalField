@@ -12,12 +12,16 @@ use App\Http\Controllers\Admin\GalleryCategoryController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Middleware\CheckLogin;
 
+Route::get('/',  function () {
+    return redirect()->route('admin.page.login');
+});
+
 Route::get('admin/page/login', [AuthController::class, 'PageLogin'])->name('admin.page.login');
 
 Route::post('admin/login', [AuthController::class, 'login'])->name('admin.login');
 
 Route::post('/Logout', [AuthController::class, 'logout'])->name('logout');
- 
+
 Route::middleware([CheckLogin::class])->group(function () {
 
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');

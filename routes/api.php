@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RefundController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BookingController;
@@ -49,6 +50,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/booking/{id}', [BookingController::class, 'update']);
     Route::delete('/booking/{id}', [BookingController::class, 'destroy']);
     Route::get('/booking-history', [BookingController::class, 'history']);
+
+    // User Ajukan Refund
+    Route::post('/refund/request/{bookingId}', [RefundController::class, 'requestRefund']);
+
+    // Admin — Approve & Process
+    Route::post('/refund/approve/{id}', [RefundController::class, 'approveRefund']);
+    Route::post('/refund/process/{id}', [RefundController::class, 'processRefund']);
+
+    // Admin — List & Detail
+    Route::get('/refunds', [RefundController::class, 'index']);
+    Route::get('/refunds/{id}', [RefundController::class, 'show']);
 });
 
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {

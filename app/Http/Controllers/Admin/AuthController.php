@@ -21,6 +21,11 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:6',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 6 karakter.',
         ]);
 
         $user = User::where('email', $request->email)->first();
@@ -31,7 +36,7 @@ class AuthController extends Controller
                 'user_id' => $user->id,
                 'user_name' => $user->name,
                 'user_email' => $user->email,
-                'role' => $user->role, 
+                'role' => $user->role,
             ]);
 
             return redirect()->route('admin.dashboard')->with([

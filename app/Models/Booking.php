@@ -20,7 +20,7 @@ class Booking extends Model
         'ticket_code',
         'qris_url'
     ];
-   public function field()
+    public function field()
     {
         return $this->belongsTo(Field::class);
     }
@@ -28,5 +28,10 @@ class Booking extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function refunds()
+    {
+        return $this->hasMany(Refund::class);
     }
 }

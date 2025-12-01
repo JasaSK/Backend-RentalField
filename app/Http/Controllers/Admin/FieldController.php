@@ -31,6 +31,17 @@ class FieldController extends Controller
             'status'            => 'required|string|max:255',
             'price_per_hour'    => 'required|numeric',
             'image'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'name.required'             => 'Nama lapangan wajib diisi.',
+            'category_field_id.required' => 'Kategori lapangan wajib diisi.',
+            'open_time.required'         => 'Jam buka wajib diisi.',
+            'close_time.required'        => 'Jam tutup wajib diisi.',
+            'description.required'       => 'Deskripsi lapangan wajib diisi.',
+            'status.required'            => 'Status lapangan wajib diisi.',
+            'price_per_hour.required'    => 'Harga per jam wajib diisi.',
+            'image.image'                => 'File harus berupa gambar.',
+            'image.mimes'                => 'Format gambar harus jpg, jpeg, atau png.',
+            'image.max'                  => 'Ukuran gambar maksimal 2MB.',
         ]);
 
         $data = $request->only([
@@ -65,6 +76,17 @@ class FieldController extends Controller
             'status'            => 'required|string|max:255',
             'price_per_hour'    => 'required|numeric',
             'image'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'name.required'             => 'Nama lapangan wajib diisi.',
+            'category_field_id.required' => 'Kategori lapangan wajib diisi.',
+            'open_time.required'         => 'Jam buka wajib diisi.',
+            'close_time.required'        => 'Jam tutup wajib diisi.',
+            'description.required'       => 'Deskripsi lapangan wajib diisi.',
+            'status.required'            => 'Status lapangan wajib diisi.',
+            'price_per_hour.required'    => 'Harga per jam wajib diisi.',
+            'image.image'                => 'File harus berupa gambar.',
+            'image.mimes'                => 'Format gambar harus jpg, jpeg, atau png.',
+            'image.max'                  => 'Ukuran gambar maksimal 2MB.',
         ]);
 
         $field = Field::findOrFail($id);

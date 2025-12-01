@@ -13,13 +13,16 @@ return new class extends Migration
     {
         Schema::create('refunds', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->unsignedInteger('amount_paid');
+            $table->unsignedInteger('refund_amount');
+            $table->text('reason')->nullable();
+            $table->enum('refund_status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('refunds');
