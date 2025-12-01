@@ -37,6 +37,8 @@ Route::middleware([CheckLogin::class])->group(function () {
     Route::delete('/admin/galleries/destroy/{id}', [GalleryController::class, 'destroy'])->name('admin.gallery.destroy');
 
     Route::get('/admin/refund', [RefundController::class, 'index'])->name('admin.refund');
+    Route::post('/admin/refund/accept/{id}', [RefundController::class, 'acceptRefund'])->name('admin.refund.accept');
+    Route::post('/admin/refund/reject/{id}', [RefundController::class, 'rejectRefund'])->name('admin.refund.reject');
 
     Route::get('/admin/fields', [FieldController::class, 'index'])->name('admin.fields');
     Route::post('/admin/fields/store', [FieldController::class, 'store'])->name('admin.fields.store');
@@ -55,7 +57,4 @@ Route::middleware([CheckLogin::class])->group(function () {
     Route::put('/admin/gallery-categories/update/{id}', [GalleryCategoryController::class, 'update'])->name('admin.gallery-categories.update');
     Route::delete('/admin/gallery-categories/destroy/{id}', [GalleryCategoryController::class, 'destroy'])->name('admin.gallery-categories.destroy');
 
-    Route::get('/admin/refund', [RefundController::class, 'index'])->name('admin.refund');
-    Route::post('/refund/accept/{id}', [RefundController::class, 'acceptRefund'])->name('admin.refund.accept');
-    Route::post('/refund/reject/{id}', [RefundController::class, 'rejectRefund'])->name('admin.refund.reject');
 });

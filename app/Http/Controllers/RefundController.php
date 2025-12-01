@@ -62,11 +62,11 @@ class RefundController extends Controller
             'refund_status' => 'pending',
             'proof' => null
         ]);
-
+        
         return response()->json([
             'status' => true,
             'message' => 'Refund berhasil diajukan.',
-            'data' => $refund
+            'data' => $refund->load('booking')
         ], 201);
     }
 

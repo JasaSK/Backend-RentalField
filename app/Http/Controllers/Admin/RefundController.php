@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class RefundController extends Controller
 {
 
-    public function getAllRefund()
+    public function index()
     {
         $refunds = Refund::all();
 
