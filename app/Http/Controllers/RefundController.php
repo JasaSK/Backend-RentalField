@@ -11,101 +11,97 @@ class RefundController extends Controller
 {
     public function requestRefund(Request $request)
     {
+        // 1. VALIDASI INPUT
         $request->validate([
-            'user_id' => 'required|integer|exists:users,id',
-            'booking_id' => 'required|integer|exists:bookings,id',
-            'amount_paid' => 'required|integer',
-            'reason' => 'required|string',
+            'user_id'       => 'required|integer|exists:users,id',
+            'booking_id'    => 'required|integer|exists:bookings,id',
+            'amount_paid'   => 'required|integer',
+            'reason'        => 'required|string',
             'refund_method' => 'nullable|string',
             'account_number' => 'nullable|string',
         ], [
-            'userId.required' => 'User ID wajib diisi.',
-            'userId.integer' => 'User ID harus berupa angka.',
-            'userId.exists' => 'User ID tidak ditemukan.',
+            'user_id.required'  => 'User ID wajib diisi.',
+            'user_id.integer'   => 'User ID harus berupa angka.',
+            'user_id.exists'    => 'User ID tidak ditemukan.',
 
-            'bookingId.required' => 'Booking ID wajib diisi.',
-            'bookingId.integer' => 'Booking ID harus berupa angka.',
-            'bookingId.exists' => 'Booking ID tidak ditemukan.',
+            'booking_id.required' => 'Booking ID wajib diisi.',
+            'booking_id.integer'  => 'Booking ID harus berupa angka.',
+            'booking_id.exists'   => 'Booking ID tidak ditemukan.',
 
             'amount_paid.required' => 'Jumlah yang dibayar wajib diisi.',
-            'amount_paid.integer' => 'Jumlah yang dibayar harus berupa angka.',
-
-            'total_price.required' => 'Total harga wajib diisi.',
-            'total_price.integer' => 'Total harga harus berupa angka.',
-
-            'total_price.required' => 'Total harga wajib diisi.',
-            'total_price.integer' => 'Total harga harus berupa angka.',
+            'amount_paid.integer'  => 'Jumlah yang dibayar harus berupa angka.',
 
             'reason.required' => 'Alasan wajib diisi.',
-            'reason.string' => 'Alasan harus berupa teks.',
+            'reason.string'   => 'Alasan harus berupa teks.',
 
             'refund_method.string' => 'Metode refund harus berupa teks.',
         ]);
 
+        // 2. AMBIL BOOKING
         $booking = Booking::find($request->booking_id);
+        $refund = Refund::where('booking_id', $booking->id)->first();
+
+        if ($refund) {
+            if ($refund->refund_status === 'approved') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Refund sudah diterima.',
+                ]);
+            }
+
+            if ($refund->refund_status === 'rejected') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Refund sudah ditolak. Silakan hubungi admin.',
+                ]);
+            }
+
+            if ($refund->refund_status === 'pending') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Refund sedang dalam proses.',
+                ]);
+            }
+        }
 
         if (!$booking) {
             return response()->json([
                 'status' => false,
                 'message' => 'Booking tidak ditemukan.',
             ], 404);
-        };
-
-        if ($request->amount_paid > $booking->total_price) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Jumlah yang dibayar tidak boleh lebih besar dari total harga.',
-            ], 400);
         }
 
-        if ($request->amount_paid < $booking->total_price) {
+        if ($booking->user_id !== $request->user_id) {
             return response()->json([
                 'status' => false,
-                'message' => 'Jumlah yang dibayar tidak boleh lebih kecil dari total harga.',
-            ], 400);
+                'message' => 'Booking tidak sesuai dengan pengguna.',
+            ], 403);
         }
 
         if ($booking->status !== 'approved') {
             return response()->json([
                 'status' => false,
                 'message' => 'Booking belum dibayar.',
-            ]);
-        }
-
-        if ($booking->user_id !== $request->user_id) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Booking tidak ditemukan.',
-            ]);
-        }
-
-        $refund = Refund::where('booking_id', $booking->id)->first();
-
-        if ($refund) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Refund sudah diajukan.',
             ], 400);
         }
 
-        if ($refund->status !== 'pending') {
+        if ($request->amount_paid != $booking->total_price) {
             return response()->json([
                 'status' => false,
-                'message' => 'Refund sudah diajukan.',
-            ]);
+                'message' => 'Jumlah yang dibayar harus sama dengan total harga.',
+            ], 400);
         }
 
-        // Create refund
         $refund = Refund::create([
             'booking_id'     => $booking->id,
             'user_id'        => $request->user_id,
-            'amount_paid'   => $booking->total_price,
+            'amount_paid'    => $booking->total_price,
             'refund_amount'  => null,
-            'reason'        => $request->reason,
-            'refund_method' => $request->refund_method,
+            'reason'         => $request->reason,
+            'refund_method'  => $request->refund_method,
             'account_number' => $request->account_number,
-            'refund_status' => 'pending',
-            'proof' => null
+            'refund_status'  => 'pending',
+            'proof'          => null,
         ]);
 
         return response()->json([
@@ -114,6 +110,7 @@ class RefundController extends Controller
             'data' => $refund->load('booking')
         ], 201);
     }
+
 
     public function getRefund()
     {
