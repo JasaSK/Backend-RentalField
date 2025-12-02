@@ -333,4 +333,13 @@ class BookingController extends Controller
             'booked_hours' => $bookedHours
         ], 200);
     }
+
+    public function getStatus($id)
+    {
+        $booking = Booking::find($id);
+        return response()->json([
+            'success' => true,
+            'status' => $booking->status
+        ], 200);
+    }
 }
