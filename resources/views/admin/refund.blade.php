@@ -6,16 +6,11 @@
     <div class="p-3 flex-1">
         <div class="mx-auto w-[97%] max-w-[1500px] space-y-6 mb-6">
 
-            <!-- Flash Message -->
             @if (session('success'))
-                <div class="bg-green-500 text-white px-4 py-2 rounded mb-4">
-                    {{ session('success') }}
-                </div>
+                <div class="bg-green-500 text-white px-4 py-2 rounded mb-4">{{ session('success') }}</div>
             @endif
             @if (session('error'))
-                <div class="bg-red-500 text-white px-4 py-2 rounded mb-4">
-                    {{ session('error') }}
-                </div>
+                <div class="bg-red-500 text-white px-4 py-2 rounded mb-4">{{ session('error') }}</div>
             @endif
 
             <!-- Card Daftar Refund -->
@@ -37,80 +32,109 @@
                     <tbody class="text-gray-700">
                         @foreach ($refunds as $index => $refund)
                             <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                <td class="py-3 px-2 text-center">{{ $index + 1 }}</td>
-                                <td class="py-3 px-2 text-center">{{ $refund->booking->code_booking ?? '-' }}</td>
-                                <td class="py-3 px-2 text-center">{{ $refund->reason ?? '-' }}</td>
-                                <td class="py-3 px-2">
-                                    <div class="flex justify-center">
-                                        @if ($refund->proof)
-                                            <img src="{{ asset('storage/' . $refund->proof) }}" alt="Bukti Transfer"
-                                                class="w-20 h-14 object-cover rounded-md shadow">
-                                        @else
-                                            <span class="text-gray-400">Belum ada</span>
-                                        @endif
-                                    </div>
+                                <td class="py-3 text-center">{{ $index + 1 }}</td>
+                                <td class="py-3 text-center">{{ $refund->booking->code_booking ?? '-' }}</td>
+                                <td class="py-3 text-center">{{ $refund->reason }}</td>
+
+                                <td class="py-3 text-center">
+                                    @if ($refund->proof)
+                                        <img src="{{ asset('storage/' . $refund->proof) }}"
+                                            class="w-20 h-14 object-cover rounded shadow mx-auto">
+                                    @else
+                                        <span class="text-gray-400">Tidak ada</span>
+                                    @endif
                                 </td>
-                                <td class="py-3 px-2 text-center">
+
+                                <td class="py-3 text-center">
                                     @php
-                                        $statusColor = match ($refund->refund_status) {
-                                            'approved' => 'bg-green-600',
-                                            'pending' => 'bg-yellow-600',
-                                            'rejected' => 'bg-red-700',
-                                            default => 'bg-gray-400',
-                                        };
+                                        $badge =
+                                            [
+                                                'approved' => 'bg-green-600',
+                                                'pending' => 'bg-yellow-600',
+                                                'rejected' => 'bg-red-600',
+                                            ][$refund->refund_status] ?? 'bg-gray-500';
                                     @endphp
-                                    <span
-                                        class="{{ $statusColor }} text-white text-sm font-semibold px-3 py-1 rounded-lg shadow">
-                                        {{ ucfirst($refund->refund_status ?? 'Pending') }}
+                                    <span class="text-white px-3 py-1 rounded-md shadow {{ $badge }}">
+                                        {{ ucfirst($refund->refund_status) }}
                                     </span>
                                 </td>
-                                <td class="py-3 px-3">
-                                    <div class="flex justify-center gap-3">
+
+                                <td class="py-3">
+                                    <div class="flex justify-center gap-2">
+
+                                        {{-- Tombol hanya muncul jika refund masih pending --}}
                                         @if ($refund->refund_status === 'pending')
-                                            <form action="{{ route('admin.refund.accept', $refund->id) }}" method="POST"
-                                                enctype="multipart/form-data">
-                                                @csrf
-                                                <input type="hidden" name="refund_amount"
-                                                    value="{{ $refund->booking->amount ?? 0 }}">
-                                                <input type="file" name="proof" required
-                                                    class="hidden proof-input-{{ $refund->id }}">
-                                                <button type="button"
-                                                    onclick="document.querySelector('.proof-input-{{ $refund->id }}').click()"
-                                                    class="bg-[#120A81] hover:bg-blue-900 text-white text-sm font-semibold px-3 py-1 rounded-lg shadow">
-                                                    Upload & Konfirmasi
-                                                </button>
-                                                <button type="submit"
-                                                    class="hidden submit-btn-{{ $refund->id }}"></button>
-                                            </form>
-                                            <form action="{{ route('admin.refund.reject', $refund->id) }}" method="POST">
+                                            {{-- Tombol Accept (buka modal) --}}
+                                            <button
+                                                class="editRefundBtn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm shadow"
+                                                data-id="{{ $refund->id }}" data-amount="{{ $refund->booking->amount }}"
+                                                data-proof="{{ $refund->proof ? asset('storage/' . $refund->proof) : '' }}">
+                                                Accept
+                                            </button>
+
+                                            {{-- Tombol Reject langsung proses --}}
+                                            <form action="{{ route('admin.refund.reject', $refund->id) }}" method="POST"
+                                                class="deleteForm">
                                                 @csrf
                                                 <button type="submit"
-                                                    class="bg-[#880719] hover:bg-[#a41e27] text-white text-sm font-semibold px-3 py-1 rounded-lg shadow">
-                                                    Tolak
+                                                    class="bg-[#880719] hover:bg-[#a41e27] text-white px-3 py-1.5 rounded-md shadow text-sm">
+                                                    Reject
                                                 </button>
                                             </form>
                                         @else
-                                            <span class="text-gray-400">Tidak ada aksi</span>
+                                            {{-- Jika approved atau rejected --}}
+                                            <span class="text-gray-400 italic">Tidak ada aksi</span>
                                         @endif
+
                                     </div>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+
+                <!-- MODAL EDIT REFUND -->
+                <div id="editRefundModal"
+                    class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                    <div class="bg-white w-[380px] rounded-xl shadow-lg p-6">
+
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Konfirmasi Refund</h2>
+
+                        <form method="POST" id="editRefundForm" enctype="multipart/form-data">
+                            @csrf
+                            @method('POST')
+
+                            <!-- Amount -->
+                            <div class="mb-4">
+                                <label class="text-sm font-medium">Jumlah Refund</label>
+                                <input type="number" id="refundAmount" name="refund_amount"
+                                    class="border rounded-lg w-full px-3 py-2" placeholder="Masukkan jumlah refund">
+                            </div>
+
+                            <!-- Preview Proof -->
+                            <img id="refundPreviewImage" class="hidden w-32 mx-auto mb-3 rounded-md shadow">
+
+                            <!-- Upload Proof -->
+                            <div class="mb-4">
+                                <label class="text-sm font-medium">Upload Bukti Transfer</label>
+                                <input type="file" id="refundImageInput" name="proof"
+                                    class="border rounded-lg w-full px-3 py-2">
+                            </div>
+
+                            <div class="flex justify-end gap-2 mt-5">
+                                <button type="button" id="refundCancel" class="px-4 py-2 border rounded-lg">Batal</button>
+
+                                <button type="submit"
+                                    class="px-4 py-2 bg-[#880719] hover:bg-[#a41e27] text-white rounded-lg">
+                                    Konfirmasi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </div>
 @endsection
-
-@push('scripts')
-    <script>
-        document.querySelectorAll('input[type="file"]').forEach(input => {
-            input.addEventListener('change', function() {
-                if (this.files.length > 0) {
-                    this.parentElement.querySelector('button[type="submit"]').click();
-                }
-            });
-        });
-    </script>
-@endpush

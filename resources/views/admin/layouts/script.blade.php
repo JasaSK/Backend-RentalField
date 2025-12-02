@@ -5,6 +5,7 @@
 <script src="{{ asset('js/edit-lapangan.js') }}"></script>
 <script src="{{ asset('js/edit-field-category.js') }}"></script>
 <script src="{{ asset('js/edit-gallery-category.js') }}"></script>
+<script src="{{ asset('js/edit-refund.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
@@ -52,24 +53,25 @@
 
     document.addEventListener("DOMContentLoaded", function() {
 
+        // Semua form dengan class ".confirmDelete" akan memiliki popup konfirmasi otomatis
         const deleteForms = document.querySelectorAll("form.deleteForm");
 
-        deleteForms.forEach(form => {
+        deleteForms.forEach((form) => {
             form.addEventListener("submit", function(e) {
-                e.preventDefault(); // cegah submit langsung
+                e.preventDefault();
 
                 Swal.fire({
-                    title: "Hapus kategori?",
-                    text: "Aksi ini tidak bisa dibatalkan!",
-                    icon: "warning",
+                    title: form.dataset.title || "Hapus Data?",
+                    text: form.dataset.text || "Aksi ini tidak dapat dibatalkan!",
+                    icon: form.dataset.icon || "warning",
                     showCancelButton: true,
-                    confirmButtonColor: "#d33",
+                    confirmButtonColor: form.dataset.confirmcolor || "#d33",
                     cancelButtonColor: "#3085d6",
-                    confirmButtonText: "Ya, hapus!",
-                    cancelButtonText: "Batal"
+                    confirmButtonText: form.dataset.confirm || "Ya, hapus!",
+                    cancelButtonText: form.dataset.cancel || "Batal"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        form.submit(); // submit jika setuju
+                        form.submit();
                     }
                 });
 

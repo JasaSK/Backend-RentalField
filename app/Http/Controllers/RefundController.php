@@ -50,6 +50,51 @@ class RefundController extends Controller
                 'message' => 'Booking tidak ditemukan.',
             ], 404);
         };
+
+        if ($request->amount_paid > $booking->total_price) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Jumlah yang dibayar tidak boleh lebih besar dari total harga.',
+            ], 400);
+        }
+
+        if ($request->amount_paid < $booking->total_price) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Jumlah yang dibayar tidak boleh lebih kecil dari total harga.',
+            ], 400);
+        }
+
+        if ($booking->status !== 'approved') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Booking belum dibayar.',
+            ]);
+        }
+
+        if ($booking->user_id !== $request->user_id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Booking tidak ditemukan.',
+            ]);
+        }
+
+        $refund = Refund::where('booking_id', $booking->id)->first();
+
+        if ($refund) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Refund sudah diajukan.',
+            ], 400);
+        }
+
+        if ($refund->status !== 'pending') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Refund sudah diajukan.',
+            ]);
+        }
+
         // Create refund
         $refund = Refund::create([
             'booking_id'     => $booking->id,
@@ -62,7 +107,7 @@ class RefundController extends Controller
             'refund_status' => 'pending',
             'proof' => null
         ]);
-        
+
         return response()->json([
             'status' => true,
             'message' => 'Refund berhasil diajukan.',
