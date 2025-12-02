@@ -111,6 +111,33 @@ class RefundController extends Controller
         ], 201);
     }
 
+    public function show($id)
+    {
+        $user = Auth::user();
+        $refund = Refund::find($id);
+
+        if (!$refund) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Refund tidak ditemukan',
+            ], 404);
+        }
+
+        // Cek kepemilikan
+        if ($refund->user_id !== $user->id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Anda tidak berhak mengakses refund ini',
+            ], 403);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Detail refund',
+            'data' => $refund
+        ], 200);
+    }
+
 
     public function getRefund()
     {

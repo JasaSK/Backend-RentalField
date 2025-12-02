@@ -59,6 +59,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/refund/all', [RefundController::class, 'getAllRefund']);
     Route::post('/refund/accept/{id}', [RefundController::class, 'acceptRefund']);
     Route::post('/refund/reject/{id}', [RefundController::class, 'rejectRefund']);
+    Route::get('/refund/{id}', [RefundController::class, 'show']);
 
     Route::post('/payment/create-qris/{booking_id}', [PaymentController::class, 'createQrisPayment']);
 
