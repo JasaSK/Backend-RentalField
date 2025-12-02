@@ -21,7 +21,7 @@
                     Dashboard
                 </a>
 
-                <a href="{{route('admin.order')}}"
+                <a href="{{ route('admin.order') }}"
                     class="block px-4 py-2 rounded-lg transition flex items-center justify-center
                     {{ Route::is('admin.order') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
                     Pemesanan
@@ -33,6 +33,12 @@
                     Banner
                 </a>
 
+                <a href="{{ route('admin.gallery-categories') }}"
+                    class="block px-4 py-2 rounded-lg transition flex items-center justify-center
+                    {{ Route::is('admin.gallery-categories') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
+                    Kategori Gallery
+                </a>
+
                 <a href="{{ route('admin.gallery') }}"
                     class="block px-4 py-2 rounded-lg transition flex items-center justify-center
                     {{ Route::is('admin.gallery') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
@@ -41,18 +47,13 @@
 
                 <a href="{{ route('admin.field-categories') }}"
                     class="block px-4 py-2 rounded-lg transition flex items-center justify-center
-                    {{ Route::is('admin.field-categories') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
+                {{ Route::is('admin.field-categories') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
                     Kategori Lapangan
                 </a>
-                <a href="{{ route('admin.gallery-categories') }}"
-                    class="block px-4 py-2 rounded-lg transition flex items-center justify-center
-                    {{ Route::is('admin.gallery-categories') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
-                    Kategori Galeri
-                </a>
-                
+
                 <a href="{{ route('admin.fields') }}"
                     class="block px-4 py-2 rounded-lg transition flex items-center justify-center
-                    {{ Route::is('admin.fields') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
+                {{ Route::is('admin.fields') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
                     Lapangan
                 </a>
 
@@ -60,6 +61,12 @@
                     class="block px-4 py-2 rounded-lg transition flex items-center justify-center
                     {{ Route::is('admin.refund') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
                     Refund
+                </a>
+
+                <a href="{{ route('admin.maintenance') }}"
+                    class="block px-4 py-2 rounded-lg transition flex items-center justify-center
+                    {{ Route::is('admin.maintenance') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
+                    Maintenance
                 </a>
             </nav>
 
@@ -75,8 +82,10 @@
             <!-- Navbar -->
             <nav class="bg-[#13810A] text-white py-4 px-8 flex justify-end items-center shadow-md sticky top-0 z-40">
                 <button id="userBtn" class="relative">
-                    <div class="w-12 h-12 bg-gray-400 rounded-full flex items-center justify-center hover:ring-2 hover:ring-white transition overflow-hidden">
-                        <img id="profilePic" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="User" class="w-12 h-12 object-cover">
+                    <div
+                        class="w-12 h-12 bg-gray-400 rounded-full flex items-center justify-center hover:ring-2 hover:ring-white transition overflow-hidden">
+                        <img id="profilePic" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="User"
+                            class="w-12 h-12 object-cover">
                     </div>
                 </button>
 
