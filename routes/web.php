@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\RefundController;
 use App\Http\Controllers\Admin\FieldCategoryController;
 use App\Http\Controllers\Admin\GalleryCategoryController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\MaintenanceController;
 use App\Http\Middleware\CheckLogin;
 
 Route::get('/',  function () {
@@ -57,4 +58,23 @@ Route::middleware([CheckLogin::class])->group(function () {
     Route::put('/admin/gallery-categories/update/{id}', [GalleryCategoryController::class, 'update'])->name('admin.gallery-categories.update');
     Route::delete('/admin/gallery-categories/destroy/{id}', [GalleryCategoryController::class, 'destroy'])->name('admin.gallery-categories.destroy');
 
+    Route::get('/admin/maintenance', 
+        [MaintenanceController::class, 'index']
+    )->name('admin.maintenance');
+   
+    Route::post('/admin/maintenance/store', 
+        [MaintenanceController::class, 'store']
+    )->name('admin.maintenance.store');
+
+    Route::get('/admin/maintenance/show/{id}', 
+        [MaintenanceController::class, 'show']
+    )->name('admin.maintenance.show');
+
+    Route::put('/admin/maintenance/update/{id}', 
+        [MaintenanceController::class, 'update']
+    )->name('admin.maintenance.update');
+
+    Route::delete('/admin/maintenance/destroy/{id}', 
+        [MaintenanceController::class, 'destroy']
+    )->name('admin.maintenance.destroy');
 });

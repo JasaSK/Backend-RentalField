@@ -6,6 +6,7 @@
 <script src="{{ asset('js/edit-field-category.js') }}"></script>
 <script src="{{ asset('js/edit-gallery-category.js') }}"></script>
 <script src="{{ asset('js/edit-refund.js') }}"></script>
+<script src="{{ asset('js/edit-maintenance.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
