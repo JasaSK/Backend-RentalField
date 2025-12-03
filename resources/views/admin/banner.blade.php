@@ -96,7 +96,7 @@
                                     <div class="flex w-full justify-center items-center gap-2">
                                         <!-- Tombol Edit -->
                                         <button
-                                            class="editBtn flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
+                                            class="editBannerBtn flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
                                             data-id="{{ $data['id'] }}" data-name="{{ $data['name'] }}"
                                             data-description="{{ $data['description'] }}"
                                             data-status="{{ $data['status'] }}"

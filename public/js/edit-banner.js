@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const editButtons = document.querySelectorAll(".editBtn");
+    const editButtons = document.querySelectorAll(".editBannerBtn");
     const modal = document.getElementById("editBannersModal");
     const cancelEdit = document.getElementById("cancelBannersEdit");
 
@@ -18,10 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.addEventListener("click", () => {
             const id = btn.dataset.id;
 
-            // update action form sesuai id
             editForm.action = `/admin/banner/update/${id}`;
 
-            // isi form dengan data dari row
             console.log("Edit input element:", editName);
             editName.value = btn.dataset.name;
             console.log("Assigned value:", editName.value);
@@ -30,11 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
             editStatus.value = btn.dataset.status;
             editDate.value = btn.dataset.created_at.split("T")[0]; // yyyy-mm-dd
 
-            // tampilkan preview gambar
             previewImage.src = btn.dataset.image;
             previewImage.classList.remove("hidden");
 
-            // tampilkan modal
             modal.classList.remove("hidden");
         });
     });

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('refund_method')->nullable();
             $table->string('account_number');
             $table->text('reason')->nullable();
+            $table->string('proof')->nullable();
             $table->enum('refund_status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });

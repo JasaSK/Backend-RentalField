@@ -13,7 +13,7 @@ class FieldController extends Controller
     // Tampilkan semua field
     public function index()
     {
-        $fields = Field::with('categoryField')->orderBy('created_at', 'desc')->get();
+        $fields = Field::with('categoryField')->orderBy('created_at', 'asc')->get();
         $categories = CategoryField::all();
 
         return view('admin.field', compact('fields', 'categories'));

@@ -32,7 +32,7 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->integer('total_price');
-            $table->enum('status', ['pending', 'approved', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'paid', 'canceled', 'refunded'])->default('pending');
             $table->string('payment_order_id')->nullable();
             $table->string('ticket_code')->nullable();
             $table->string('qris_url')->nullable();

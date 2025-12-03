@@ -103,7 +103,7 @@
                             </div>
 
                             <div class="flex justify-end gap-2 mt-5">
-                                <button type="button" id="cancetFieldCategoryEdit"
+                                <button type="button" id="cancelFieldCategoryEdit"
                                     class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">
                                     Batal
                                 </button>
