@@ -160,12 +160,7 @@
                                 class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]"></textarea>
                         </div>
 
-                        <!-- Tanggal Upload -->
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Upload</label>
-                            <input type="date" id="editBannersDate" name="tanggal"
-                                class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]" />
-                        </div>
+                
                         <!-- Preview Gambar -->
                         <img id="previewBannersImage" src="" alt="Preview Banner"
                             class="hidden w-32 mx-auto mb-3 rounded-md shadow">

@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const editImageInput = document.getElementById("editBannersImage");
     const editName = document.getElementById("editBannersName");
     const editDescription = document.getElementById("editBannersDescription");
-    const editDate = document.getElementById("editBannersDate");
     const editStatus = document.getElementById("editBannersStatus");
     const editForm = document.getElementById("editBannersForm");
 
@@ -26,7 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             editDescription.value = btn.dataset.description;
             editStatus.value = btn.dataset.status;
-            editDate.value = btn.dataset.created_at.split("T")[0]; // yyyy-mm-dd
 
             previewImage.src = btn.dataset.image;
             previewImage.classList.remove("hidden");

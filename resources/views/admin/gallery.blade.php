@@ -100,7 +100,8 @@
                                             class="editBtn flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
                                             data-id="{{ $data['id'] }}" data-name="{{ $data['name'] }}"
                                             data-description="{{ $data['description'] }}"
-                                            data-category="{{ $data['category_gallery']['name'] ?? '' }}"
+                                            data-category-id="{{ $data->category_gallery_id }}"
+                                            data-category="{{ $data->categoryGallery->name ?? '' }}"
                                             data-image="{{ $data->image ? asset('storage/' . $data->image) : '' }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
                                                 viewBox="0 0 24 24" stroke="currentColor">

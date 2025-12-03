@@ -12,18 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const id = btn.dataset.id;
             const name = btn.dataset.name;
             const description = btn.dataset.description;
-            const categoryName = btn.dataset.category; // ← ini sesuai Blade
+            let categoryId = btn.dataset.categoryId; // pakai let agar bisa diganti
             const image = btn.dataset.image;
-
-            // Cari categoryId berdasarkan nama kategori
-            let categoryId = "";
-            document
-                .querySelectorAll("#edit_category option")
-                .forEach((opt) => {
-                    if (opt.textContent.trim() === categoryName.trim()) {
-                        categoryId = opt.value;
-                    }
-                });
 
             // Isi form
             document.getElementById("edit_id").value = id;
@@ -57,13 +47,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Tombol batal
+    // Close modal
     closeModal.addEventListener("click", () => {
         modal.classList.add("hidden");
         modal.classList.remove("flex");
     });
 
-    // Klik luar modal
     modal.addEventListener("click", (e) => {
         if (e.target === modal) {
             modal.classList.add("hidden");
