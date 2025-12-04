@@ -17,7 +17,7 @@ class CheckLogin
 
         // cek role admin
         if (session('role') !== 'admin') {
-            abort(403, 'Unauthorized');
+            return back()->with('error', 'Akses ditolak. Anda bukan admin.');
         }
 
         return $next($request);
