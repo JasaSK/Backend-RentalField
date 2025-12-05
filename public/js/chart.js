@@ -1,4 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
+
+  // Data dari Laravel
+  // const weeklyOrders = @json($weeklyOrders);
+  // const weeklyIncome = @json($weeklyIncome);
+
   // === Chart Pemesanan ===
   const ctxPesanan = document.getElementById("chartPesanan");
   if (ctxPesanan) {
@@ -9,21 +14,15 @@ document.addEventListener("DOMContentLoaded", function () {
         datasets: [
           {
             label: "Jumlah Pemesanan",
-            data: [40, 65, 52, 70],
+            data: weeklyOrders,
             backgroundColor: "#13810A",
             borderRadius: 6,
           },
         ],
       },
       options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
-        plugins: {
-          legend: { display: false },
-        },
+        scales: { y: { beginAtZero: true } },
+        plugins: { legend: { display: false } },
       },
     });
   }
@@ -38,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
         datasets: [
           {
             label: "Pendapatan Per Minggu (Rp)",
-            data: [5000000, 6200000, 5800000, 7300000],
+            data: weeklyIncome,
             borderColor: "#13810A",
             backgroundColor: "rgba(19,129,10,0.2)",
             borderWidth: 3,

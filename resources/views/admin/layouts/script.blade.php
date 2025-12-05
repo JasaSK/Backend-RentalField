@@ -7,7 +7,15 @@
 <script src="{{ asset('js/edit-gallery-category.js') }}"></script>
 <script src="{{ asset('js/edit-refund.js') }}"></script>
 <script src="{{ asset('js/edit-maintenance.js') }}"></script>
+<script src="{{ asset('js/chart.js') }}"></script>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const weeklyOrders = @json($weeklyOrders);
+    const weeklyIncome = @json($weeklyIncome);
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

@@ -20,19 +20,19 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-7">
         <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition space-y-3 text-center">
             <h3 class="text-lg font-semibold text-gray-700">Pendapatan Bulan Ini</h3>
-            <p class="text-3xl font-bold text-[#13810A]">RP 12.000.000</p>
-            <p class="text-lg font-semibold text-gray-700">Naik 5% Dari Bulan Lalu</p>
+            <p class="text-3xl font-bold text-[#13810A]">RP {{ $incomeThisMonth }}</p>
+            <p class="text-lg font-semibold text-gray-700">Naik {{ $percentageChange }}% Dari Bulan Lalu</p>
         </div>
 
         <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition space-y-3 text-center">
             <h3 class="text-lg font-semibold text-gray-700">Jumlah Booking Hari Ini</h3>
-            <p class="text-3xl font-bold text-[#13810A]">8 Booking</p>
+            <p class="text-3xl font-bold text-[#13810A]">{{ $bookingCount }} Booking</p>
             <p class="text-lg font-semibold text-gray-700">Dari Total {{ $fieldCount }} Lapangan</p>
         </div>
 
         <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition space-y-3 text-center">
             <h3 class="text-lg font-semibold text-gray-700">Lapangan Aktif</h3>
-            <p class="text-3xl font-bold text-[#13810A]">8</p>
+            <p class="text-3xl font-bold text-[#13810A]">{{ $fieldStatus }}</p>
         </div>
 
         <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition space-y-3 text-center">
@@ -69,8 +69,3 @@
             </tbody>
         </table>
     @endsection
-    <!-- script js -->
-    @push('scripts')
-        <script src="{{ asset('js/usercard.js') }}"></script>
-        <script src="{{ asset('js/chart.js') }}"></script>
-    @endpush
