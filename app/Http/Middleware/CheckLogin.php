@@ -11,7 +11,7 @@ class CheckLogin
     {
         // cek login
         if (!session()->has('user_id')) {
-            return redirect()->route('page.admin.login')
+            return redirect()->route('admin.page.login')
                 ->with('error', 'Silakan login terlebih dahulu.');
         }
 

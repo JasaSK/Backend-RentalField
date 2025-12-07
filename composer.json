@@ -9,12 +9,13 @@
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
         "darkaonline/l5-swagger": "^9.0",
-        "endroid/qr-code": "^6.0",
+        "endroid/qr-code": "^5.0",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.2",
         "laravel/tinker": "^2.10.1",
         "midtrans/midtrans-php": "^2.6",
-        "opcodesio/log-viewer": "^3.21"
+        "opcodesio/log-viewer": "^3.21",
+        "simplesoftwareio/simple-qrcode": "^4.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

@@ -1,4 +1,3 @@
-<!-- SweetAlert2 CDN -->
 
 <script src="{{ asset('js/edit-banner.js') }}"></script>
 <script src="{{ asset('js/edit-gallery.js') }}"></script>

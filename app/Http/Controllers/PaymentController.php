@@ -8,16 +8,17 @@ use App\Models\Booking;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
+
 class PaymentController extends Controller
 {
     public function __construct()
     {
-        Config::$serverKey   = config('services.midtrans.server_key');
-        Config::$isProduction = config('services.midtrans.is_production', false);
-        Config::$isSanitized  = true;
-        Config::$is3ds        = false;
+        $serverKey   = config('services.midtrans.server_key');
+        $isProduction = config('services.midtrans.is_production', false);
+        $isSanitized  = true;
+        $is3ds        = false;
 
-        if (!Config::$serverKey) {
+        if (!$serverKey) {
             throw new \Exception("ServerKey Midtrans belum diset di .env");
         }
     }
