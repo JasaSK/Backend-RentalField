@@ -19,27 +19,22 @@ class TicketController extends Controller
     {
         // Validasi input
         $request->validate([
-            'booking_id'   => 'required|exists:bookings,id',
+            // 'booking_id'   => 'required|exists:bookings,id',
             'ticket_code'  => 'required|string|exists:bookings,ticket_code',
         ], [
-            'booking_id.required' => 'ID booking wajib diisi.',
-            'booking_id.exists' => 'ID booking tidak ditemukan.',
+            // 'booking_id.required' => 'ID booking wajib diisi.',
+            // 'booking_id.exists' => 'ID booking tidak ditemukan.',
             'ticket_code.required' => 'Kode tiket wajib diisi.',
             'ticket_code.string' => 'Format kode tiket tidak valid.',
             'ticket_code.exists' => 'Kode tiket tidak ditemukan.',
         ]);
 
-        // Ambil booking berdasarkan ID + kode tiket
-        $booking = Booking::where('id', $request->booking_id)
-            ->where('ticket_code', $request->ticket_code)
-            ->first();
+        $booking = Booking::where('ticket_code', $request->ticket_code)->first();
 
-        // Jika booking tidak ditemukan
         if (!$booking) {
-            return back()->with('error', 'Tiket tidak valid.');
+            return back()->with('error', 'Kode tiket tidak ditemukan.');
         }
 
-        // Cek apakah status sudah approved dan tiket belum dipakai
         if ($booking->status !== 'approved') {
             return back()->with('error', 'Booking belum disetujui.');
         }
@@ -48,13 +43,11 @@ class TicketController extends Controller
             return back()->with('error', 'Tiket ini sudah pernah diverifikasi.');
         }
 
-        // Update booking → tiket jadi used
         $booking->update(['status_ticket' => 'used']);
 
-        // Log ke tabel Ticket
         Ticket::create([
             'ticket_code' => $request->ticket_code,
-            'booking_id'  => $request->booking_id,
+            'booking_id'  => $booking->id,
             'verified_at' => now(),
         ]);
 

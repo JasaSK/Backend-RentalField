@@ -89,29 +89,4 @@ class TicketController extends Controller
         return $pdf->stream('ticket-' . $booking->ticket_code . '.pdf');
     }
 
-
-    public function verifyTicket(Request $request)
-    {
-        $request->validate([
-            'ticket_code' => 'required|string',
-        ], [
-            'ticket_code.required' => 'Kode tiket wajib diisi.',
-        ]);
-
-        $booking = Booking::where('ticket_code', $request->ticket_code)->first();
-
-        if (!$booking) {
-            return response()->json(['success' => false, 'message' => 'Tiket tidak valid'], 404);
-        }
-
-        if ($booking->status !== 'approved') {
-            return response()->json(['success' => false, 'message' => 'Tiket belum dapat diverifikasi karena pembayaran belum disetujui'], 403);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Tiket valid',
-            'booking' => $booking
-        ]);
-    }
 }

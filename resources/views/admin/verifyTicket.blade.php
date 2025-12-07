@@ -15,20 +15,15 @@
                     @csrf
 
                     <input type="hidden" name="ticket_code" id="ticket_code">
-                    <input type="hidden" name="booking_id" id="booking_id">
 
-                    {{-- Scanner box --}}
                     <div id="reader" class="w-72 h-72 border-2 border-gray-300 rounded-lg shadow-inner hidden"></div>
 
-                    {{-- Loading text --}}
                     <p id="loadingText" class="text-gray-500 text-sm mt-3 hidden animate-pulse">
                         Mengaktifkan kamera...
                     </p>
 
-                    {{-- Hasil scan --}}
                     <div id="result" class="mt-4 font-medium text-center"></div>
 
-                    {{-- Button Control --}}
                     <div class="mt-6 flex gap-4">
                         <button type="button" id="startScan"
                             class="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold shadow">
@@ -44,7 +39,7 @@
             </div>
         </div>
 
-        {{-- TABLE LIST --}}
+        {{-- TABLE --}}
         <div class="bg-white shadow-xl rounded-xl p-6 border">
             <h2 class="text-xl font-bold text-gray-800 mb-4">Tiket Terverifikasi</h2>
 
@@ -64,11 +59,6 @@
                             <td class="p-3 border-b text-gray-700">ABC123</td>
                             <td class="p-3 border-b text-gray-700">2025-12-07 14:20</td>
                         </tr>
-                        <tr>
-                            <td class="p-3 border-b text-gray-700">2</td>
-                            <td class="p-3 border-b text-gray-700">XYZ987</td>
-                            <td class="p-3 border-b text-gray-700">2025-12-07 15:12</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -86,8 +76,8 @@
 
             const startBtn = document.getElementById("startScan");
             const stopBtn = document.getElementById("stopScan");
-            const resultBox = document.getElementById("result");
             const form = document.getElementById("verifyForm");
+            const resultBox = document.getElementById("result");
 
             startBtn.addEventListener("click", function() {
                 if (isRunning) return;
@@ -113,34 +103,17 @@
                     },
 
                     async (decodedText) => {
-                            if (scanned) return;
-                            scanned = true;
+                        if (scanned) return;
+                        scanned = true;
 
-                            // FORMAT QR = KODETIKET|BOOKINGID
-                            let ticket = decodedText;
-                            let booking = null;
+                        document.getElementById("ticket_code").value = decodedText;
 
-                            if (decodedText.includes("|")) {
-                                let parts = decodedText.split("|");
-                                ticket = parts[0];
-                                booking = parts[1];
-                            }
+                        resultBox.innerHTML =
+                            `<span class='text-green-600 font-semibold'>Kode Tiket: ${decodedText}</span>`;
 
-                            // Set input values
-                            document.getElementById("ticket_code").value = ticket;
-                            document.getElementById("booking_id").value = booking ?? "";
-
-                            resultBox.innerHTML =
-                                `<span class='text-green-600 font-semibold'>Kode Tiket: ${ticket}</span><br>
-                             <span class='text-blue-600'>Booking ID: ${booking ?? '-'}</span>`;
-
-                            // Matikan kamera lalu submit
-                            await html5QrCode.stop();
-                            form.submit();
-                        },
-
-                        (err) => {
-                            /* ignore error */ }
+                        await html5QrCode.stop();
+                        form.submit();
+                    }
                 ).catch(err => {
                     resultBox.innerHTML =
                         "<span class='text-red-600 font-semibold'>Camera tidak bisa diakses</span>";
@@ -156,10 +129,11 @@
 
                     document.getElementById("reader").classList.add("hidden");
                     document.getElementById("loadingText").classList.add("hidden");
-                    resultBox.innerHTML = "";
 
                     stopBtn.classList.add("hidden");
                     startBtn.classList.remove("hidden");
+
+                    resultBox.innerHTML = "";
                 });
             });
         });
