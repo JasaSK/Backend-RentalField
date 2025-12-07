@@ -68,4 +68,8 @@
                 @endforeach
             </tbody>
         </table>
+        <script>
+            const weeklyOrders = @json($weeklyOrders);
+            const weeklyIncome = @json($weeklyIncome);
+        </script>
     @endsection

@@ -18,6 +18,7 @@ class Booking extends Model
         'total_price',
         'payment_order_id',
         'ticket_code',
+        'status_ticket',
         'qris_url'
     ];
     public function field()
@@ -33,5 +34,10 @@ class Booking extends Model
     public function refunds()
     {
         return $this->hasMany(Refund::class);
+    }
+
+    public function ticket()
+    {
+        return $this->hasOne(Ticket::class);
     }
 }

@@ -1,0 +1,167 @@
+@extends('admin.layouts.master')
+
+@section('content')
+    <div class="max-w-5xl mx-auto mt-10">
+
+        {{-- CARD SCANNER --}}
+        <div class="bg-white shadow-xl rounded-xl p-6 border mb-10">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                Verifikasi Tiket
+            </h1>
+
+            <div class="flex flex-col items-center">
+                <form id="verifyForm" action="{{ route('admin.verify.ticket.process') }}" method="POST"
+                    class="flex flex-col items-center">
+                    @csrf
+
+                    <input type="hidden" name="ticket_code" id="ticket_code">
+                    <input type="hidden" name="booking_id" id="booking_id">
+
+                    {{-- Scanner box --}}
+                    <div id="reader" class="w-72 h-72 border-2 border-gray-300 rounded-lg shadow-inner hidden"></div>
+
+                    {{-- Loading text --}}
+                    <p id="loadingText" class="text-gray-500 text-sm mt-3 hidden animate-pulse">
+                        Mengaktifkan kamera...
+                    </p>
+
+                    {{-- Hasil scan --}}
+                    <div id="result" class="mt-4 font-medium text-center"></div>
+
+                    {{-- Button Control --}}
+                    <div class="mt-6 flex gap-4">
+                        <button type="button" id="startScan"
+                            class="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold shadow">
+                            Start Scan
+                        </button>
+
+                        <button type="button" id="stopScan"
+                            class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold shadow hidden">
+                            Stop Scan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- TABLE LIST --}}
+        <div class="bg-white shadow-xl rounded-xl p-6 border">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Tiket Terverifikasi</h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-left">
+                    <thead>
+                        <tr class="bg-gray-100 border-b">
+                            <th class="p-3 font-semibold text-gray-700">No</th>
+                            <th class="p-3 font-semibold text-gray-700">Kode Tiket</th>
+                            <th class="p-3 font-semibold text-gray-700">Waktu Scan</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="ticketTable">
+                        <tr>
+                            <td class="p-3 border-b text-gray-700">1</td>
+                            <td class="p-3 border-b text-gray-700">ABC123</td>
+                            <td class="p-3 border-b text-gray-700">2025-12-07 14:20</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b text-gray-700">2</td>
+                            <td class="p-3 border-b text-gray-700">XYZ987</td>
+                            <td class="p-3 border-b text-gray-700">2025-12-07 15:12</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let html5QrCode;
+        let isRunning = false;
+        let scanned = false;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            html5QrCode = new Html5Qrcode("reader");
+
+            const startBtn = document.getElementById("startScan");
+            const stopBtn = document.getElementById("stopScan");
+            const resultBox = document.getElementById("result");
+            const form = document.getElementById("verifyForm");
+
+            startBtn.addEventListener("click", function() {
+                if (isRunning) return;
+
+                scanned = false;
+                resultBox.innerHTML = "";
+                isRunning = true;
+
+                document.getElementById("reader").classList.remove("hidden");
+                document.getElementById("loadingText").classList.remove("hidden");
+
+                startBtn.classList.add("hidden");
+                stopBtn.classList.remove("hidden");
+
+                html5QrCode.start({
+                        facingMode: "environment"
+                    }, {
+                        fps: 10,
+                        qrbox: {
+                            width: 250,
+                            height: 250
+                        }
+                    },
+
+                    async (decodedText) => {
+                            if (scanned) return;
+                            scanned = true;
+
+                            // FORMAT QR = KODETIKET|BOOKINGID
+                            let ticket = decodedText;
+                            let booking = null;
+
+                            if (decodedText.includes("|")) {
+                                let parts = decodedText.split("|");
+                                ticket = parts[0];
+                                booking = parts[1];
+                            }
+
+                            // Set input values
+                            document.getElementById("ticket_code").value = ticket;
+                            document.getElementById("booking_id").value = booking ?? "";
+
+                            resultBox.innerHTML =
+                                `<span class='text-green-600 font-semibold'>Kode Tiket: ${ticket}</span><br>
+                             <span class='text-blue-600'>Booking ID: ${booking ?? '-'}</span>`;
+
+                            // Matikan kamera lalu submit
+                            await html5QrCode.stop();
+                            form.submit();
+                        },
+
+                        (err) => {
+                            /* ignore error */ }
+                ).catch(err => {
+                    resultBox.innerHTML =
+                        "<span class='text-red-600 font-semibold'>Camera tidak bisa diakses</span>";
+                });
+            });
+
+            stopBtn.addEventListener("click", function() {
+                if (!isRunning) return;
+
+                html5QrCode.stop().then(() => {
+                    isRunning = false;
+                    scanned = false;
+
+                    document.getElementById("reader").classList.add("hidden");
+                    document.getElementById("loadingText").classList.add("hidden");
+                    resultBox.innerHTML = "";
+
+                    stopBtn.classList.add("hidden");
+                    startBtn.classList.remove("hidden");
+                });
+            });
+        });
+    </script>
+@endsection

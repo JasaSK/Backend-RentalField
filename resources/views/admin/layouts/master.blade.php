@@ -21,10 +21,10 @@
                     Dashboard
                 </a>
 
-                <a href="{{ route('admin.order') }}"
+                <a href="{{ route('admin.verify.ticket') }}"
                     class="block px-4 py-2 rounded-lg transition flex items-center justify-center
-                    {{ Route::is('admin.order') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
-                    Pemesanan
+                    {{ Route::is('admin.verify.ticket') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
+                    Verify Ticket
                 </a>
 
                 <a href="{{ route('admin.banner') }}"

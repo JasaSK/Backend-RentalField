@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\FieldCategoryController;
 use App\Http\Controllers\Admin\GalleryCategoryController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\MaintenanceController;
+use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\admin\UserController;
 use App\Http\Middleware\CheckLogin;
 
@@ -63,4 +64,7 @@ Route::middleware([CheckLogin::class])->group(function () {
     Route::get('/admin/maintenance/show/{id}', [MaintenanceController::class, 'show'])->name('admin.maintenance.show');
     Route::put('/admin/maintenance/update/{id}', [MaintenanceController::class, 'update'])->name('admin.maintenance.update');
     Route::delete('/admin/maintenance/destroy/{id}', [MaintenanceController::class, 'destroy'])->name('admin.maintenance.destroy');
+
+    Route::get('/admin/verify-ticket', [TicketController::class, 'index'])->name('admin.verify.ticket');
+    Route::post('/admin/verify-ticket/process', [TicketController::class, 'verifyTicket'])->name('admin.verify.ticket.process');
 });

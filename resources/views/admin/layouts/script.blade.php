@@ -12,10 +12,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    const weeklyOrders = @json($weeklyOrders);
-    const weeklyIncome = @json($weeklyIncome);
-</script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
