@@ -7,17 +7,17 @@ use Illuminate\Http\Request;
 
 class CheckLogin
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
         // cek login
-        if (!session()->has('user_id')) {
-            return redirect()->route('admin.page.login')
-                ->with('error', 'Silakan login terlebih dahulu.');
+        $user = $request->user();
+
+        if (!$user) {
+            return redirect()->route('admin.page.login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        // cek role admin
-        if (session('role') !== 'admin') {
-            return back()->with('error', 'Akses ditolak. Anda bukan admin.');
+        if (!in_array($user->role, $roles)) {
+            return redirect()->route('admin.page.login')->with('error', 'Anda tidak memiliki akses ke halaman ini.');
         }
 
         return $next($request);

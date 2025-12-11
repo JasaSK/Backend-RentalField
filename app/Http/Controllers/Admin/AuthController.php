@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -28,50 +26,23 @@ class AuthController extends Controller
             'password.min' => 'Password minimal 6 karakter.',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $credentials = $request->only('email', 'password');
+        if (Auth::guard('web')->attempt($credentials)) {
+            $user = Auth::user();
+            $request->session()->put('user_name', $user->name);
 
-        if ($user && password_verify($request->password, $user->password)) { // password harus hash
-            // Simpan session manual
-            session([
-                'user_id' => $user->id,
-                'user_name' => $user->name,
-                'user_email' => $user->email,
-                'role' => $user->role,
-            ]);
 
-            return redirect()->route('admin.dashboard')->with([
-                'swal' => [
-                    'icon' => 'success',
-                    'title' => 'Login Berhasil!',
-                    'text' => 'Selamat datang, ' . $user->name . '!',
-                    'timer' => 2000
-                ]
-            ]);
+            return redirect()->route('admin.dashboard')->with('success', 'Login berhasil!');
         }
-
-        return back()->withErrors(['login' => 'Email atau password salah!'])->with([
-            'swal' => [
-                'icon' => 'error',
-                'title' => 'Login Gagal!',
-                'text' => 'Email atau password salah!',
-            ]
-        ]);
+        return back()->withErrors(['login' => 'Email atau password salah!'])->with('error', 'Login gagal, silakan coba lagi.');
     }
-
-
     public function logout(Request $request)
     {
         $request->session()->forget(['user_id', 'user_name', 'user_email']);
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/')->with([
-            'swal' => [
-                'icon' => 'success',
-                'title' => 'Logout Berhasil!',
-                'text' => 'Anda telah berhasil logout.',
-                'timer' => 3000
-            ]
-        ]);
+        return redirect('/')->with('success', 'Anda telah logout.');
     }
+
 }

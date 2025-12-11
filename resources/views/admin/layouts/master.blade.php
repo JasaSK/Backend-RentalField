@@ -80,18 +80,21 @@
         <div class="ml-60 flex-1 flex flex-col h-screen overflow-y-auto">
 
             <!-- Navbar -->
-            <nav class="bg-[#13810A] text-white py-4 px-8 flex justify-end items-center shadow-md sticky top-0 z-40">
-                <button id="userBtn" class="relative">
+            <nav class="bg-[#13810A] text-white py-4 px-8 flex justify-end items-center shadow-md sticky top-0 z-50">
+                <!-- Profil user sebagai label -->
+                <div class="relative flex flex-col items-center flex-none cursor-default">
                     <div
-                        class="w-12 h-12 bg-gray-400 rounded-full flex items-center justify-center hover:ring-2 hover:ring-white transition overflow-hidden">
-                        <img id="profilePic" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="User"
-                            class="w-12 h-12 object-cover">
+                        class="w-16 aspect-square 
+                    bg-green-600 hover:bg-green-700 
+                    rounded-full flex items-center justify-center 
+                    shadow-lg transition-all duration-300 ease-in-out 
+                    border-2 border-white/20 overflow-hidden flex-shrink-0">
+                        <span
+                            class="text-white font-bold text-2xl tracking-wider select-none">{{ Auth::user()->name[0] }}</span>
                     </div>
-                </button>
-
-                <!-- card profile -->
-                @include('admin.layouts.usercard')
+                </div>
             </nav>
+
 
             <!-- konten dinamis -->
             <div class="p-8 flex-1">

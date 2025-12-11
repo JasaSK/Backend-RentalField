@@ -1,7 +1,7 @@
 @extends('admin.layouts.master')
 
 @section('content')
-    <h1 class="text-3xl font-bold text-gray-800 mb-8">Selamat Datang, Admin!</h1>
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">Selamat Datang, {{ Auth::user()->name }}!</h1>
 
     <!-- Grafik -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-7">

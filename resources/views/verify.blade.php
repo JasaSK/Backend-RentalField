@@ -19,14 +19,14 @@
 
         <p style="color:#555; margin-bottom:20px;">
             Terima kasih telah mendaftar di <span style="color:#13810A; font-weight:bold;">EZFutsal</span>.
-            Berikut kode verifikasi untuk mengaktifkan akun Anda:
+            {{ $emailMessage }}
         </p>
 
         <!-- Kode OTP -->
         <div style="text-align:center; margin:30px 0;">
 
             <p style="color:#555; margin-bottom:20px; font-size:15px; text-align:center;">
-                Berikut kode verifikasi untuk mengaktifkan akun Anda:
+                Berikut {{$emailSubject}}:
             </p>
 
             @foreach (str_split($code) as $digit)
