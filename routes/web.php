@@ -67,4 +67,6 @@ Route::middleware('checkLogin:admin')->group(function () {
 
     Route::get('/admin/verify-ticket', [TicketController::class, 'index'])->name('admin.verify.ticket');
     Route::post('/admin/verify-ticket/process', [TicketController::class, 'verifyTicket'])->name('admin.verify.ticket.process');
+
+    Route::post('/Logout', [AuthController::class, 'logout'])->name('logout');
 });

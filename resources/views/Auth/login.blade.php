@@ -25,18 +25,19 @@
     <!-- CARD LOGIN -->
     <div class="relative w-[95%] max-w-[970px] h-auto md:h-[520px] rounded-2xl overflow-hidden shadow-2xl bg-white">
         <!-- Background hanya tampil di tablet/desktop -->
-        <div class="hidden md:block absolute inset-0 bg-[url('/aset/login-bg.jpg')] bg-cover bg-center"></div>
+        <div class="hidden md:block absolute inset-0 bg-[url('/aset/login-bg2.jpg')] bg-cover bg-center"></div>
+        <div class="hidden md:block absolute inset-0 bg-black/40 rounded-2xl"></div>
 
         <!-- Teks sambutan -->
         <div
-            class="hidden md:block absolute bottom-8 left-[60px] md:left-[100px] text-white text-lg md:text-xl font-semibold drop-shadow-lg max-w-sm leading-relaxed">
-            Welcome back! Let's make today <br>
-            <span class="pl-6">productive and smooth.</span>
+            class="hidden md:block absolute top-1/2 left-[60px] md:left-[100px] -translate-y-1/2 text-white text-lg md:text-xl font-semibold drop-shadow-lg max-w-sm leading-relaxed">
+            Welcome back admin, Have a great day!<br>
+            <span class="pl-6">Let's manage EZFutsal smoothly.</span>
         </div>
 
         <!-- FORM LOGIN -->
         <div
-            class="relative md:absolute md:top-6 md:right-6 md:bottom-6 bg-[#13810A]/65 md:backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full md:w-[360px] text-white flex flex-col justify-center items-center transition-all duration-300">
+            class="relative md:absolute md:top-6 md:right-6 md:bottom-6 bg-white/25 md:backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full md:w-[360px] text-white flex flex-col justify-center items-center transition-all duration-300">
 
             <div class="flex flex-col items-center w-full">
                 <!-- Icon -->
@@ -79,13 +80,6 @@
                         </label>
                         {{-- <a href="{{ url('beranda/forgotpassword') }}" class="hover:underline">Forgot password?</a> --}}
                     </div>
-
-                    <!-- Belum punya akun -->
-                    <p class="text-center text-sm leading-tight mt-2">
-                        Belum memiliki akun? <br>
-                        {{-- <a href="{{ route('PageRegister') }}" class="underline text-blue-300 hover:text-blue-400">Daftar
-                            sekarang</a> --}}
-                    </p>
 
                     <!-- Tombol Login -->
                     <div class="flex justify-center mt-4">

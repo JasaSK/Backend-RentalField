@@ -82,7 +82,7 @@
 
                                         <!-- Edit -->
                                         <button
-                                            class="editMaintenanceBtn flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
+                                            class="editMaintenanceBtn flex items-center gap-1 bg-blue-800 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
                                             data-id="{{ $m->id }}" data-field="{{ $m->field_id }}"
                                             data-date="{{ $m->date }}" data-start="{{ $m->start_time }}"
                                             data-end="{{ $m->end_time }}" data-reason="{{ $m->reason }}">
@@ -98,7 +98,7 @@
                                         <form action="{{ route('admin.maintenance.destroy', $m->id) }}" method="POST">
                                             @csrf @method('DELETE')
                                             <button type="submit"
-                                                class="hapusBtn flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition">
+                                                class="hapusBtn flex items-center gap-1  bg-[#880719] hover:bg-[#a41e27] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
                                                     viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -115,71 +115,69 @@
                     </tbody>
                 </table>
             </div>
-
-            <!-- Modal Edit Maintenance -->
-            <div id="editMaintenanceModal"
-                class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-
-                <div class="bg-white rounded-xl shadow-lg p-6 w-[400px] relative">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Edit Maintenance</h2>
-
-                    <form id="editMaintenanceForm" method="POST">
-                        @csrf
-                        @method('PUT')
-
-                        <input type="hidden" id="maintenance_edit_id" name="id">
-
-                        <!-- Pilih Lapangan -->
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Lapangan</label>
-                            <select id="maintenance_edit_field_id" name="field_id"
-                                class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]">
-                                @foreach ($fields as $field)
-                                    <option value="{{ $field->id }}">{{ $field->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Tanggal -->
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-                            <input type="date" id="maintenance_edit_date" name="date"
-                                class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]">
-                        </div>
-
-                        <!-- Waktu Mulai -->
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Waktu Mulai</label>
-                            <input type="time" id="maintenance_edit_start_time" name="start_time"
-                                class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]">
-                        </div>
-
-                        <!-- Waktu Selesai -->
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Waktu Selesai</label>
-                            <input type="time" id="maintenance_edit_end_time" name="end_time"
-                                class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]">
-                        </div>
-
-                        <!-- Alasan -->
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Alasan Maintenance</label>
-                            <textarea id="maintenance_edit_reason" name="reason"
-                                class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]"></textarea>
-                        </div>
-
-                        <!-- Tombol -->
-                        <div class="flex justify-end gap-2 mt-5">
-                            <button type="button" id="closeMaintenanceModal"
-                                class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Batal</button>
-                            <button type="submit"
-                                class="px-4 py-2 rounded-lg bg-[#880719] hover:bg-[#a41e27] text-white font-semibold">Simpan</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </div>
+    </div>
+    <!-- Modal Edit Maintenance -->
+    <div id="editMaintenanceModal"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 overflow-y-auto p-4">
 
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-[450px] relative p-6 flex flex-col">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Edit Maintenance</h2>
+
+            <form id="editMaintenanceForm" method="POST" class="flex-1 flex flex-col gap-3">
+                @csrf
+                @method('PUT')
+
+                <input type="hidden" id="maintenance_edit_id" name="id">
+
+                <!-- Pilih Lapangan -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Lapangan</label>
+                    <select id="maintenance_edit_field_id" name="field_id"
+                        class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]">
+                        @foreach ($fields as $field)
+                            <option value="{{ $field->id }}">{{ $field->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Tanggal -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                    <input type="date" id="maintenance_edit_date" name="date"
+                        class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]">
+                </div>
+
+                <!-- Waktu Mulai -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Waktu Mulai</label>
+                    <input type="time" id="maintenance_edit_start_time" name="start_time"
+                        class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]">
+                </div>
+
+                <!-- Waktu Selesai -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Waktu Selesai</label>
+                    <input type="time" id="maintenance_edit_end_time" name="end_time"
+                        class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]">
+                </div>
+
+                <!-- Alasan -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Alasan Maintenance</label>
+                    <textarea id="maintenance_edit_reason" name="reason"
+                        class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]"></textarea>
+                </div>
+
+                <!-- Tombol -->
+                <div class="flex justify-end gap-2 mt-5">
+                    <button type="button" id="closeMaintenanceModal"
+                        class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Batal</button>
+                    <button type="submit"
+                        class="px-4 py-2 rounded-lg bg-[#880719] hover:bg-[#a41e27] text-white font-semibold">Simpan</button>
+                </div>
+            </form>
+        </div>
     </div>
     </div>
 @endsection
