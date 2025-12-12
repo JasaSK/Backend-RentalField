@@ -68,6 +68,14 @@
                     {{ Route::is('admin.maintenance') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
                     Maintenance
                 </a>
+
+                <form action="{{ route('logout') }}" method="POST" class="block">
+                    @csrf
+                    <button type="submit"
+                        class="w-full px-4 py-2 rounded-lg transition flex items-center justify-center {{ Route::is('Auth.login') ? 'bg-[#13810A] text-white' : 'hover:bg-[#13810A] hover:text-white text-gray-800' }}">
+                        Logout
+                    </button>
+                </form>
             </nav>
 
 

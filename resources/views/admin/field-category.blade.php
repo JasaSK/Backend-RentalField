@@ -51,7 +51,7 @@
 
                                         <!-- Tombol Edit -->
                                         <button
-                                            class="editFieldCategoryBtn flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
+                                            class="editFieldCategoryBtn flex items-center gap-1 bg-blue-800 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
                                             data-id="{{ $category['id'] }}" data-name="{{ $category['name'] }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
                                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -68,7 +68,7 @@
                                             @method('DELETE')
 
                                             <button type="submit"
-                                                class="hapusBtn flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition">
+                                                class="hapusBtn flex items-center gap-1 bg-[#880719] hover:bg-[#a41e27] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
                                                     viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

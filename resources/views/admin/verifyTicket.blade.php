@@ -26,12 +26,12 @@
 
                     <div class="mt-6 flex gap-4">
                         <button type="button" id="startScan"
-                            class="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold shadow">
+                            class="px-5 py-2 bg-[#13810A] hover:bg-green-700 text-white rounded-lg font-semibold shadow">
                             Start Scan
                         </button>
 
                         <button type="button" id="stopScan"
-                            class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold shadow hidden">
+                            class="px-5 py-2 bg-[#880719] hover:bg-[#a41e27] text-white rounded-lg font-semibold shadow hidden">
                             Stop Scan
                         </button>
                     </div>

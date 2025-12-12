@@ -2,6 +2,7 @@
 
 @section('content')
     <h1 class="text-3xl font-bold text-gray-800 mb-3">Info Banner</h1>
+
     <div class="p-3 flex-1">
         <div class="mx-auto w-[97%] max-w-[1500px] space-y-6 mb-6">
 
@@ -40,7 +41,6 @@
                             @foreach ($options as $status)
                                 <option value="{{ $status }}">{{ ucfirst($status) }}</option>
                             @endforeach
-                            {{-- <option value="non-active">Non-active</option> --}}
                         </select>
                     </div>
 
@@ -50,7 +50,6 @@
                         Upload Banner
                     </button>
                 </form>
-
             </div>
 
             <!-- Card Daftar Banner -->
@@ -74,21 +73,19 @@
                         @foreach ($banners as $index => $data)
                             <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
                                 <td class="py-3 px-2">{{ $index + 1 }}</td>
-                                <td class="py-3 px-2"> <img src="{{ $data->image ? asset('storage/' . $data->image) : '' }}"
-                                        alt="Banners" class="banner-img w-20 mx-auto rounded-md shadow"></td>
-                                <td class="py-3 px-2 nama">
-                                    {{ $data['name'] }}
+                                <td class="py-3 px-2">
+                                    <img src="{{ $data->image ? asset('storage/' . $data->image) : '' }}" alt="Banners"
+                                        class="banner-img w-20 mx-auto rounded-md shadow">
                                 </td>
-                                <td class="py-3 px-2 deskripsi">
-                                    {{ $data['description'] }}
-                                </td>
+                                <td class="py-3 px-2 nama">{{ $data['name'] }}</td>
+                                <td class="py-3 px-2 deskripsi">{{ $data['description'] }}</td>
                                 <td class="py-3 px-2 tanggal">
                                     {{ \Carbon\Carbon::parse($data['created_at'])->format('d M Y') }}
                                 </td>
                                 <td class="py-3 px-2 text-center">
                                     <span
                                         class="inline-block px-3 py-1 text-sm font-semibold rounded-full shadow text-white
-                                        {{ $data['status'] === 'active' ? 'bg-green-600' : 'bg-gray-500' }}">
+                                    {{ $data['status'] === 'active' ? 'bg-[#13810A]' : 'bg-gray-500' }}">
                                         {{ ucfirst($data['status']) }}
                                     </span>
                                 </td>
@@ -96,7 +93,7 @@
                                     <div class="flex w-full justify-center items-center gap-2">
                                         <!-- Tombol Edit -->
                                         <button
-                                            class="editBannerBtn flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
+                                            class="editBannerBtn flex items-center gap-1 bg-blue-800 hover:bg-blue-600 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
                                             data-id="{{ $data['id'] }}" data-name="{{ $data['name'] }}"
                                             data-description="{{ $data['description'] }}"
                                             data-status="{{ $data['status'] }}"
@@ -115,8 +112,8 @@
                                             class="deleteForm">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
-                                                class="hapusBtn flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition">
+                                            <button
+                                                class="hapusBtn flex items-center gap-1  bg-[#880719] hover:bg-[#a41e27] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
                                                     viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -127,73 +124,67 @@
                                         </form>
                                     </div>
                                 </td>
-
-
-
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
 
-            <!-- 🔹 Modal Edit Banner -->
-            <div id="editBannersModal"
-                class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                <div class="bg-white rounded-xl shadow-lg p-6 w-[400px] relative">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Edit Banner</h2>
+        </div>
+    </div>
 
-                    <form action="" method="POST" id="editBannersForm" enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
+    <!-- 🔹 Modal Edit Banner: ditempatkan di luar container scrollable -->
+    <div id="editBannersModal"
+        class="hidden fixed top-0 left-0 right-0 bottom-0 min-h-screen w-screen bg-black bg-opacity-40 flex items-center justify-center z-[9999]">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-[400px] relative">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Edit Banner</h2>
 
-                        <!-- Nama Banner -->
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Banner</label>
-                            <input type="text" id="editBannersName" name="name" placeholder="Masukkan nama banner"
-                                class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]" />
-                        </div>
+            <form action="" method="POST" id="editBannersForm" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
 
-                        <!-- Deskripsi -->
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
-                            <textarea id="editBannersDescription" name="description"
-                                class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]"></textarea>
-                        </div>
-
-                
-                        <!-- Preview Gambar -->
-                        <img id="previewBannersImage" src="" alt="Preview Banner"
-                            class="hidden w-32 mx-auto mb-3 rounded-md shadow">
-
-                        <!-- Upload Gambar Baru -->
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Ganti Gambar Banner</label>
-                            <input type="file" id="editBannersImage" name="image"
-                                class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]" />
-                        </div>
-
-                        <!-- Status -->
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                            <select id="editBannersStatus" name="status"
-                                class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]">
-                                <option value="active">Aktif</option>
-                                <option value="non-active">Nonaktif</option>
-                            </select>
-                        </div>
-
-
-                        <div class="flex justify-end gap-2 mt-5">
-                            <button type="button" id="cancelBannersEdit"
-                                class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Batal</button>
-                            <button type="submit"
-                                class="px-4 py-2 rounded-lg bg-[#880719] hover:bg-[#a41e27] text-white font-semibold">Simpan</button>
-                        </div>
-                    </form>
-
+                <!-- Nama Banner -->
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Banner</label>
+                    <input type="text" id="editBannersName" name="name" placeholder="Masukkan nama banner"
+                        class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]" />
                 </div>
-            </div>
 
+                <!-- Deskripsi -->
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                    <textarea id="editBannersDescription" name="description"
+                        class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]"></textarea>
+                </div>
+
+                <!-- Preview Gambar -->
+                <img id="previewBannersImage" src="" alt="Preview Banner"
+                    class="hidden w-32 mx-auto mb-3 rounded-md shadow">
+
+                <!-- Upload Gambar Baru -->
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ganti Gambar Banner</label>
+                    <input type="file" id="editBannersImage" name="image"
+                        class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]" />
+                </div>
+
+                <!-- Status -->
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select id="editBannersStatus" name="status"
+                        class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#880719]">
+                        <option value="active">Aktif</option>
+                        <option value="non-active">Nonaktif</option>
+                    </select>
+                </div>
+
+                <div class="flex justify-end gap-2 mt-5">
+                    <button type="button" id="cancelBannersEdit"
+                        class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Batal</button>
+                    <button type="submit"
+                        class="px-4 py-2 rounded-lg bg-[#880719] hover:bg-[#a41e27] text-white font-semibold">Simpan</button>
+                </div>
+            </form>
         </div>
     </div>
 @endsection
