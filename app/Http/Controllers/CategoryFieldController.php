@@ -44,82 +44,82 @@ class CategoryFieldController extends Controller
         ], 200);
     }
 
-    public function store(Request $request)
-    {
-        $request->validate(
-            [
-                'name' => 'required|string|max:100',
-            ],
-            [
-                'name.required' => 'Nama kategori lapangan wajib diisi.',
-                'name.string' => 'Nama kategori lapangan harus berupa teks.',
-                'name.max' => 'Nama kategori lapangan maksimal 100 karakter.',
-            ]
-        );
+    // public function store(Request $request)
+    // {
+    //     $request->validate(
+    //         [
+    //             'name' => 'required|string|max:100',
+    //         ],
+    //         [
+    //             'name.required' => 'Nama kategori lapangan wajib diisi.',
+    //             'name.string' => 'Nama kategori lapangan harus berupa teks.',
+    //             'name.max' => 'Nama kategori lapangan maksimal 100 karakter.',
+    //         ]
+    //     );
 
-        $category = CategoryField::create([
-            'name' => $request->name,
-        ]);
+    //     $category = CategoryField::create([
+    //         'name' => $request->name,
+    //     ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Kategori lapangan berhasil ditambahkan',
-            'data' => $category
-        ], 201);
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Kategori lapangan berhasil ditambahkan',
+    //         'data' => $category
+    //     ], 201);
+    // }
 
-    public function update(Request $request, $id)
-    {
-        $category = CategoryField::find($id);
+    // public function update(Request $request, $id)
+    // {
+    //     $category = CategoryField::find($id);
 
-        if (!$category) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kategori lapangan tidak ditemukan',
-                'data' => null
-            ], 404);
-        }
+    //     if (!$category) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Kategori lapangan tidak ditemukan',
+    //             'data' => null
+    //         ], 404);
+    //     }
 
-        $request->validate(
-            [
-                'name' => 'required|string|max:100',
-            ],
-            [
-                'name.required' => 'Nama kategori lapangan wajib diisi.',
-                'name.string' => 'Nama kategori lapangan harus berupa teks.',
-                'name.max' => 'Nama kategori lapangan maksimal 100 karakter.',
-            ]
-        );
+    //     $request->validate(
+    //         [
+    //             'name' => 'required|string|max:100',
+    //         ],
+    //         [
+    //             'name.required' => 'Nama kategori lapangan wajib diisi.',
+    //             'name.string' => 'Nama kategori lapangan harus berupa teks.',
+    //             'name.max' => 'Nama kategori lapangan maksimal 100 karakter.',
+    //         ]
+    //     );
 
-        $category->update([
-            'name' => $request->name,
-        ]);
+    //     $category->update([
+    //         'name' => $request->name,
+    //     ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Kategori lapangan berhasil diperbarui',
-            'data' => $category
-        ], 200);
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Kategori lapangan berhasil diperbarui',
+    //         'data' => $category
+    //     ], 200);
+    // }
 
-    public function destroy($id)
-    {
-        $category = CategoryField::find($id);
+    // public function destroy($id)
+    // {
+    //     $category = CategoryField::find($id);
 
-        if (!$category) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kategori lapangan tidak ditemukan',
-                'data' => null
-            ], 404);
-        }
+    //     if (!$category) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Kategori lapangan tidak ditemukan',
+    //             'data' => null
+    //         ], 404);
+    //     }
 
-        $category->delete();
+    //     $category->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Kategori lapangan berhasil dihapus',
-            'data' => null
-        ], 200);
-    }   
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Kategori lapangan berhasil dihapus',
+    //         'data' => null
+    //     ], 200);
+    // }   
 }

@@ -36,6 +36,7 @@ class AuthController extends Controller
         }
         return back()->withErrors(['login' => 'Email atau password salah!'])->with('error', 'Login gagal, silakan coba lagi.');
     }
+    
     public function logout(Request $request)
     {
         $request->session()->forget(['user_id', 'user_name', 'user_email']);
