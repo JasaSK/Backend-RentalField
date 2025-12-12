@@ -72,11 +72,9 @@ class AuthController extends Controller
             'user' => $user,
             'code' => $code,
             'verifyUrl' => $verifyUrl,
-            'emailMessage' => 'Berikut kode Verifikasi Akun Anda: ',
-            'emailSubject' => 'Kode Verifikasi',
         ], function ($message) use ($user) {
             $message->to($user->email)
-                ->subject('Kode Verifikasi');
+                ->subject('Kode Verifikasi Akun Anda');
         });
 
         return response()->json([
@@ -166,11 +164,9 @@ class AuthController extends Controller
             'user' => $user,
             'code' => $verificationCode,
             'verifyUrl' => $verifyUrl,
-            'emailMessage' => 'Berikut kode Verifikasi Baru Anda: ',
-            'emailSubject' => 'Kode Verifikasi Baru',
         ], function ($message) use ($user) {
             $message->to($user->email)
-                ->subject('Kode Verifikasi Baru');
+                ->subject('Kode Verifikasi Akun Anda');
         });
 
         return response()->json([
@@ -236,40 +232,25 @@ class AuthController extends Controller
             ], 404);
         }
 
-        $verifyUrl = url('/verify/' . $user->email);
         $resetCode = rand(100000, 999999);
         $user->update([
             'reset_code' => $resetCode,
             'reset_code_expires_at' => now()->addMinutes(10),
         ]);
 
-
-        Mail::send('verify', [
-            'user' => $user,
-            'code' => $resetCode,
-            'verifyUrl' => $verifyUrl,
-            'emailMessage' => 'Berikut kode reset password Anda: ',
-            'emailSubject' => 'Kode Reset Password Anda',
-        ], function ($message) use ($user) {
+        Mail::raw("Kode reset password Anda adalah: $resetCode (berlaku 10 menit)", function ($message) use ($user) {
             $message->to($user->email)
-                ->subject('Kode Reset Password Anda');
+                ->subject('Kode Reset Password');
         });
-
-        User::where('email', $request->email)->update([
-            'reset_code' => $resetCode,
-            'reset_code_expires_at' => now()->addMinutes(10),
-        ]);
 
         return response()->json([
             'status' => true,
-            'message' => 'Kode reset password telah dikirim ke email Anda.',
-            'data' => $user,
+            'message' => 'Kode reset password telah dikirim ke email Anda.'
         ], 200);
     }
 
     public function verifyResetCode(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'email' => 'required|string|email',
             'reset_code' => 'required|digits:6',
@@ -286,7 +267,7 @@ class AuthController extends Controller
         if (!$user) {
             return response()->json([
                 'status' => false,
-                'message' => 'Kode reset tidak valid. atau email tidak ditemukan.'
+                'message' => 'Kode reset tidak valid.'
             ], 400);
         }
 
@@ -297,15 +278,9 @@ class AuthController extends Controller
             ], 400);
         }
 
-        $user->reset_code_expires_at = null;
-        $user->reset_code = null;
-        $user->email_verified_at = now()->addMinutes(10); // Temporarily mark email as verified for password reset
-        $user->save();
-
         return response()->json([
             'status' => true,
-            'message' => 'Kode reset valid.',
-            'data' => $user,
+            'message' => 'Kode reset valid.'
         ], 200);
     }
 
@@ -313,37 +288,44 @@ class AuthController extends Controller
     {
         $request->validate([
             'email' => 'required|string|email',
+            'reset_code' => 'required|digits:6',
             'password' => 'required|string|min:6|confirmed',
         ], [
             'email.required' => 'Email wajib diisi.',
+            'reset_code.required' => 'Kode reset wajib diisi.',
+            'reset_code.digits' => 'Kode reset harus 6 digit angka.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)
+            ->where('reset_code', $request->reset_code)
+            ->first();
+
         if (!$user) {
             return response()->json([
                 'status' => false,
-                'message' => 'Email tidak ditemukan.'
-            ], 404);
+                'message' => 'Kode reset tidak valid.'
+            ], 400);
         }
 
-        if (Carbon::now()->greaterThan($user->email_verified_at)) {
+        if (Carbon::now()->greaterThan($user->reset_code_expires_at)) {
             return response()->json([
                 'status' => false,
-                'message' => 'Sesi reset password telah kadaluarsa. Silakan minta kode reset baru.'
+                'message' => 'Kode reset telah kadaluarsa.'
             ], 400);
-        };
+        }
 
-        $user->password = bcrypt($request->password);
-        $user->save();
+        $user->update([
+            'password' => Hash::make($request->password),
+            'reset_code' => null,
+            'reset_code_expires_at' => null,
+        ]);
 
         return response()->json([
             'status' => true,
             'message' => 'Password berhasil direset.'
         ], 200);
     }
-
-    
 }
