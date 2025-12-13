@@ -18,13 +18,13 @@ return new class extends Migration
             $table->string('no_telp')->unique();
             $table->string('password');
             $table->enum('role', ['user', 'admin', 'superadmin'])->default('user'); // role: user, admin, superadmin
-            $table->string('verification_code')->nullable();
-            $table->rememberToken();
-            $table->timestamp('verification_code_expires_at')->nullable();
+            // $table->string('verification_code')->nullable();
+            // $table->timestamp('verification_code_expires_at')->nullable();
+            // $table->string('reset_code')->nullable();
+            // $table->timestamp('reset_code_expires_at')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('reset_code')->nullable();
+            $table->rememberToken();
             $table->timestamps();
-            $table->timestamp('reset_code_expires_at')->nullable();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

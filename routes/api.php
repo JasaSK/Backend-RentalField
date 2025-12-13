@@ -13,7 +13,6 @@ use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\TicketController;
 use Illuminate\Support\Facades\Route;
 
-
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/verify-code', [AuthController::class, 'verifyCode']);
 Route::post('/resend-code', [AuthController::class, 'resendCode']);
@@ -56,19 +55,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     Route::post('/refund/request', [RefundController::class, 'requestRefund']);
     Route::get('/refund/user', [RefundController::class, 'getRefund']);
-    Route::get('/refund/all', [RefundController::class, 'getAllRefund']);
-    Route::post('/refund/accept/{id}', [RefundController::class, 'acceptRefund']);
-    Route::post('/refund/reject/{id}', [RefundController::class, 'rejectRefund']);
     Route::get('/refund/{id}', [RefundController::class, 'show']);
-
+    
     Route::post('/payment/create-qris/{booking_id}', [PaymentController::class, 'createQrisPayment']);
     Route::get('/payment/{booking_id}', [PaymentController::class, 'getQris']);
-
+    
     Route::get('/ticket/{booking_id}', [TicketController::class, 'showTicket']);
     Route::get('/booking/{id}/ticket', [TicketController::class, 'downloadTicket']);
 });
 Route::post('/payment/midtrans/callback', [PaymentController::class, 'midtransCallback']);
-Route::post('/ticket/verify', [TicketController::class, 'verifyTicket']);
+// Route::post('/ticket/verify', [TicketController::class, 'verifyTicket']);
+
+// Route::get('/refund/all', [RefundController::class, 'getAllRefund']);
+// Route::post('/refund/accept/{id}', [RefundController::class, 'acceptRefund']);
+// Route::post('/refund/reject/{id}', [RefundController::class, 'rejectRefund']);
 // Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {php
     // Route::get('/booking', [BookingController::class, 'index']);
 

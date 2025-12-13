@@ -17,9 +17,7 @@ class User extends Authenticatable
         'no_telp',
         'password',
         'role',
-        'verification_code',
         'email_verified_at',
-        'verification_code_expires_at',
     ];
 
     protected $hidden = [
@@ -31,6 +29,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    
+    public function passwordReset(){
+        return $this->hasOne(PasswordReset::class);
+    }
+
+    public function emailVerification(){
+        return $this->hasOne(EmailVerification::class);
+    }
 
     public function bookings()
     {
