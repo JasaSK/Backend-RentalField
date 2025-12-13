@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Field;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -102,6 +103,25 @@ class FieldController extends Controller
             'data' => $fields
         ], 200);
     }
+    public function show($id)
+    {
+        $field = Field::find($id);
+
+        if (!$field) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lapangan tidak ditemukan'
+            ], 404);
+        }
+
+        $field->load('categoryField');
+
+        return response()->json([
+            'success' => true,
+            'data' => $field
+        ], 200);
+    }
+
 
     // public function store(Request $request)
     // {
@@ -170,24 +190,6 @@ class FieldController extends Controller
     //         'message' => 'Lapangan berhasil ditambahkan',
     //         'data' => $field
     //     ], 201);
-    // }
-    // public function show($id)
-    // {
-    //     $field = Field::find($id);
-
-    //     if (!$field) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Lapangan tidak ditemukan'
-    //         ], 404);
-    //     }
-
-    //     $field->load('categoryField');
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'data' => $field
-    //     ], 200);
     // }
 
     // public function update(Request $request, $id)

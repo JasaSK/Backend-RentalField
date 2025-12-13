@@ -26,7 +26,7 @@
         <div style="text-align:center; margin:30px 0;">
 
             <p style="color:#555; margin-bottom:20px; font-size:15px; text-align:center;">
-                Berikut {{$emailSubject}}:
+                Berikut {{ $emailSubject }}:
             </p>
 
             @foreach (str_split($code) as $digit)

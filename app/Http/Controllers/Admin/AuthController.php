@@ -26,6 +26,8 @@ class AuthController extends Controller
             'password.min' => 'Password minimal 6 karakter.',
         ]);
 
+        // dd($request->all());
+
         $credentials = $request->only('email', 'password');
         if (Auth::guard('web')->attempt($credentials)) {
             $user = Auth::user();
@@ -43,7 +45,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/')->with('success', 'Anda telah logout.');
+        return redirect()->route('admin.page.login')->with('success', 'Anda telah logout.');
     }
 
 }

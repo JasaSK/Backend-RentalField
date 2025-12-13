@@ -1,10 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Midtrans\Config;
 use App\Models\Booking;
+use App\Models\Payment;
+use App\Models\Ticket;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -30,7 +34,30 @@ class PaymentController extends Controller
         if (!$booking) {
             return response()->json(['message' => 'Booking tidak ditemukan'], 404);
         }
+        if (Carbon::parse($booking->date)->lt(Carbon::now())) {
+            return response()->json([
+                'message' => 'Tidak boleh booking tanggal yang sudah lewat'
+            ]);
+        }
 
+        if ($booking->status == 'approved') {
+            return response()->json([
+                'message' => 'Booking sudah dibayar'
+            ]);
+        }
+
+        $existingPayment = Payment::where('booking_id', $booking_id)
+            ->where('payment_status', 'unpaid')
+            ->latest()
+            ->first();
+
+        if ($existingPayment) {
+            return response()->json([
+                'message' => 'Gunakan pembayaran yang sudah ada',
+                'qris_url' => $existingPayment->qris_url,
+                'order_id' => $existingPayment->payment_order_id
+            ]);
+        }
         // BUAT order_id unik
         $orderId = $booking->code_booking . '-' . uniqid();
 
@@ -49,12 +76,14 @@ class PaymentController extends Controller
         // CALL MIDTRANS API
         $response = Http::withBasicAuth(config('services.midtrans.server_key'), '')
             ->post('https://api.sandbox.midtrans.com/v2/charge', $payload);
-        // SIMPAN KE DATABASE
-        $booking->update([
-            'payment_order_id' => $orderId,
-            'qris_url' => $response['actions'][0]['url'] ?? null
-        ]);
 
+        $qrisUrl = $response->json()['actions'][0]['url'] ?? null;
+        Payment::create([
+            'booking_id' => $booking_id,
+            'payment_order_id' => $orderId,
+            'payment_status' => 'unpaid',
+            'qris_url' => $qrisUrl
+        ]);
         return $response->json();
     }
 
@@ -84,32 +113,54 @@ class PaymentController extends Controller
         }
 
         // Cari booking
-        $booking = Booking::where('payment_order_id', $orderId)->first();
+        $payment = Payment::where('payment_order_id', $orderId)->first();
 
-        if (!$booking) {
-            return response()->json(['message' => 'Booking not found'], 404);
+        if (!$payment) {
+            return response()->json(['message' => 'Pembayaran tidak ditemukan, silahkan coba lagi'], 404);
         }
 
         // Update status
         if (in_array($request->transaction_status, ['settlement', 'capture'])) {
-            $booking->status = 'approved';
+            $payment->payment_status = 'paid';
         } elseif ($request->transaction_status === 'pending') {
-            $booking->status = 'pending';
+            $payment->payment_status = 'unpaid';
         } else {
-            $booking->status = 'cancelled';
+            $payment->payment_status = 'cancelled';
         }
 
-        $booking->update([
-            'status' => $booking->status,
-            'ticket_code' => $booking->ticket_code ?? strtoupper(Str::random(10)),
-        ]);
+        // $payment->payment_status =  $payment->status;
+        $payment->save();
 
-        $booking->save();
+        if ($payment->payment_status == 'paid') {
+            $booking = Booking::find($payment->booking_id);
+            if ($booking->status != 'approved') {
+                $booking->status = 'approved';
+                $booking->save();
+            }
+
+            $ticketExists = Ticket::where('payment_id', $payment->id)->exists();
+            // $ticket_code = 
+
+            if (!$ticketExists) {
+                Ticket::create([
+                    'booking_id' => $payment->booking_id,
+                    'payment_id' => $payment->id,
+                    'ticket_code' => 'TCK-' . strtoupper(Str::random(10)),
+                    'status_ticket' => 'unused'
+                ]);
+            }
+        }
+
+        if ($payment->payment_status == 'cancelled') {
+            $booking = Booking::find($payment->booking_id);
+            $booking->status = 'rejected';
+            $booking->save();
+        }
 
         return response()->json([
             'message' => 'Callback processed',
             'order_id' => $orderId,
-            'status' => $booking->status
+            'status' => $payment->status
         ]);
     }
 }

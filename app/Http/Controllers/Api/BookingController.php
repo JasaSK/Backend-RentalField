@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Field;
 use App\Models\Schedule;
@@ -69,6 +70,13 @@ class BookingController extends Controller
             'end_time.after' => 'Waktu selesai harus setelah waktu mulai'
         ]);
 
+        if (Carbon::parse($request->date)->lt(Carbon::now())) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak boleh booking tanggal yang sudah lewat'
+            ], 400);
+        }
+        
         $conflict = Booking::where('field_id', $request->field_id)
             ->where('date', $request->date)
             ->whereNotIn('status', ['canceled', 'refunded'])
@@ -123,12 +131,7 @@ class BookingController extends Controller
             ], 400);
         }
 
-        if ($request->date < now()->toDateString()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Tidak boleh booking tanggal yang sudah lewat'
-            ], 400);
-        }
+
 
         $bookingCode = 'BK-' . strtoupper(Str::random(8));
         $duration = (strtotime($request->end_time) - strtotime($request->start_time)) / 3600;
@@ -138,7 +141,6 @@ class BookingController extends Controller
         $data['code_booking'] = $bookingCode;
         $data['status'] = 'pending';
         $data['total_price'] = $totalPrice;
-        $data['payment_order_id'] = null;
 
         $booking = Booking::create($data);
 

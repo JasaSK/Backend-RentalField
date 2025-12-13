@@ -16,10 +16,6 @@ class Booking extends Model
         'status',
         'code_booking',
         'total_price',
-        'payment_order_id',
-        'ticket_code',
-        'status_ticket',
-        'qris_url'
     ];
     public function field()
     {
@@ -39,5 +35,10 @@ class Booking extends Model
     public function ticket()
     {
         return $this->hasOne(Ticket::class);
+    }
+
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
     }
 }

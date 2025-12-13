@@ -54,11 +54,13 @@
                     </thead>
 
                     <tbody id="ticketTable">
-                        <tr>
-                            <td class="p-3 border-b text-gray-700">1</td>
-                            <td class="p-3 border-b text-gray-700">ABC123</td>
-                            <td class="p-3 border-b text-gray-700">2025-12-07 14:20</td>
-                        </tr>
+                        @foreach ($verify as $index => $data)
+                            <tr>
+                                <td class="p-3 border-b text-gray-700">{{ $index + 1 }}</td>
+                                <td class="p-3 border-b text-gray-700">{{ $data->ticket_code }}</td>
+                                <td class="p-3 border-b text-gray-700">{{ $data->created_at }}</td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>

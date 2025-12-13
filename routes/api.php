@@ -1,16 +1,16 @@
 <?php
 
-use App\Http\Controllers\RefundController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BannerController;
-use App\Http\Controllers\BookingController;
-use App\Http\Controllers\CategoryFieldController;
-use App\Http\Controllers\CategoryGalleryController;
-use App\Http\Controllers\FieldController;
-use App\Http\Controllers\GalleryController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\ScheduleController;
-use App\Http\Controllers\TicketController;
+use App\Http\Controllers\Api\RefundController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BannerController;
+use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\Api\CategoryFieldController;
+use App\Http\Controllers\Api\CategoryGalleryController;
+use App\Http\Controllers\Api\FieldController;
+use App\Http\Controllers\Api\GalleryController;
+use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\ScheduleController;
+use App\Http\Controllers\Api\TicketController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -69,7 +69,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::post('/payment/midtrans/callback', [PaymentController::class, 'midtransCallback']);
 Route::post('/ticket/verify', [TicketController::class, 'verifyTicket']);
 // Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {php
-//     Route::get('/booking', [BookingController::class, 'index']);
+    // Route::get('/booking', [BookingController::class, 'index']);
 
 //     Route::post('/category-fields', [CategoryFieldController::class, 'store']);
 //     Route::put('/category-fields/{id}', [CategoryFieldController::class, 'update']);

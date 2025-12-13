@@ -8,12 +8,19 @@ class Ticket extends Model
 {
     protected $table = 'ticket';
     protected $fillable = [
-        'ticket_code',
+        'payment_id',
         'booking_id',
+        'ticket_code',
+        'status_ticket',
     ];
 
     public function booking()
     {
         return $this->belongsTo(Booking::class);
+    }
+
+    public function payment()
+    {
+        return $this->belongsTo(Payment::class);
     }
 }

@@ -1,4 +1,3 @@
-
 <script src="{{ asset('js/edit-banner.js') }}"></script>
 <script src="{{ asset('js/edit-gallery.js') }}"></script>
 <script src="{{ asset('js/edit-lapangan.js') }}"></script>
@@ -58,7 +57,6 @@
 
     document.addEventListener("DOMContentLoaded", function() {
 
-        // Semua form dengan class ".confirmDelete" akan memiliki popup konfirmasi otomatis
         const deleteForms = document.querySelectorAll("form.deleteForm");
 
         deleteForms.forEach((form) => {
@@ -73,6 +71,34 @@
                     confirmButtonColor: form.dataset.confirmcolor || "#d33",
                     cancelButtonColor: "#3085d6",
                     confirmButtonText: form.dataset.confirm || "Ya, hapus!",
+                    cancelButtonText: form.dataset.cancel || "Batal"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+
+            });
+        });
+
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const logoutForms = document.querySelectorAll("form.logout");
+
+        logoutForms.forEach((form) => {
+            form.addEventListener("submit", function(e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: form.dataset.title || "Logout?",
+                    text: form.dataset.text || "Aksi ini tidak dapat dibatalkan!",
+                    icon: form.dataset.icon || "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: form.dataset.confirmcolor || "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: form.dataset.confirm || "Ya, logout!",
                     cancelButtonText: form.dataset.cancel || "Batal"
                 }).then((result) => {
                     if (result.isConfirmed) {
