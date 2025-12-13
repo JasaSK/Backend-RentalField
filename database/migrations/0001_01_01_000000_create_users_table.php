@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('no_telp')->unique();
             $table->string('password');
-            $table->string('role')->default('user'); // role: user, admin, superadmin
+            $table->enum('role', ['user', 'admin', 'superadmin'])->default('user'); // role: user, admin, superadmin
             $table->string('verification_code')->nullable();
             $table->rememberToken();
             $table->timestamp('verification_code_expires_at')->nullable();

@@ -16,9 +16,12 @@ use Illuminate\Support\Str;
 class TicketController extends Controller
 {
 
-    public function showTicket($id)
+    public function showTicket($booking_id)
     {
-        $ticket = Ticket::with('booking')->find($id);
+        $ticket = Ticket::where('booking_id', $booking_id)->first();
+        if (!$ticket) {
+            return response()->json(['status' => false, 'message' => 'Tiket tidak ditemukan'], 404);
+        }
         $qr = new QrCode(
             data: $ticket->ticket_code,
             encoding: new Encoding('UTF-8'),
@@ -32,10 +35,12 @@ class TicketController extends Controller
 
         // Kirim data booking + QR Base64 ke FE
         return response()->json([
-            'success' => true,
-            'booking' => $ticket,
-            'qrBase64' => $qrBase64
-        ]);
+            'status' => true,
+            'data' => [
+                'ticket' => $ticket->load('booking'),
+                'qrBase64' => $qrBase64
+            ]
+        ], 200);
     }
 
     public function downloadTicket($id)

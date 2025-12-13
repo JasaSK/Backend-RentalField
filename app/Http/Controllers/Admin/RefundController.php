@@ -53,6 +53,10 @@ class RefundController extends Controller
         $refund->booking->update([
             'status' => 'refunded'
         ]);
+
+        $refund->payment->update([
+            'payment_status' => 'refunded'
+        ]);
         return redirect()->route('admin.refund')->with('success', 'Refund berhasil diterima.');
     }
 

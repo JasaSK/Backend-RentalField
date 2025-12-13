@@ -54,6 +54,7 @@
                     <select name="category_field_id"
                         class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#880719]"
                         required>
+                        <option value="">-- Pilih Kategori --</option>
                         @foreach ($categories as $category)
                             <option value="{{ $category['id'] }}">{{ $category['name'] }}</option>
                         @endforeach

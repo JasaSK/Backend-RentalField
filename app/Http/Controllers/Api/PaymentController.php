@@ -34,10 +34,11 @@ class PaymentController extends Controller
         if (!$booking) {
             return response()->json(['message' => 'Booking tidak ditemukan'], 404);
         }
-        if (Carbon::parse($booking->date)->lt(Carbon::now())) {
+        if (Carbon::parse($booking->date)->startOfDay()->lessThan(Carbon::now()->startOfDay())) {
             return response()->json([
+                'success' => false,
                 'message' => 'Tidak boleh booking tanggal yang sudah lewat'
-            ]);
+            ], 400);
         }
 
         if ($booking->status == 'approved') {
@@ -139,7 +140,6 @@ class PaymentController extends Controller
             }
 
             $ticketExists = Ticket::where('payment_id', $payment->id)->exists();
-            // $ticket_code = 
 
             if (!$ticketExists) {
                 Ticket::create([
@@ -161,6 +161,22 @@ class PaymentController extends Controller
             'message' => 'Callback processed',
             'order_id' => $orderId,
             'status' => $payment->status
+        ]);
+    }
+
+    public function getQris($booking_id)
+    {
+        $payment = Payment::where('booking_id', $booking_id)->first();
+        if (!$payment) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Pembayaran tidak ditemukan atau belum dibuat',
+            ], 404);
+        }
+        return response()->json([
+            'status' => true,
+            'message' => 'Detail data pembayaran',
+            'data' => $payment
         ]);
     }
 }

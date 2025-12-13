@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('booking_id')->references('id')->on('bookings')->onDelete('cascade');
             $table->string('payment_order_id')->nullable();
             $table->string('qris_url')->nullable();
-            $table->enum('payment_status', ['unpaid', 'paid', 'failed'])->nullable();
+            $table->enum('payment_status', ['unpaid', 'paid', 'failed', 'refunded'])->default('unpaid');
             $table->timestamps();
         });
     }

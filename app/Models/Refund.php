@@ -10,16 +10,21 @@ class Refund extends Model
 
     protected $fillable = [
         'booking_id',
+        'payment_id',
         'user_id',
         'amount_paid',
         'refund_amount',
-        'reason',
         'refund_method',
         'account_number',
-        'refund_status',
+        'reason',
         'proof',
+        'refund_status',
     ];
 
+    public function payment()
+    {
+        return $this->belongsTo(Payment::class);
+    }
 
     public function booking()
     {

@@ -32,7 +32,7 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->integer('total_price');
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'refunded'])->default('pending');
             $table->timestamps();
         });
     }

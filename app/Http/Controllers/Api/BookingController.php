@@ -70,13 +70,14 @@ class BookingController extends Controller
             'end_time.after' => 'Waktu selesai harus setelah waktu mulai'
         ]);
 
-        if (Carbon::parse($request->date)->lt(Carbon::now())) {
+        if (Carbon::parse($request->date)->startOfDay()->lessThan(Carbon::now()->startOfDay())) {
             return response()->json([
                 'success' => false,
                 'message' => 'Tidak boleh booking tanggal yang sudah lewat'
             ], 400);
         }
-        
+
+
         $conflict = Booking::where('field_id', $request->field_id)
             ->where('date', $request->date)
             ->whereNotIn('status', ['canceled', 'refunded'])
@@ -339,6 +340,12 @@ class BookingController extends Controller
     public function getStatus($id)
     {
         $booking = Booking::find($id);
+        if (!$booking) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Booking tidak ditemukan'
+            ], 404);
+        }
         return response()->json([
             'success' => true,
             'status' => $booking->status

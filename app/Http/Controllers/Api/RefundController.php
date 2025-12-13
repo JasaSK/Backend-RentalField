@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Payment;
 use App\Models\Refund;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,7 +13,6 @@ class RefundController extends Controller
 {
     public function requestRefund(Request $request)
     {
-        // 1. VALIDASI INPUT
         $request->validate([
             'user_id'       => 'required|integer|exists:users,id',
             'booking_id'    => 'required|integer|exists:bookings,id',
@@ -38,38 +38,17 @@ class RefundController extends Controller
             'refund_method.string' => 'Metode refund harus berupa teks.',
         ]);
 
-        // 2. AMBIL BOOKING
         $booking = Booking::find($request->booking_id);
-        $refund = Refund::where('booking_id', $booking->id)->first();
+        $payment = Payment::where('booking_id', $booking->id)->first();
+        $refund  = Refund::where('booking_id', $booking->id)->first();
 
-        if ($refund) {
-            if ($refund->refund_status === 'approved') {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Refund sudah diterima.',
-                ]);
-            }
-
-            if ($refund->refund_status === 'rejected') {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Refund sudah ditolak. Silakan hubungi admin.',
-                ]);
-            }
-
-            if ($refund->refund_status === 'pending') {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Refund sedang dalam proses.',
-                ]);
-            }
-        }
-
-        if (!$booking) {
+        if ($refund && in_array($refund->refund_status, ['approved', 'pending'])) {
             return response()->json([
                 'status' => false,
-                'message' => 'Booking tidak ditemukan.',
-            ], 404);
+                'message' => $refund->refund_status === 'approved'
+                    ? 'Refund sudah diterima.'
+                    : 'Refund sedang dalam proses.',
+            ]);
         }
 
         if ($booking->user_id !== $request->user_id) {
@@ -96,6 +75,7 @@ class RefundController extends Controller
         $refund = Refund::create([
             'booking_id'     => $booking->id,
             'user_id'        => $request->user_id,
+            'payment_id'     => $payment->id,
             'amount_paid'    => $booking->total_price,
             'refund_amount'  => null,
             'reason'         => $request->reason,
@@ -108,9 +88,10 @@ class RefundController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Refund berhasil diajukan.',
-            'data' => $refund->load('booking')
+            'data' => $refund->load('booking', 'payment'),
         ], 201);
     }
+
 
     public function show($id)
     {
@@ -151,85 +132,86 @@ class RefundController extends Controller
         ], 200);
     }
 
-    public function getAllRefund()
-    {
-        $refunds = Refund::all();
-        return response()->json([
-            'status' => true,
-            'message' => 'Daftar refund',
-            'data' => $refunds
-        ], 200);
-    }
+
+    // public function getAllRefund()
+    // {
+    //     $refunds = Refund::all();
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Daftar refund',
+    //         'data' => $refunds
+    //     ], 200);
+    // }
 
 
-    public function acceptRefund(Request $request, $id)
-    {
-        $request->validate([
-            'refund_amount' => 'required|integer',
-            'proof' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-        ], [
-            'refund_amount.required' => 'Jumlah refund wajib diisi.',
-            'refund_amount.integer' => 'Jumlah refund harus berupa angka.',
-            'proof.required' => 'Bukti wajib diisi.',
-            'proof.image' => 'Bukti harus berupa gambar.',
-            'proof.mimes' => 'Format gambar harus JPG, JPEG, atau PNG.',
-            'proof.max' => 'Ukuran gambar maksimal 2MB.',
-        ]);
+    // public function acceptRefund(Request $request, $id)
+    // {
+    //     $request->validate([
+    //         'refund_amount' => 'required|integer',
+    //         'proof' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+    //     ], [
+    //         'refund_amount.required' => 'Jumlah refund wajib diisi.',
+    //         'refund_amount.integer' => 'Jumlah refund harus berupa angka.',
+    //         'proof.required' => 'Bukti wajib diisi.',
+    //         'proof.image' => 'Bukti harus berupa gambar.',
+    //         'proof.mimes' => 'Format gambar harus JPG, JPEG, atau PNG.',
+    //         'proof.max' => 'Ukuran gambar maksimal 2MB.',
+    //     ]);
 
-        $refund = Refund::find($id);
+    //     $refund = Refund::find($id);
 
-        if (!$refund) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Refund tidak ditemukan.',
-            ], 404);
-        }
+    //     if (!$refund) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Refund tidak ditemukan.',
+    //         ], 404);
+    //     }
 
-        if ($refund->booking->status !== 'approved') {
-            return response()->json([
-                'status' => false,
-                'message' => 'Refund hanya dapat diproses jika booking berstatus approved.',
-            ], 400);
-        }
+    //     if ($refund->booking->status !== 'approved') {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Refund hanya dapat diproses jika booking berstatus approved.',
+    //         ], 400);
+    //     }
 
-        // Upload bukti
-        $imagePath = $request->file('proof')->store('refunds', 'public');
+    //     // Upload bukti
+    //     $imagePath = $request->file('proof')->store('refunds', 'public');
 
-        // Update refund
-        $refund->update([
-            'refund_amount' => $request->refund_amount,
-            'proof' => $imagePath,
-            'refund_status' => 'approved',
-            'refunded_at' => now(),
-        ]);
-        $refund->booking->update([
-            'status' => 'refunded'
-        ]);
-        return response()->json([
-            'status' => true,
-            'message' => 'Refund berhasil disetujui.',
-            'data' => $refund
-        ], 200);
-    }
+    //     // Update refund
+    //     $refund->update([
+    //         'refund_amount' => $request->refund_amount,
+    //         'proof' => $imagePath,
+    //         'refund_status' => 'approved',
+    //         'refunded_at' => now(),
+    //     ]);
+    //     $refund->booking->update([
+    //         'status' => 'refunded'
+    //     ]);
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Refund berhasil disetujui.',
+    //         'data' => $refund
+    //     ], 200);
+    // }
 
-    public function rejectRefund($id)
-    {
-        $refund = Refund::find($id);
+    // public function rejectRefund($id)
+    // {
+    //     $refund = Refund::find($id);
 
-        if (!$refund) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Refund tidak ditemukan.',
-            ], 404);
-        }
+    //     if (!$refund) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Refund tidak ditemukan.',
+    //         ], 404);
+    //     }
 
-        $refund->update([
-            'refund_status' => 'rejected',
-        ]);
-        return response()->json([
-            'status' => true,
-            'message' => 'Refund berhasil ditolak.',
-            'data' => $refund
-        ], 200);
-    }
+    //     $refund->update([
+    //         'refund_status' => 'rejected',
+    //     ]);
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Refund berhasil ditolak.',
+    //         'data' => $refund
+    //     ], 200);
+    // }
 }
