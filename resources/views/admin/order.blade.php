@@ -1,4 +1,4 @@
-@extends('admin.layouts.master')
+{{-- @extends('admin.layouts.master')
 
 @section('content')
 <!-- Konten -->
@@ -113,4 +113,4 @@
 @push('scripts')
 <script src="{{ asset('js/usercard.js') }}"></script>
 <script src="{{ asset('js/konfirmasi-pemesanan.js') }}"></script>
-@endpush
+@endpush --}}

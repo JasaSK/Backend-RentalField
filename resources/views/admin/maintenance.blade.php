@@ -52,69 +52,98 @@
 
             <!-- Card Table Maintenance -->
             <div class="bg-white border border-gray-200 shadow-md rounded-xl p-6 mt-6">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">Daftar Jadwal Maintenance</h3>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">
+                    Daftar Jadwal Maintenance
+                </h3>
 
-                <table class="w-full border-collapse">
-                    <thead class="text-center bg-gray-100">
-                        <tr class="border-b border-gray-300">
-                            <th class="py-3 px-2">No</th>
-                            <th class="py-3 px-2">Lapangan</th>
-                            <th class="py-3 px-2">Tanggal</th>
-                            <th class="py-3 px-2">Buka</th>
-                            <th class="py-3 px-2">Tutup</th>
-                            <th class="py-3 px-2">Alasan</th>
-                            <th class="py-3 px-2">Aksi</th>
-                        </tr>
-                    </thead>
+                <!-- WRAPPER SCROLL -->
+                <div class="overflow-x-auto overflow-y-auto max-h-[450px]">
+                    <table class="w-full min-w-[900px] border-collapse">
+                        <thead class="text-center bg-gray-100 sticky top-0 z-10">
+                            <tr class="border-b border-gray-300">
+                                <th class="py-3 px-2">No</th>
+                                <th class="py-3 px-2">Lapangan</th>
+                                <th class="py-3 px-2">Tanggal</th>
+                                <th class="py-3 px-2">Buka</th>
+                                <th class="py-3 px-2">Tutup</th>
+                                <th class="py-3 px-2">Alasan</th>
+                                <th class="py-3 px-2">Aksi</th>
+                            </tr>
+                        </thead>
 
-                    <tbody class="text-gray-700 text-center">
-                        @foreach ($maintenances as $index => $m)
-                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition" data-id="{{ $m->id }}">
-                                <td class="py-3 px-2">{{ $index + 1 }}</td>
-                                <td class="py-3 px-2">{{ $m->field->name }}</td>
-                                <td class="py-3 px-2">{{ \Carbon\Carbon::parse($m->date)->format('d M Y') }}</td>
-                                <td class="py-3 px-2">{{ $m->start_time }}</td>
-                                <td class="py-3 px-2">{{ $m->end_time }}</td>
-                                <td class="py-3 px-2">{{ $m->reason }}</td>
-                                </td>
-                                <td class="py-3 px-2">
-                                    <div class="flex w-full justify-center items-center gap-2">
+                        <tbody class="text-gray-700 text-center">
+                            @foreach ($maintenances as $index => $m)
+                                <tr data-id="{{ $m->id }}"
+                                    class="border-b border-gray-200 hover:bg-gray-50 transition">
 
-                                        <!-- Edit -->
-                                        <button
-                                            class="editMaintenanceBtn flex items-center gap-1 bg-blue-800 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
-                                            data-id="{{ $m->id }}" data-field="{{ $m->field_id }}"
-                                            data-date="{{ $m->date }}" data-start="{{ $m->start_time }}"
-                                            data-end="{{ $m->end_time }}" data-reason="{{ $m->reason }}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5h2m2 0h.01M6 20h12a2 2 0 002-2v-5a2 2 0 00-2-2H6a2 2 0 00-2 2v5a2 2 0 002 2zm6-7v.01" />
-                                            </svg>
-                                            Edit
-                                        </button>
+                                    <td class="py-3 px-2">
+                                        {{ $index + 1 }}
+                                    </td>
 
-                                        <!-- Hapus -->
-                                        <form action="{{ route('admin.maintenance.destroy', $m->id) }}" method="POST">
-                                            @csrf @method('DELETE')
-                                            <button type="submit"
-                                                class="hapusBtn flex items-center gap-1  bg-[#880719] hover:bg-[#a41e27] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition">
+                                    <td class="py-3 px-2">
+                                        {{ $m->field->name }}
+                                    </td>
+
+                                    <td class="py-3 px-2">
+                                        {{ \Carbon\Carbon::parse($m->date)->format('d M Y') }}
+                                    </td>
+
+                                    <td class="py-3 px-2">
+                                        {{ $m->start_time }}
+                                    </td>
+
+                                    <td class="py-3 px-2">
+                                        {{ $m->end_time }}
+                                    </td>
+
+                                    <td class="py-3 px-2">
+                                        {{ $m->reason }}
+                                    </td>
+
+                                    <td class="py-3 px-2">
+                                        <div class="flex w-full justify-center items-center gap-2">
+
+                                            <!-- Edit -->
+                                            <button
+                                                class="editMaintenanceBtn flex items-center gap-1 bg-blue-800 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
+                                                data-id="{{ $m->id }}" data-field="{{ $m->field_id }}"
+                                                data-date="{{ $m->date }}" data-start="{{ $m->start_time }}"
+                                                data-end="{{ $m->end_time }}" data-reason="{{ $m->reason }}">
+
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
                                                     viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M6 18L18 6M6 6l12 12" />
+                                                        d="M11 5h2m2 0h.01M6 20h12a2 2 0 002-2v-5a2 2 0 00-2-2H6a2 2 0 00-2 2v5a2 2 0 002 2zm6-7v.01" />
                                                 </svg>
-                                                Hapus
+                                                Edit
                                             </button>
-                                        </form>
 
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                            <!-- Hapus -->
+                                            <form action="{{ route('admin.maintenance.destroy', $m->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button
+                                                    class="hapusBtn flex items-center gap-1 bg-[#880719] hover:bg-[#a41e27] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition">
+
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                    Hapus
+                                                </button>
+                                            </form>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
         </div>
     </div>
     <!-- Modal Edit Maintenance -->

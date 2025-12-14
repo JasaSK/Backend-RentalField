@@ -114,8 +114,8 @@
                                             </div>
                                         </td>
                                         <td class="py-3 px-2 text-center">{{ $data['name'] }}</td>
-                                        <td class="py-3 px-2 text-center">{{ $data['open_time'] }}</td>
-                                        <td class="py-3 px-2 text-center">{{ $data['close_time'] }}</td>
+                                        <td class="py-3 px-2 text-center">{{ \Carbon\Carbon::parse($data['open_time'])->format('H:i') }}</td>
+                                        <td class="py-3 px-2 text-center">{{ \Carbon\Carbon::parse($data['close_time'])->format('H:i') }}</td>
                                         <td class="py-3 px-2 text-center">{{ $data['description'] }}</td>
                                         <td class="py-3 px-2 text-center">{{ $data['price_per_hour'] }}</td>
                                         <td class="py-3 px-2 text-center">
@@ -159,6 +159,7 @@
                                                                 stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                         </svg>
                                                         Hapus
+                                                    </button>
                                                 </form>
                                             </div>
                                         </td>

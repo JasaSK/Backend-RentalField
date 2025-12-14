@@ -54,75 +54,102 @@
 
             <!-- Card Daftar Galeri -->
             <div class="bg-white border border-gray-200 shadow-md rounded-xl p-6 mt-6">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">Daftar Galeri</h3>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">
+                    Daftar Galeri
+                </h3>
 
-                <table class="w-full border-collapse">
-                    <thead class="text-center bg-gray-100">
-                        <tr class="border-b border-gray-300">
-                            <th class="py-3 px-2">No</th>
-                            <th class="py-3 px-2">Gambar</th>
-                            <th class="py-3 px-2">Nama</th>
-                            <th class="py-3 px-2">Deskripsi</th>
-                            <th class="py-3 px-2">Tanggal Upload</th>
-                            <th class="py-3 px-2">Kategori</th>
-                            <th class="py-3 px-2">Aksi</th>
-                        </tr>
-                    </thead>
+                <!-- WRAPPER SCROLL -->
+                <div class="overflow-x-auto overflow-y-auto max-h-[450px]">
+                    <table class="w-full min-w-[900px] border-collapse">
+                        <thead class="text-center bg-gray-100 sticky top-0 z-10">
+                            <tr class="border-b border-gray-300">
+                                <th class="py-3 px-2">No</th>
+                                <th class="py-3 px-2">Gambar</th>
+                                <th class="py-3 px-2">Nama</th>
+                                <th class="py-3 px-2">Deskripsi</th>
+                                <th class="py-3 px-2">Tanggal Upload</th>
+                                <th class="py-3 px-2">Kategori</th>
+                                <th class="py-3 px-2">Aksi</th>
+                            </tr>
+                        </thead>
 
-                    <tbody class="text-gray-700 text-center">
-                        @foreach ($galleries as $index => $data)
-                            <tr data-id="{{ $data['id'] }}" class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                <td class="py-3 px-2">{{ $index + 1 }}</td>
-                                <td class="py-3 px-2">
-                                    <div class="flex items-center justify-center">
-                                        <img src="{{ $data->image ? asset('storage/' . $data->image) : '' }}"
-                                            alt="Fasilitas" class="w-20 h-14 object-cover rounded-md shadow">
-                                    </div>
-                                </td>
-                                <td class="py-3 px-2">{{ $data['name'] }}</td>
-                                <td class="py-3 px-2">{{ $data['description'] }}</td>
-                                <td class="py-3 px-2">{{ \Carbon\Carbon::parse($data['created_at'])->format('d M Y') }}
-                                </td>
-                                <td class="py-3 px-2">{{ $data->categoryGallery->name ?? 'Tidak ada kategori' }}</td>
-                                <td class="py-3 px-2">
-                                    <div class="flex w-full justify-center items-center gap-2">
-                                        <!-- Tombol Edit -->
-                                        <button
-                                            class="editBtn flex items-center gap-1 bg-blue-800 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
-                                            data-id="{{ $data['id'] }}" data-name="{{ $data['name'] }}"
-                                            data-description="{{ $data['description'] }}"
-                                            data-category-id="{{ $data->category_gallery_id }}"
-                                            data-category="{{ $data->categoryGallery->name ?? '' }}"
-                                            data-image="{{ $data->image ? asset('storage/' . $data->image) : '' }}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5h2m2 0h.01M6 20h12a2 2 0 002-2v-5a2 2 0 00-2-2H6a2 2 0 00-2 2v5a2 2 0 002 2zm6-7v.01" />
-                                            </svg>
-                                            Edit
-                                        </button>
+                        <tbody class="text-gray-700 text-center">
+                            @foreach ($galleries as $index => $data)
+                                <tr data-id="{{ $data['id'] }}"
+                                    class="border-b border-gray-200 hover:bg-gray-50 transition">
 
-                                        <!-- Tombol Hapus -->
-                                        <form action="{{ route('admin.gallery.destroy', $data['id']) }}" method="POST"
-                                            class="deleteForm">
-                                            @csrf
-                                            @method('DELETE')
+                                    <td class="py-3 px-2">
+                                        {{ $index + 1 }}
+                                    </td>
+
+                                    <td class="py-3 px-2">
+                                        <div class="flex items-center justify-center">
+                                            <img src="{{ $data->image ? asset('storage/' . $data->image) : '' }}"
+                                                alt="Fasilitas" class="w-20 h-14 object-cover rounded-md shadow">
+                                        </div>
+                                    </td>
+
+                                    <td class="py-3 px-2">
+                                        {{ $data['name'] }}
+                                    </td>
+
+                                    <td class="py-3 px-2">
+                                        {{ $data['description'] }}
+                                    </td>
+
+                                    <td class="py-3 px-2">
+                                        {{ \Carbon\Carbon::parse($data['created_at'])->format('d M Y') }}
+                                    </td>
+
+                                    <td class="py-3 px-2">
+                                        {{ $data->categoryGallery->name ?? 'Tidak ada kategori' }}
+                                    </td>
+
+                                    <td class="py-3 px-2">
+                                        <div class="flex w-full justify-center items-center gap-2">
+
+                                            <!-- Tombol Edit -->
                                             <button
-                                                class="hapusBtn flex items-center gap-1  bg-[#880719] hover:bg-[#a41e27] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition">
+                                                class="editBtn flex items-center gap-1 bg-blue-800 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
+                                                data-id="{{ $data['id'] }}" data-name="{{ $data['name'] }}"
+                                                data-description="{{ $data['description'] }}"
+                                                data-category-id="{{ $data->category_gallery_id }}"
+                                                data-category="{{ $data->categoryGallery->name ?? '' }}"
+                                                data-image="{{ $data->image ? asset('storage/' . $data->image) : '' }}">
+
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
                                                     viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M6 18L18 6M6 6l12 12" />
+                                                        d="M11 5h2m2 0h.01M6 20h12a2 2 0 002-2v-5a2 2 0 00-2-2H6a2 2 0 00-2 2v5a2 2 0 002 2zm6-7v.01" />
                                                 </svg>
-                                                Hapus
+                                                Edit
                                             </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+
+                                            <!-- Tombol Hapus -->
+                                            <form action="{{ route('admin.gallery.destroy', $data['id']) }}" method="POST"
+                                                class="deleteForm">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button
+                                                    class="hapusBtn flex items-center gap-1 bg-[#880719] hover:bg-[#a41e27] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition">
+
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                    Hapus
+                                                </button>
+                                            </form>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
         </div>

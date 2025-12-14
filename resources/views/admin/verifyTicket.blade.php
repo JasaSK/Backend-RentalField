@@ -41,12 +41,15 @@
 
         {{-- TABLE --}}
         <div class="bg-white shadow-xl rounded-xl p-6 border">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">Tiket Terverifikasi</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                Tiket Terverifikasi
+            </h2>
 
-            <div class="overflow-x-auto">
-                <table class="w-full border-collapse text-left">
-                    <thead>
-                        <tr class="bg-gray-100 border-b">
+            <!-- Wrapper Scroll -->
+            <div class="overflow-x-auto overflow-y-auto max-h-[400px] border border-gray-200 rounded-lg">
+                <table class="min-w-[600px] w-full border-collapse text-left">
+                    <thead class="bg-gray-100 sticky top-0 z-10">
+                        <tr class="border-b">
                             <th class="p-3 font-semibold text-gray-700">No</th>
                             <th class="p-3 font-semibold text-gray-700">Kode Tiket</th>
                             <th class="p-3 font-semibold text-gray-700">Waktu Scan</th>
@@ -55,10 +58,16 @@
 
                     <tbody id="ticketTable">
                         @foreach ($verify as $index => $data)
-                            <tr>
-                                <td class="p-3 border-b text-gray-700">{{ $index + 1 }}</td>
-                                <td class="p-3 border-b text-gray-700">{{ $data->ticket_code }}</td>
-                                <td class="p-3 border-b text-gray-700">{{ $data->created_at }}</td>
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="p-3 border-b text-gray-700">
+                                    {{ $index + 1 }}
+                                </td>
+                                <td class="p-3 border-b text-gray-700">
+                                    {{ $data->ticket_code }}
+                                </td>
+                                <td class="p-3 border-b text-gray-700">
+                                    {{ $data->created_at }}
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

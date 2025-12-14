@@ -23,7 +23,8 @@
     <div class="h-28"></div> <!-- Spacer navbar -->
 
     <!-- CARD LOGIN -->
-    <div class="relative w-[95%] max-w-[970px] h-auto md:h-[520px] rounded-2xl overflow-hidden shadow-2xl bg-white">
+    <div class="relative w-[95%] max-w-[970px] h-auto md:h-[520px] rounded-2xl overflow-hidden shadow-2xl">
+
         <!-- Background hanya tampil di tablet/desktop -->
         <div class="hidden md:block absolute inset-0 bg-[url('/aset/login-bg2.jpg')] bg-cover bg-center"></div>
         <div class="hidden md:block absolute inset-0 bg-black/40 rounded-2xl"></div>
@@ -37,26 +38,26 @@
 
         <!-- FORM LOGIN -->
         <div
-            class="relative md:absolute md:top-6 md:right-6 md:bottom-6 bg-white/25 md:backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full md:w-[360px] text-white flex flex-col justify-center items-center transition-all duration-300">
+            class="relative md:absolute md:top-6 md:right-6 md:bottom-6 bg-[#13810A] md:bg-white/25 md:backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full md:w-[360px] flex flex-col justify-center items-center transition-all duration-300">
 
             <div class="flex flex-col items-center w-full">
-                <!-- Icon -->
+                <!-- Icon / Logo -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mt-2 md:mt-6 mb-1" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
 
-                <h2 class="text-2xl font-bold mb-6">Login</h2>
+                <h2 class="text-2xl font-bold mb-6 text-black">Login</h2>
 
                 <form action="{{ route('admin.login') }}" method="POST" class="w-full flex flex-col gap-4">
                     @csrf
 
                     <!-- Email -->
                     <div>
-                        <label class="block mb-1 text-sm">Email</label>
+                        <label class="block mb-1 text-sm text-black">Email</label>
                         <input type="text" name="email" placeholder="Masukkan Email"
-                            class="w-full p-2 rounded-md text-black placeholder-gray-400 focus:ring-2 focus:ring-green-400 outline-none">
+                            class="w-full p-2 rounded-md text-black placeholder-gray-400 focus:ring-2 focus:ring-[#880719] outline-none">
                         @error('email')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -64,27 +65,26 @@
 
                     <!-- Password -->
                     <div>
-                        <label class="block mb-1 text-sm">Password</label>
+                        <label class="block mb-1 text-sm text-black">Password</label>
                         <input type="password" name="password" placeholder="Masukkan Password"
-                            class="w-full p-2 rounded-md text-black placeholder-gray-400 focus:ring-2 focus:ring-green-400 outline-none">
+                            class="w-full p-2 rounded-md text-black placeholder-gray-400 focus:ring-2 focus:ring-[#880719] outline-none">
                         @error('password')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <!-- Remember me & Forgot password -->
-                    <div class="flex justify-between items-center text-sm mt-1 w-full px-1 gap-4">
+                    <!-- Remember me -->
+                    <div class="flex justify-start items-center text-sm mt-1 w-full px-1 gap-4">
                         <label class="flex items-center gap-2">
                             <input type="checkbox" class="accent-green-500">
-                            <span>Remember me</span>
+                            <span class="text-black">Remember me</span>
                         </label>
-                        {{-- <a href="{{ url('beranda/forgotpassword') }}" class="hover:underline">Forgot password?</a> --}}
                     </div>
 
                     <!-- Tombol Login -->
                     <div class="flex justify-center mt-4">
                         <button type="submit"
-                            class="bg-white text-[#13810A] font-bold py-2.5 px-6 rounded-md hover:bg-gray-100 transition w-fit">
+                            class="bg-[#880719] text-white font-bold py-2.5 px-6 rounded-md hover:bg-[#a41e27] transition w-fit">
                             Login
                         </button>
                     </div>

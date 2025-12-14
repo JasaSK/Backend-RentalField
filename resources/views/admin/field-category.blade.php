@@ -29,75 +29,88 @@
 
             <!-- Card Daftar Kategori -->
             <div class="bg-white border border-gray-200 shadow-md rounded-xl p-6 mt-6">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">Daftar Kategori Lapangan</h3>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">
+                    Daftar Kategori Lapangan
+                </h3>
 
-                <table class="w-full border-collapse">
-                    <thead class="text-center bg-gray-100">
-                        <tr class="border-b border-gray-300">
-                            <th class="py-3 px-3">No</th>
-                            <th class="py-3 px-3">Nama Kategori</th>
-                            <th class="py-3 px-3">Aksi</th>
-                        </tr>
-                    </thead>
+                <!-- WRAPPER SCROLL -->
+                <div class="overflow-x-auto overflow-y-auto max-h-[450px]">
+                    <table class="w-full min-w-[600px] border-collapse">
+                        <thead class="text-center bg-gray-100 sticky top-0 z-10">
+                            <tr class="border-b border-gray-300">
+                                <th class="py-3 px-3">No</th>
+                                <th class="py-3 px-3">Nama Kategori</th>
+                                <th class="py-3 px-3">Aksi</th>
+                            </tr>
+                        </thead>
 
-                    <tbody class="text-gray-700">
-                        @foreach ($categories as $index => $category)
-                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                <td class="py-3 px-2 text-center">{{ $index + 1 }}</td>
-                                <td class="py-3 px-2 text-center">{{ $category['name'] }}</td>
+                        <tbody class="text-gray-700">
+                            @foreach ($categories as $index => $category)
+                                <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                                    <td class="py-3 px-2 text-center">
+                                        {{ $index + 1 }}
+                                    </td>
 
-                                <td class="py-3 px-2">
-                                    <div class="flex justify-center items-center gap-2">
+                                    <td class="py-3 px-2 text-center">
+                                        {{ $category['name'] }}
+                                    </td>
 
-                                        <!-- Tombol Edit -->
-                                        <button
-                                            class="editFieldCategoryBtn flex items-center gap-1 bg-blue-800 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
-                                            data-id="{{ $category['id'] }}" data-name="{{ $category['name'] }}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5h2m2 0h.01M6 20h12a2 2 0 002-2v-5a2 2 0 00-2-2H6a2 2 0 00-2 2v5a2 2 0 002 2zm6-7v.01" />
-                                            </svg>
-                                            Edit
-                                        </button>
+                                    <td class="py-3 px-2">
+                                        <div class="flex justify-center items-center gap-2">
 
-                                        <!-- Tombol Delete -->
-                                        <form action="{{ route('admin.field-categories.destroy', $category['id']) }}"
-                                            method="POST" class="deleteForm">
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button type="submit"
-                                                class="hapusBtn flex items-center gap-1 bg-[#880719] hover:bg-[#a41e27] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition">
+                                            <!-- Tombol Edit -->
+                                            <button
+                                                class="editFieldCategoryBtn flex items-center gap-1 bg-blue-800 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition"
+                                                data-id="{{ $category['id'] }}" data-name="{{ $category['name'] }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
                                                     viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M6 18L18 6M6 6l12 12" />
+                                                        d="M11 5h2m2 0h.01M6 20h12a2 2 0 002-2v-5a2 2 0 00-2-2H6a2 2 0 00-2 2v5a2 2 0 002 2zm6-7v.01" />
                                                 </svg>
-                                                Hapus
+                                                Edit
                                             </button>
 
-                                        </form>
+                                            <!-- Tombol Delete -->
+                                            <form action="{{ route('admin.field-categories.destroy', $category['id']) }}"
+                                                method="POST" class="deleteForm">
+                                                @csrf
+                                                @method('DELETE')
 
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                                <button type="submit"
+                                                    class="hapusBtn flex items-center gap-1 bg-[#880719] hover:bg-[#a41e27] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm transition">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                    Hapus
+                                                </button>
+                                            </form>
 
-                <!-- Modal Edit -->
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- MODAL EDIT (DI LUAR SCROLL) -->
                 <div id="editFieldCategoryModal"
                     class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
                     <div class="bg-white rounded-xl shadow-lg p-6 w-[400px] relative">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Edit Kategori</h2>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                            Edit Kategori
+                        </h2>
 
                         <form action="" method="POST" id="editFieldCategoryForm">
                             @csrf
                             @method('PUT')
 
                             <div class="mb-3">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Kategori</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Nama Kategori
+                                </label>
                                 <input type="text" id="editFieldCategoryName" name="name"
                                     class="border border-gray-300 rounded-lg w-full px-3 py-2 focus:ring-2 focus:ring-[#880719]" />
                             </div>
@@ -113,11 +126,8 @@
                                 </button>
                             </div>
                         </form>
-
                     </div>
                 </div>
-
-
             </div>
 
         </div>
