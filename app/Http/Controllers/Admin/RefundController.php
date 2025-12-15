@@ -11,7 +11,7 @@ class RefundController extends Controller
 
     public function index()
     {
-        $refunds = Refund::all();
+        $refunds = Refund::latest()->paginate(10);
 
         return view('admin.refund', compact('refunds'));
     }
@@ -52,6 +52,9 @@ class RefundController extends Controller
         ]);
         $refund->booking->update([
             'status' => 'refunded'
+        ]);
+        $refund->booking->ticket->update([
+            'status_ticket' => 'refunded'
         ]);
 
         $refund->payment->update([

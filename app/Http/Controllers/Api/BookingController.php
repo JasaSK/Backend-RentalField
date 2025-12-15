@@ -273,7 +273,7 @@ class BookingController extends Controller
         }
 
         $bookings = Booking::where('user_id', $user->id)
-            ->with('field', 'ticket')
+            ->with('field', 'ticket', 'refunds')
             ->orderBy('created_at', 'desc')
             ->get();
 

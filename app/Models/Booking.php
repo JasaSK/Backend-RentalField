@@ -29,7 +29,7 @@ class Booking extends Model
 
     public function refunds()
     {
-        return $this->hasMany(Refund::class);
+        return $this->hasMany(Refund::class)->latest();
     }
 
     public function ticket()
@@ -42,3 +42,4 @@ class Booking extends Model
         return $this->hasOne(Payment::class);
     }
 }
+    

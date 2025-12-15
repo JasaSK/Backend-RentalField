@@ -1,34 +1,40 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const editButtons = document.querySelectorAll(".editGalleryCategoryBtn");
+document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("editGalleryCategoryModal");
-    const closeModal = document.getElementById("cancelGalleryCategoryEdit");
+    const closeButtons = document.querySelectorAll(
+        ".btn-close-gallery-category"
+    );
+    const overlay = modal.querySelector(".modal-overlay");
+    const editButtons = document.querySelectorAll(".editGalleryCategoryBtn");
     const editForm = document.getElementById("editGalleryCategoryForm");
-    const editName = document.getElementById("editGalleryCategoryName");
+    const modalPanel = modal.querySelector(".relative");
 
-    editButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const id = btn.dataset.id;
-
-            editName.value = btn.dataset.name;
+    editButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+            const { id, name } = this.dataset;
 
             editForm.action = `/admin/gallery-categories/update/${id}`;
+            document.getElementById("editGalleryCategoryName").value = name;
+
             modal.classList.remove("hidden");
             modal.classList.add("flex");
+            document.body.style.overflow = "hidden";
         });
     });
 
-    // Tombol batal
-    closeModal.addEventListener("click", () => {
+    function closeModal() {
         modal.classList.add("hidden");
         modal.classList.remove("flex");
-    });
-    console.log(modal);
+        document.body.style.overflow = "auto";
+    }
 
-    // Klik luar modal untuk tutup
-    modal.addEventListener("click", (e) => {
-        if (e.target === modal) {
-            modal.classList.add("hidden");
-            modal.classList.remove("flex");
-        }
+    closeButtons.forEach((btn) => {
+        btn.addEventListener("click", closeModal);
+    });
+
+    overlay.addEventListener("click", closeModal);
+
+    // ⛔ STOP bubbling supaya submit bisa jalan
+    modalPanel.addEventListener("click", function (e) {
+        e.stopPropagation();
     });
 });

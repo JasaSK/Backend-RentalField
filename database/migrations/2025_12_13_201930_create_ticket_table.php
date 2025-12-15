@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('payment_id');
             $table->foreign('payment_id')->references('id')->on('payment')->onDelete('cascade');
             $table->string('ticket_code')->unique();
-            $table->enum('status_ticket', ['unused', 'used'])->default('unused');
+            $table->enum('status_ticket', ['unused', 'used', 'refunded', 'cancelled'])->default('unused');
             $table->timestamps();
         });
     }

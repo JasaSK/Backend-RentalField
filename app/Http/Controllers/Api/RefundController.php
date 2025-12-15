@@ -124,7 +124,7 @@ class RefundController extends Controller
     public function getRefund()
     {
         $user = Auth::user();
-        $refunds = Refund::where('user_id', $user->id)->get();
+        $refunds = Refund::where('user_id', $user->id)->where('refund_status', 'pending')->get();;
         return response()->json([
             'status' => true,
             'message' => 'Daftar refund',
