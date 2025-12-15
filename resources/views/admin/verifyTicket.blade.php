@@ -52,6 +52,11 @@
                         <tr class="border-b">
                             <th class="p-3 font-semibold text-gray-700">No</th>
                             <th class="p-3 font-semibold text-gray-700">Kode Tiket</th>
+                            <th class="p-3 font-semibold text-gray-700">Lapangan</th>
+                            <th class="p-3 font-semibold text-gray-700">Tanggal</th>
+                            <th class="p-3 font-semibold text-gray-700">Jam Mulai</th>
+                            <th class="p-3 font-semibold text-gray-700">Jam Selesai</th>
+                            <th class="p-3 font-semibold text-gray-700">Harga</th>
                             <th class="p-3 font-semibold text-gray-700">Waktu Scan</th>
                         </tr>
                     </thead>
@@ -64,6 +69,21 @@
                                 </td>
                                 <td class="p-3 border-b text-gray-700">
                                     {{ $data->ticket_code }}
+                                </td>
+                                <td class="p-3 border-b text-gray-700">
+                                    {{ $data->booking->field->name }}
+                                </td>
+                                <td class="p-3 border-b text-gray-700">
+                                    {{ $data->booking->date }}
+                                </td>
+                                <td class="p-3 border-b text-gray-700">
+                                    {{ $data->booking->start_time }}
+                                </td>
+                                <td class="p-3 border-b text-gray-700">
+                                    {{ $data->booking->end_time }}
+                                </td>
+                                <td class="p-3 border-b text-gray-700">
+                                    {{ $data->booking->total_price }}
                                 </td>
                                 <td class="p-3 border-b text-gray-700">
                                     {{ $data->created_at }}

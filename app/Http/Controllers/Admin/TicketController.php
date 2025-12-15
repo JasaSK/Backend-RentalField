@@ -11,7 +11,7 @@ class TicketController extends Controller
 {
     public function index()
     {
-        $verify = Booking::where('status_ticket', 'used')->get();
+        $verify = Ticket::where('status_ticket', 'used')->get();
         return view('admin.verifyTicket', compact('verify'));
     }
 
@@ -20,7 +20,7 @@ class TicketController extends Controller
         // Validasi input
         $request->validate([
             // 'booking_id'   => 'required|exists:bookings,id',
-            'ticket_code'  => 'required|string|exists:bookings,ticket_code',
+            'ticket_code'  => 'required|string|exists:ticket,ticket_code',
         ], [
             // 'booking_id.required' => 'ID booking wajib diisi.',
             // 'booking_id.exists' => 'ID booking tidak ditemukan.',
@@ -29,27 +29,29 @@ class TicketController extends Controller
             'ticket_code.exists' => 'Kode tiket tidak ditemukan.',
         ]);
 
-        $booking = Booking::where('ticket_code', $request->ticket_code)->first();
+        $ticket = Ticket::where('ticket_code', $request->ticket_code)->first();
 
-        if (!$booking) {
+        if (!$ticket) {
             return back()->with('error', 'Kode tiket tidak ditemukan.');
         }
 
-        if ($booking->status !== 'approved') {
-            return back()->with('error', 'Booking belum disetujui.');
-        }
-
-        if ($booking->status_ticket === 'used') {
+        if ($ticket->status_ticket === 'used') {
             return back()->with('error', 'Tiket ini sudah pernah diverifikasi.');
         }
+        if ($ticket->booking->status !== 'approved') {
+            return back()->with('error', 'Booking belum disetujui.');
+        }
+        if ($ticket->payment->payment_status !== 'paid') {
+            return back()->with('error', 'Pembayaran belum dilakukan.');
+        }
 
-        $booking->update(['status_ticket' => 'used']);
+        $ticket->update(['status_ticket' => 'used']);
 
-        Ticket::create([
-            'ticket_code' => $request->ticket_code,
-            'booking_id'  => $booking->id,
-            'verified_at' => now(),
-        ]);
+        // Ticket::create([
+        //     'ticket_code' => $request->ticket_code,
+        //     'booking_id'  => $ticket->id,
+        //     'verified_at' => now(),
+        // ]);
 
         return back()->with('success', 'Tiket berhasil diverifikasi.');
     }
