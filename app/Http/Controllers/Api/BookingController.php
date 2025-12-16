@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Field;
+use App\Models\Payment;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -70,12 +71,15 @@ class BookingController extends Controller
             'end_time.after' => 'Waktu selesai harus setelah waktu mulai'
         ]);
 
-        if (Carbon::parse($request->date)->startOfDay()->lessThan(Carbon::now()->startOfDay())) {
+        $bookingDateTime = Carbon::parse($request->date . ' ' . $request->start_time);
+
+        if ($bookingDateTime->lessThanOrEqualTo(now())) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tidak boleh booking tanggal yang sudah lewat'
+                'message' => 'Tidak boleh booking waktu yang sudah lewat'
             ], 400);
         }
+
 
 
         $conflict = Booking::where('field_id', $request->field_id)
@@ -144,7 +148,12 @@ class BookingController extends Controller
         $data['total_price'] = $totalPrice;
 
         $booking = Booking::create($data);
-
+        Payment::create([
+            'booking_id' => $booking->id,
+            'payment_status' => 'unpaid',
+            'expires_at' => now()->addMinutes(15),
+        ]);
+        
         return response()->json([
             'success' => true,
             'message' => 'Booking berhasil dibuat',

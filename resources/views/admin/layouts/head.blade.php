@@ -1,5 +1,5 @@
 <!-- admin/layouts/head.blade.php -->
-
+<link rel="stylesheet" href="{{ asset('css/loader.css') }}">
 <!-- Meta Tags -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,3 +31,5 @@
 <style>
     /* Custom styles if any */
 </style>
+
+<link rel="stylesheet" href="{{ asset('css/loader1.css') }}">

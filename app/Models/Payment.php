@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Payment extends Model
 {
     protected $table = 'payment';
-    protected $fillable = ['booking_id', 'payment_order_id', 'qris_url', 'payment_status'];
-
+    protected $fillable = ['booking_id', 'payment_order_id', 'qris_url', 'payment_status', 'expires_at'];
+    protected $casts = ['expires_at' => 'datetime'];
     public function booking()
     {
         return $this->belongsTo(Booking::class);

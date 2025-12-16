@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('payment_order_id')->nullable();
             $table->string('qris_url')->nullable();
             $table->enum('payment_status', ['unpaid', 'paid', 'failed', 'refunded'])->default('unpaid');
+            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
     }

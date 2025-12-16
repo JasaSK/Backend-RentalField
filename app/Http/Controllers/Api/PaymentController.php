@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\CancelUnpaidBooking;
 use Illuminate\Http\Request;
 use Midtrans\Config;
 use App\Models\Booking;
@@ -34,34 +35,41 @@ class PaymentController extends Controller
         if (!$booking) {
             return response()->json(['message' => 'Booking tidak ditemukan'], 404);
         }
-        if (Carbon::parse($booking->date)->startOfDay()->lessThan(Carbon::now()->startOfDay())) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Tidak boleh booking tanggal yang sudah lewat'
-            ], 400);
-        }
 
-        if ($booking->status == 'approved') {
+        // ❌ booking waktu lampau (date + time seharusnya, tapi aku fokus payment)
+        if ($booking->status === 'approved') {
             return response()->json([
                 'message' => 'Booking sudah dibayar'
             ]);
         }
 
-        $existingPayment = Payment::where('booking_id', $booking_id)
+        $payment = Payment::where('booking_id', $booking_id)
             ->where('payment_status', 'unpaid')
-            ->latest()
             ->first();
 
-        if ($existingPayment) {
+        if (!$payment) {
+            return response()->json([
+                'message' => 'Payment tidak ditemukan atau sudah expired'
+            ], 404);
+        }
+
+        // ⏰ kalau payment sudah expired → STOP
+        if ($payment->expires_at && now()->greaterThan($payment->expires_at)) {
+            return response()->json([
+                'message' => 'Payment sudah expired'
+            ], 400);
+        }
+
+        // Sudah pernah generate QRIS
+        if ($payment->qris_url) {
             return response()->json([
                 'message' => 'Gunakan pembayaran yang sudah ada',
-                'qris_url' => $existingPayment->qris_url,
-                'order_id' => $existingPayment->payment_order_id
+                'qris_url' => $payment->qris_url,
+                'order_id' => $payment->payment_order_id
             ]);
         }
-        // BUAT order_id unik
-        $orderId = $booking->code_booking . '-' . uniqid();
 
+        $orderId = $booking->code_booking . '-' . uniqid();
 
         $payload = [
             'payment_type' => 'qris',
@@ -74,21 +82,65 @@ class PaymentController extends Controller
             ]
         ];
 
-        // CALL MIDTRANS API
-        $response = Http::withBasicAuth(config('services.midtrans.server_key'), '')
-            ->post('https://api.sandbox.midtrans.com/v2/charge', $payload);
+        $response = Http::withBasicAuth(
+            config('services.midtrans.server_key'),
+            ''
+        )->post('https://api.sandbox.midtrans.com/v2/charge', $payload);
 
-        $qrisUrl = $response->json()['actions'][0]['url'] ?? null;
-        Payment::create([
-            'booking_id' => $booking_id,
+        if (!$response->successful()) {
+            return response()->json([
+                'message' => 'Gagal membuat QRIS'
+            ], 500);
+        }
+
+        $qrisUrl = $response->json('actions.0.url');
+
+        $payment->update([
             'payment_order_id' => $orderId,
-            'payment_status' => 'unpaid',
-            'qris_url' => $qrisUrl
+            'qris_url' => $qrisUrl,
         ]);
-        return $response->json();
+
+        return response()->json([
+            'success' => true,
+            'qris_url' => $qrisUrl,
+            'expires_at' => $payment->expires_at
+        ]);
     }
 
-    // CALLBACK
+    public function expirePayment(Request $request, $booking_id)
+    {
+        $payment = Payment::where('booking_id', $booking_id)
+            ->where('payment_status', 'unpaid')
+            ->latest()
+            ->first();
+
+        if (!$payment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment tidak ditemukan'
+            ], 404);
+        }
+
+        // VALIDASI EXPIRED
+        if (now()->diffInMilliseconds($payment->expires_at, false) > 0) {
+            return response()->json([
+                'message' => 'Payment belum expired'
+            ], 400);
+        }
+
+        // HAPUS BOOKING (PAYMENT AKAN IKUT TERHAPUS)
+        $booking = Booking::find($booking_id);
+        if ($booking) {
+            $booking->delete();
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment expired, booking dibatalkan'
+        ]);
+    }
+
+
     public function midtransCallback(Request $request)
     {
         // \Log::info('MIDTRANS CALLBACK RECEIVED', $request->all());
@@ -120,6 +172,7 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Pembayaran tidak ditemukan, silahkan coba lagi'], 404);
         }
 
+
         // Update status
         if (in_array($request->transaction_status, ['settlement', 'capture'])) {
             $payment->payment_status = 'paid';
@@ -129,6 +182,7 @@ class PaymentController extends Controller
             $payment->payment_status = 'cancelled';
         }
 
+        // if ($payment->payment_status === 'paid') return;
         // $payment->payment_status =  $payment->status;
         $payment->save();
 

@@ -52,14 +52,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //    
     Route::put('/booking/{id}', [BookingController::class, 'update']);
     //
-    
+
     Route::post('/refund/request', [RefundController::class, 'requestRefund']);
     Route::get('/refund/user', [RefundController::class, 'getRefund']);
     Route::get('/refund/{id}', [RefundController::class, 'show']);
-    
+
     Route::post('/payment/create-qris/{booking_id}', [PaymentController::class, 'createQrisPayment']);
     Route::get('/payment/{booking_id}', [PaymentController::class, 'getQris']);
-    
+    Route::post('/payment/{booking_id}/expire', [PaymentController::class, 'expirePayment']);
+
     Route::get('/ticket/{booking_id}', [TicketController::class, 'showTicket']);
     Route::get('/booking/{id}/ticket', [TicketController::class, 'downloadTicket']);
 });

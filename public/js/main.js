@@ -5,58 +5,210 @@
     const loader = document.getElementById("page-loader");
     const loaderText = document.getElementById("loader-text");
     const loadingBar = document.getElementById("loading-bar");
+    const progressPercentage = document.getElementById("progress-percentage");
+    const loadingPhase = document.getElementById("loading-phase");
     const body = document.body;
 
-    // Show loading bar animation
-    function startLoadingAnimation() {
-        if (loadingBar) {
-            let progress = 0;
-            const animate = () => {
-                if (progress < 100) {
-                    progress += 1;
-                    loadingBar.style.width = progress + "%";
+    // Loading phases with different texts
+    const loadingPhases = [
+        {
+            text: "Initializing system...",
+            duration: 200,
+        },
+        {
+            text: "Loading UI components...",
+            duration: 300,
+        },
+        {
+            text: "Connecting to database...",
+            duration: 400,
+        },
+        {
+            text: "Preparing dashboard...",
+            duration: 300,
+        },
+        {
+            text: "Almost ready...",
+            duration: 200,
+        },
+    ];
 
-                    if (progress < 80) {
-                        setTimeout(animate, 20);
-                    } else {
-                        setTimeout(animate, 50);
+    // Simulated loading with smooth progress
+    function simulateSmoothLoading() {
+        let progress = 0;
+        let phaseIndex = 0;
+
+        function updateProgress() {
+            if (progress < 100) {
+                // Calculate increment with easing
+                let increment;
+                if (progress < 20) {
+                    increment = 0.8; // Slow start
+                } else if (progress < 80) {
+                    increment = 1.5; // Fast middle
+                } else {
+                    increment = 0.5; // Slow finish
+                }
+
+                progress += increment;
+
+                // Update progress bar
+                if (loadingBar) {
+                    loadingBar.style.width = progress + "%";
+                    loadingBar.style.transition = "width 0.1s ease";
+                }
+
+                // Update percentage
+                if (progressPercentage) {
+                    progressPercentage.textContent =
+                        Math.min(Math.round(progress), 100) + "%";
+                }
+
+                // Update phase text
+                if (loadingPhase && phaseIndex < loadingPhases.length) {
+                    const phaseProgress = Math.min(progress, 100);
+                    const phaseThreshold =
+                        (100 / loadingPhases.length) * (phaseIndex + 1);
+
+                    if (phaseProgress >= phaseThreshold) {
+                        loadingPhase.textContent =
+                            loadingPhases[phaseIndex].text;
+                        phaseIndex++;
                     }
                 }
-            };
-            setTimeout(animate, 100);
+
+                // Continue animation
+                setTimeout(updateProgress, 20);
+            }
         }
+
+        updateProgress();
     }
 
-    // Hide loader
+    // Hide loader with smooth animation
     function hideLoader() {
         if (loader) {
-            loader.style.opacity = "0";
+            // Add fade-out animation
+            loader.classList.add("fade-out");
+
+            // Wait for animation to complete
             setTimeout(() => {
                 loader.style.display = "none";
                 body.classList.remove("preload");
                 body.classList.add("loaded");
+
+                // Add fade-in animation to main content
+                const mainContent =
+                    document.querySelector(".flex.min-h-screen");
+                if (mainContent) {
+                    mainContent.style.opacity = "1";
+                }
             }, 500);
         }
     }
 
-    // Start loading animation immediately
-    document.addEventListener("DOMContentLoaded", function () {
-        // Start loading bar
-        startLoadingAnimation();
+    // Enhanced page transition for navigation
+    function setupPageTransitions() {
+        document.addEventListener("click", function (e) {
+            const target = e.target.closest("a");
 
-        // Setup sidebar
+            // Skip for special links
+            if (
+                !target ||
+                target.hasAttribute("data-no-loader") ||
+                target.classList.contains("logout") ||
+                target.target === "_blank" ||
+                e.ctrlKey ||
+                e.metaKey ||
+                !target.href.startsWith(window.location.origin) ||
+                target.href.includes("#") ||
+                target.href === window.location.href
+            ) {
+                return;
+            }
+
+            // Prevent default to show loader
+            e.preventDefault();
+
+            // Get page name
+            let pageName = "Halaman";
+            if (target.textContent && target.textContent.trim()) {
+                pageName = target.textContent.trim();
+            }
+
+            // Update loader text
+            if (loaderText) {
+                loaderText.innerHTML = `Memuat ${pageName} <div class="loading-dots inline-flex ml-2"><span></span><span></span><span></span></div>`;
+            }
+
+            // Show loader with animation
+            if (loader) {
+                loader.style.display = "flex";
+                loader.style.opacity = "1";
+                loader.classList.remove("fade-out");
+
+                // Reset and start progress
+                if (loadingBar) {
+                    loadingBar.style.width = "0%";
+                }
+                if (progressPercentage) {
+                    progressPercentage.textContent = "0%";
+                }
+                if (loadingPhase) {
+                    loadingPhase.textContent = "Memulai...";
+                }
+
+                simulateSmoothLoading();
+
+                // Navigate after showing loader
+                setTimeout(() => {
+                    window.location.href = target.href;
+                }, 800);
+            } else {
+                // Fallback to normal navigation
+                window.location.href = target.href;
+            }
+        });
+    }
+
+    // Initialize everything when DOM is ready
+    document.addEventListener("DOMContentLoaded", function () {
+        // Start smooth loading animation
+        simulateSmoothLoading();
+
+        // Setup page transitions
+        setupPageTransitions();
+
+        // Setup sidebar (your existing function)
         setupSidebar();
     });
 
     // When page fully loads
     window.addEventListener("load", function () {
-        setTimeout(() => {
-            hideLoader();
-        }, 800);
+        // Complete progress to 100%
+        if (loadingBar) {
+            loadingBar.style.width = "100%";
+            loadingBar.style.transition = "width 0.3s ease";
+        }
+        if (progressPercentage) {
+            progressPercentage.textContent = "100%";
+        }
+        if (loadingPhase) {
+            loadingPhase.textContent = "Dashboard siap!";
+        }
+
+        // Hide loader after a brief delay
+        setTimeout(hideLoader, 500);
     });
 
-    // Setup sidebar - FIXED VERSION
-    // Perbaikan di bagian setupSidebar()
+    // Fallback: Hide loader after max timeout
+    setTimeout(() => {
+        if (body.classList.contains("preload")) {
+            hideLoader();
+        }
+    }, 4000);
+
+    // Your existing setupSidebar function
     function setupSidebar() {
         const hamburger = document.getElementById("hamburger");
         const sidebar = document.getElementById("sidebar");
@@ -66,17 +218,10 @@
 
         if (!hamburger || !sidebar) return;
 
-        // Debug: Log untuk memastikan elemen ditemukan
-        console.log("Hamburger element:", hamburger);
-        console.log("Sidebar element:", sidebar);
-
-        // Toggle sidebar function
         function toggleSidebar() {
-            console.log("Toggle sidebar clicked");
             const isHidden = sidebar.classList.contains("-translate-x-full");
 
             if (isHidden) {
-                // Show sidebar
                 sidebar.classList.remove("-translate-x-full");
                 if (overlay) {
                     overlay.classList.remove("hidden");
@@ -84,10 +229,8 @@
                 }
                 if (iconHamburger) iconHamburger.classList.add("hidden");
                 if (iconClose) iconClose.classList.remove("hidden");
-                // Prevent body scroll
                 document.body.style.overflow = "hidden";
             } else {
-                // Hide sidebar
                 sidebar.classList.add("-translate-x-full");
                 if (overlay) {
                     overlay.classList.add("hidden");
@@ -95,28 +238,21 @@
                 }
                 if (iconHamburger) iconHamburger.classList.remove("hidden");
                 if (iconClose) iconClose.classList.add("hidden");
-                // Restore body scroll
                 document.body.style.overflow = "auto";
             }
         }
 
-        // Hamburger click event - Gunakan event listener yang lebih reliable
         hamburger.addEventListener(
             "click",
             function (e) {
-                console.log("Hamburger clicked");
                 e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
                 toggleSidebar();
             },
             true
-        ); // Gunakan capture phase
+        );
 
-        // Overlay click event
         if (overlay) {
             overlay.addEventListener("click", function (e) {
-                console.log("Overlay clicked");
                 e.stopPropagation();
                 sidebar.classList.add("-translate-x-full");
                 overlay.classList.add("hidden");
@@ -127,14 +263,10 @@
             });
         }
 
-        // Close sidebar on mobile when clicking a link
         const sidebarLinks = document.querySelectorAll("#sidebar nav a");
         sidebarLinks.forEach((link) => {
             link.addEventListener("click", function (e) {
-                // Skip if logout form
                 if (this.closest(".logout")) return;
-
-                // Only for mobile screens
                 if (window.innerWidth < 1024) {
                     setTimeout(() => {
                         sidebar.classList.add("-translate-x-full");
@@ -151,7 +283,6 @@
             });
         });
 
-        // Close sidebar when clicking outside on mobile
         document.addEventListener("click", function (e) {
             if (
                 window.innerWidth < 1024 &&
@@ -170,7 +301,6 @@
             }
         });
 
-        // Close sidebar with Escape key
         document.addEventListener("keydown", function (e) {
             if (
                 e.key === "Escape" &&
@@ -188,10 +318,8 @@
             }
         });
 
-        // Handle window resize
         window.addEventListener("resize", function () {
             if (window.innerWidth >= 1024) {
-                // Pada desktop, pastikan sidebar terlihat dan overlay hidden
                 sidebar.classList.remove("-translate-x-full");
                 if (overlay) {
                     overlay.classList.add("hidden");
@@ -199,7 +327,6 @@
                 }
                 document.body.style.overflow = "auto";
             } else {
-                // Pada mobile, pastikan sidebar tersembunyi
                 if (!sidebar.classList.contains("-translate-x-full")) {
                     sidebar.classList.add("-translate-x-full");
                     if (overlay) {
@@ -212,52 +339,4 @@
             }
         });
     }
-
-    // Setup navigation dengan filter untuk tidak pakai loader di beberapa link
-    document.addEventListener("click", function (e) {
-        const target = e.target.closest("a");
-
-        // SKIP LOADER untuk link tertentu:
-        // 1. Link dengan atribut data-no-loader
-        // 2. Link logout
-        // 3. Link dengan hash (#) anchor
-        // 4. External links
-        if (
-            !target ||
-            !target.href ||
-            target.hasAttribute("data-no-loader") ||
-            target.classList.contains("logout") ||
-            target.target === "_blank" ||
-            target.hasAttribute("download") ||
-            !target.href.startsWith(window.location.origin) ||
-            e.ctrlKey ||
-            e.metaKey ||
-            e.shiftKey ||
-            target.href === window.location.href ||
-            target.href.includes("#")
-        ) {
-            return;
-        }
-
-        // Get page name for loader text
-        let pageName = "Halaman";
-        if (target.textContent && target.textContent.trim()) {
-            pageName = target.textContent.trim();
-        }
-
-        // Update loader text
-        if (loaderText) loaderText.textContent = `Memuat ${pageName}`;
-
-        // Show loader for navigation
-        if (loader) {
-            loader.style.display = "flex";
-            loader.style.opacity = "1";
-            startLoadingAnimation();
-        }
-    });
-
-    // Fallback safety
-    setTimeout(() => {
-        hideLoader();
-    }, 3000);
 })();
