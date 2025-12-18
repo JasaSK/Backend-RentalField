@@ -43,9 +43,9 @@ class TicketController extends Controller
         ], 200);
     }
 
-    public function downloadTicket($id)
+    public function downloadTicket($bookingId)
     {
-        $ticket = Ticket::with('booking')->find($id);
+        $ticket = Ticket::with('booking')->where('booking_id', $bookingId)->first();
 
         if (!$ticket) {
             return response()->json(['success' => false, 'message' => 'Booking not found'], 404);
