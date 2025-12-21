@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RequestLogin;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
-
+use Illuminate\Auth\Events\Login;
 
 class AuthController extends Controller
 {
@@ -200,17 +201,9 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function login(Request $request)
+    public function login(RequestLogin $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string|min:6',
-        ], [
-            'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
-            'password.required' => 'Password wajib diisi.',
-            'password.min' => 'Password minimal 6 karakter.',
-        ]);
+        $credentials = $request->validated();
 
         $user = User::where('email', $credentials['email'])->first();
 

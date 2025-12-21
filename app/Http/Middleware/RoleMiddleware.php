@@ -2,12 +2,13 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Requests\RequestLogin;
 use Closure;
 use Illuminate\Http\Request;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, ...$roles)
+    public function handle(RequestLogin $request, Closure $next, ...$roles)
     {
         $user = $request->user();
 
