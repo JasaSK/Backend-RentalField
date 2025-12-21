@@ -22,7 +22,7 @@ class RequestLogin extends FormRequest
     public function rules(): array
     {
         return [
-            'email'    => 'required|email',
+            'email'    => 'required|email|exists:users,email',
             'password' => 'required|min:6',
         ];
     }
@@ -31,6 +31,7 @@ class RequestLogin extends FormRequest
     {
         return [
             'email.required'    => 'Email wajib diisi.',
+            'email.exists'      => 'Email tidak ditemukan.',
             'email.email'       => 'Format email tidak valid.',
             'password.required' => 'Password wajib diisi.',
             'password.min'      => 'Password minimal 6 karakter.',
