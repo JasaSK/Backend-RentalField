@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Banner\BannerRequest;
 use App\Models\Banner;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class BannerController extends Controller
@@ -19,28 +19,9 @@ class BannerController extends Controller
     }
 
     // Tambah banner baru
-    public function store(Request $request)
+    public function store(BannerRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'status' => 'required|in:active,non-active',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ], [
-            'name.required' => 'Judul banner wajib diisi.',
-            'name.string' => 'Judul banner harus berupa teks.',
-            'name.max' => 'Judul banner maksimal 255 karakter.',
-
-            'description.required' => 'Deskripsi banner wajib diisi.',
-            'description.string' => 'Deskripsi banner harus berupa teks.',
-
-            'status.required' => 'Status banner wajib diisi.',
-            'status.in' => 'Status banner harus "active" atau "non-active".',
-
-            'image.image' => 'File harus berupa gambar.',
-            'image.mimes' => 'Format gambar harus jpg, jpeg, atau png.',
-            'image.max' => 'Ukuran gambar maksimal 2MB.',
-        ]);
+        $request->validated();
 
         $banner = new Banner();
         $banner->name = $request->name;
@@ -58,30 +39,11 @@ class BannerController extends Controller
     }
 
     // Update banner
-    public function update(Request $request, $id)
+    public function update(BannerRequest $request, $id)
     {
         $banner = Banner::findOrFail($id);
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'status' => 'required|in:active,non-active',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ], [
-            'name.required' => 'Judul banner wajib diisi.',
-            'name.string' => 'Judul banner harus berupa teks.',
-            'name.max' => 'Judul banner maksimal 255 karakter.',
-
-            'description.required' => 'Deskripsi banner wajib diisi.',
-            'description.string' => 'Deskripsi banner harus berupa teks.',
-
-            'status.required' => 'Status banner wajib diisi.',
-            'status.in' => 'Status banner harus "active" atau "non-active".',
-
-            'image.image' => 'File harus berupa gambar.',
-            'image.mimes' => 'Format gambar harus jpg, jpeg, atau png.',
-            'image.max' => 'Ukuran gambar maksimal 2MB.',
-        ]);
+        $request->validated();
 
         $banner->name = $request->name;
         $banner->description = $request->description;
