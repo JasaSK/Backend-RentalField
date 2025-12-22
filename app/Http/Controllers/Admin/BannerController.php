@@ -23,17 +23,17 @@ class BannerController extends Controller
     {
         $request->validated();
 
-        $banner = new Banner();
-        $banner->name = $request->name;
-        $banner->description = $request->description;
-        $banner->status = $request->status;
-
+        $imagePath = null;
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('banners', 'public'); // simpan di storage/app/public/banners
-            $banner->image = $path;
+            $imagePath = $request->file('image')->store('banners', 'public');
         }
 
-        $banner->save();
+        Banner::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'status' => $request->status,
+            'image' => $imagePath
+        ]);
 
         return redirect()->back()->with('success', 'Banner berhasil ditambahkan!');
     }
@@ -42,22 +42,21 @@ class BannerController extends Controller
     public function update(BannerRequest $request, $id)
     {
         $banner = Banner::findOrFail($id);
-
+        if (!$banner) {
+            return redirect()->back()->with('error', 'Banner tidak ditemukan!');
+        }
         $request->validated();
+        if ($request->hasFile('image')) {
+            if ($banner->image && Storage::disk('public')->exists($banner->image)) {
+                Storage::disk('public')->delete($banner->image);
+            }
+            $imagePath = $request->file('image')->store('banners', 'public');
+        }
 
         $banner->name = $request->name;
         $banner->description = $request->description;
         $banner->status = $request->status;
-
-        if ($request->hasFile('image')) {
-            // hapus gambar lama
-            if ($banner->image && Storage::disk('public')->exists($banner->image)) {
-                Storage::disk('public')->delete($banner->image);
-            }
-            $path = $request->file('image')->store('banners', 'public');
-            $banner->image = $path;
-        }
-
+        $banner->image = $imagePath;
         $banner->save();
 
         return redirect()->back()->with('success', 'Banner berhasil diperbarui!');
