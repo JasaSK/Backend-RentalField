@@ -25,7 +25,7 @@ Route::post('admin/login', [AuthController::class, 'login'])->name('admin.login'
 
 Route::post('/Logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware('checkLogin:admin')->group(function () {
+Route::middleware('checkLogin:admin,superadmin')->group(function () {
 
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/banner', [BannerController::class, 'index'])->name('admin.banner');
