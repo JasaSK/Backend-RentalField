@@ -14,7 +14,9 @@ class FieldCategoryController extends Controller
     {
         // Ambil semua kategori dari database
         $categories = CategoryField::all();
-
+        if (!$categories) {
+            return redirect()->back()->with('error', 'Kategori tidak ditemukan!');
+        }
         return view('admin.field-category', compact('categories'));
     }
 
