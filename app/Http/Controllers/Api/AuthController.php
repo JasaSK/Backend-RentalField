@@ -3,31 +3,22 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RequestLogin;
+use App\Http\Requests\Auth\EmailRequest;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Http\Requests\Auth\VerifyRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
-use Illuminate\Auth\Events\Login;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'no_telp' => 'required|string|min:10|max:15|unique:users,no_telp',
-            'password' => 'required|string|min:6|confirmed',
-        ], [
-            'name.required' => 'Nama wajib diisi.',
-            'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
-            'email.unique' => 'Email sudah terdaftar.',
-            'no_telp.unique' => 'Nomor telepon sudah terdaftar.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
-        ]);
+        $validated = $request->validated();
 
         $user = User::create([
             'name' => $validated['name'],
@@ -61,18 +52,10 @@ class AuthController extends Controller
             'data' => $user
         ], 201);
     }
-
-
-    public function verifyCode(Request $request)
+    
+    public function verifyCode(VerifyRequest $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'code' => 'required|digits:6',
-        ], [
-            'email.required' => 'Email wajib diisi.',
-            'code.required' => 'Kode verifikasi wajib diisi.',
-            'code.digits' => 'Kode verifikasi harus 6 digit angka.',
-        ]);
+        $request->validated();
 
         $user = User::where('email', $request->email)->first();
 
@@ -129,14 +112,9 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function resendCode(Request $request)
+    public function resendCode(EmailRequest $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-        ], [
-            'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
-        ]);
+        $request->validated();
 
         $user = User::where('email', $request->email)->first();
 
@@ -201,7 +179,7 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function login(RequestLogin $request)
+    public function login(LoginRequest $request)
     {
         $credentials = $request->validated();
         $user = User::where('email', $credentials['email'])->first();
@@ -231,14 +209,9 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function forgotPassword(Request $request)
+    public function forgotPassword(EmailRequest $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-        ], [
-            'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
-        ]);
+        $request->validated();
 
         $user = User::where('email', $request->email)->first();
 
@@ -289,17 +262,9 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function verifyResetCode(Request $request)
+    public function verifyResetCode(VerifyRequest $request)
     {
-        // dd($request->all());
-        $request->validate([
-            'email' => 'required|string|email',
-            'reset_code' => 'required|digits:6',
-        ], [
-            'email.required' => 'Email wajib diisi.',
-            'reset_code.required' => 'Kode reset wajib diisi.',
-            'reset_code.digits' => 'Kode reset harus 6 digit angka.',
-        ]);
+        $request->validated();
 
         $user = User::where('email', $request->email)->first();
 
@@ -330,16 +295,12 @@ class AuthController extends Controller
                 'message' => 'Kode reset telah kadaluarsa.'
             ], 400);
         }
-        if ($resetVerification->reset_code != $request->reset_code) {
+        if ($resetVerification->code != $request->reset_code) {
             return response()->json([
                 'status' => false,
                 'message' => 'Kode reset tidak valid.'
             ], 400);
         }
-
-        // $resetVerification->update([
-        //     'last_sent_at' => null,
-        // ]);
 
         return response()->json([
             'status' => true,
@@ -348,20 +309,9 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function resetPassword(Request $request)
+    public function resetPassword(ResetPasswordRequest $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'reset_code' => 'required|digits:6',
-            'password' => 'required|string|min:6|confirmed', // harus ada password_confirmation
-        ], [
-            'email.required' => 'Email wajib diisi.',
-            'reset_code.required' => 'Kode reset wajib diisi.',
-            'reset_code.digits' => 'Kode reset harus 6 digit angka.',
-            'password.required' => 'Password wajib diisi.',
-            'password.min' => 'Password minimal 6 karakter.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
-        ]);
+        $request->validated();
 
         $user = User::where('email', $request->email)->first();
         if (!$user) {
@@ -386,7 +336,7 @@ class AuthController extends Controller
             ], 400);
         }
 
-        if ($resetVerification->reset_code != $request->reset_code) {
+        if ($resetVerification->code != $request->reset_code) {
             return response()->json([
                 'status' => false,
                 'message' => 'Kode reset tidak valid.'

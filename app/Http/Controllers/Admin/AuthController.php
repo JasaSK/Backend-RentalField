@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RequestLogin;
+use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,14 +14,10 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    // 🔹 LOGIN
-    public function login(RequestLogin $request)
+    public function login(LoginRequest $request)
     {
-        // dd($request->all());
-        if (Auth::guard('web')->attempt($request->validated())) {
-            Auth::user();
+        if (Auth::attempt($request->validated())) {
             $request->session()->regenerate();
-            // dd(Auth::user());
             return redirect()
                 ->route('admin.dashboard')
                 ->with('success', 'Login berhasil!');
