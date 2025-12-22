@@ -43,6 +43,7 @@ Route::get('/category-gallery/{id}', [CategoryGalleryController::class, 'show'])
 Route::get('bookings/booked-hours/{fieldId}', [BookingController::class, 'bookedHours']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::get('/booking/{id}', [BookingController::class, 'show']);
     Route::post('/booking', [BookingController::class, 'store']);

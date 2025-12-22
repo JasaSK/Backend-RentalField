@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -205,6 +206,16 @@ class AuthController extends Controller
             'data' => $user,
             'token' => $token,
             'role' => $user->role,
+        ], 200);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Logout berhasil'
         ], 200);
     }
 
