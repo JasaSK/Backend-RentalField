@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\NameRequest;
 use Illuminate\Http\Request;
 use App\Models\CategoryField;
 
@@ -18,13 +19,9 @@ class FieldCategoryController extends Controller
     }
 
     // Simpan kategori baru
-    public function store(Request $request)
+    public function store(NameRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-        ], [
-            'name.required' => 'Nama kategori wajib diisi.',
-        ]);
+        $request->validated();
 
         CategoryField::create([
             'name' => $request->name,
@@ -34,13 +31,9 @@ class FieldCategoryController extends Controller
     }
 
     // Update kategori
-    public function update(Request $request, $id)
+    public function update(NameRequest $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-        ], [
-            'name.required' => 'Nama kategori wajib diisi.',
-        ]);
+        $request->validated();
 
         $category = CategoryField::findOrFail($id);
         $category->update([
