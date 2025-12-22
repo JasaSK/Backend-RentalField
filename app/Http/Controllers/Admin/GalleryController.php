@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Gallery\GalleryRequest;
 use App\Models\Gallery;
 use App\Models\CategoryGallery;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
@@ -62,7 +61,9 @@ class GalleryController extends Controller
     public function destroy($id)
     {
         $gallery = Gallery::findOrFail($id);
-
+        if (!$gallery) {
+            return redirect()->back()->with('error', 'Gallery tidak ditemukan!');
+        }
         if ($gallery->image && Storage::disk('public')->exists($gallery->image)) {
             Storage::disk('public')->delete($gallery->image);
         }

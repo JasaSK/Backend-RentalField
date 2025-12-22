@@ -47,6 +47,12 @@ class FieldCategoryController extends Controller
     public function destroy($id)
     {
         $category = CategoryField::findOrFail($id);
+        if (!$category) {
+            return redirect()->back()->with('error', 'Kategori tidak ditemukan!');
+        }
+        if ($category->fields()->count() > 0) {
+            return redirect()->back()->with('error', 'Kategori ini memiliki field terkait, tidak bisa dihapus!');
+        }
         $category->delete();
 
         return redirect()->back()->with('success', 'Kategori berhasil dihapus.');

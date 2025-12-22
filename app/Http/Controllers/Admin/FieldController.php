@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Field\FieldRequest;
 use Illuminate\Http\Request;
 use App\Models\Field;
 use App\Models\CategoryField;
@@ -20,96 +21,58 @@ class FieldController extends Controller
     }
 
     // Simpan field baru
-    public function store(Request $request)
+    public function store(FieldRequest $request)
     {
-        $request->validate([
-            'name'              => 'required|string|max:255',
-            'category_field_id' => 'required|integer',
-            'open_time'         => 'required',
-            'close_time'        => 'required',
-            'description'       => 'required|string',
-            'status'            => 'required|string|max:255',
-            'price_per_hour'    => 'required|numeric',
-            'image'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ], [
-            'name.required'             => 'Nama lapangan wajib diisi.',
-            'category_field_id.required' => 'Kategori lapangan wajib diisi.',
-            'open_time.required'         => 'Jam buka wajib diisi.',
-            'close_time.required'        => 'Jam tutup wajib diisi.',
-            'description.required'       => 'Deskripsi lapangan wajib diisi.',
-            'status.required'            => 'Status lapangan wajib diisi.',
-            'price_per_hour.required'    => 'Harga per jam wajib diisi.',
-            'image.image'                => 'File harus berupa gambar.',
-            'image.mimes'                => 'Format gambar harus jpg, jpeg, atau png.',
-            'image.max'                  => 'Ukuran gambar maksimal 2MB.',
-        ]);
-
-        $data = $request->only([
-            'name',
-            'category_field_id',
-            'description',
-            'price_per_hour',
-            'open_time',
-            'close_time',
-            'status'
-        ]);
-
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('fields', 'public');
-            $data['image'] = $path;
+        $request->validated();
+        // dd($request->all());
+        if ($request->open_time > $request->close_time) {
+            return redirect()->back()->with('error', 'Waktu buka tidak boleh lebih besar dari waktu tutup.');
         }
 
-        Field::create($data);
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('fields', 'public');
+        }
+
+
+        Field::create([
+            'name' => $request->name,
+            'category_field_id' => $request->category_field_id,
+            'description' => $request->description,
+            'price_per_hour' => $request->price_per_hour,
+            'open_time' => $request->open_time,
+            'close_time' => $request->close_time,
+            'status' => $request->status,
+            'image' => $imagePath
+        ]);
 
         return redirect()->route('admin.fields')->with('success', 'Field berhasil ditambahkan.');
     }
 
-    // Update field
-    public function update(Request $request, $id)
+    public function update(FieldRequest $request, $id)
     {
-        $request->validate([
-            'name'              => 'required|string|max:255',
-            'category_field_id' => 'required|integer',
-            'open_time'         => 'required',
-            'close_time'        => 'required',
-            'description'       => 'required|string',
-            'status'            => 'required|string|max:255',
-            'price_per_hour'    => 'required|numeric',
-            'image'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ], [
-            'name.required'             => 'Nama lapangan wajib diisi.',
-            'category_field_id.required' => 'Kategori lapangan wajib diisi.',
-            'open_time.required'         => 'Jam buka wajib diisi.',
-            'close_time.required'        => 'Jam tutup wajib diisi.',
-            'description.required'       => 'Deskripsi lapangan wajib diisi.',
-            'status.required'            => 'Status lapangan wajib diisi.',
-            'price_per_hour.required'    => 'Harga per jam wajib diisi.',
-            'image.image'                => 'File harus berupa gambar.',
-            'image.mimes'                => 'Format gambar harus jpg, jpeg, atau png.',
-            'image.max'                  => 'Ukuran gambar maksimal 2MB.',
-        ]);
-
+        $request->validated();
+        // dd($request->all());
         $field = Field::findOrFail($id);
-
-        $data = $request->only([
-            'name',
-            'category_field_id',
-            'description',
-            'price_per_hour',
-            'open_time',
-            'close_time',
-            'status'
-        ]);
+        if (!$field) {
+            return redirect()->back()->with('error', 'Field tidak ditemukan!');
+        }
 
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
             if ($field->image && Storage::disk('public')->exists($field->image)) {
                 Storage::disk('public')->delete($field->image);
             }
-            $data['image'] = $request->file('image')->store('fields', 'public');
+            $imagePath = $request->file('image')->store('fields', 'public');
         }
-
-        $field->update($data);
+        $field->name = $request->name;
+        $field->category_field_id = $request->category_field_id;
+        $field->description = $request->description;
+        $field->price_per_hour = $request->price_per_hour;
+        $field->open_time = $request->open_time;
+        $field->close_time = $request->close_time;
+        $field->status = $request->status;
+        $field->image = $imagePath;
+        $field->save();
 
         return redirect()->route('admin.fields')->with('success', 'Field berhasil diperbarui.');
     }
@@ -118,7 +81,9 @@ class FieldController extends Controller
     public function destroy($id)
     {
         $field = Field::findOrFail($id);
-
+        if (!$field) {
+            return redirect()->back()->with('error', 'Field tidak ditemukan!');
+        }
         if ($field->image && Storage::disk('public')->exists($field->image)) {
             Storage::disk('public')->delete($field->image);
         }

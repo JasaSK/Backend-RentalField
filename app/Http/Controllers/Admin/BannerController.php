@@ -66,7 +66,9 @@ class BannerController extends Controller
     public function destroy($id)
     {
         $banner = Banner::findOrFail($id);
-
+        if (!$banner) {
+            return redirect()->back()->with('error', 'Banner tidak ditemukan!');
+        }
         // hapus file gambar
         if ($banner->image && Storage::disk('public')->exists($banner->image)) {
             Storage::disk('public')->delete($banner->image);
