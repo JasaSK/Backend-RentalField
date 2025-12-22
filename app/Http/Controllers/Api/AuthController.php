@@ -9,7 +9,6 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\VerifyRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
@@ -52,7 +51,7 @@ class AuthController extends Controller
             'data' => $user
         ], 201);
     }
-    
+
     public function verifyCode(VerifyRequest $request)
     {
         $request->validated();
