@@ -51,31 +51,34 @@ class FieldController extends Controller
 
     public function update(FieldRequest $request, $id)
     {
-        $request->validated();
-        // dd($request->all());
+        $validated = $request->validated();
+
         $field = Field::findOrFail($id);
-        if (!$field) {
-            return redirect()->back()->with('error', 'Field tidak ditemukan!');
-        }
 
         if ($request->hasFile('image')) {
             if ($field->image && Storage::disk('public')->exists($field->image)) {
                 Storage::disk('public')->delete($field->image);
             }
-            $imagePath = $request->file('image')->store('fields', 'public');
-        }
-        $field->name = $request->name;
-        $field->category_field_id = $request->category_field_id;
-        $field->description = $request->description;
-        $field->price_per_hour = $request->price_per_hour;
-        $field->open_time = $request->open_time;
-        $field->close_time = $request->close_time;
-        $field->status = $request->status;
-        $field->image = $imagePath;
-        $field->save();
 
-        return redirect()->route('admin.fields')->with('success', 'Field berhasil diperbarui.');
+            $validated['image'] = $request->file('image')->store('fields', 'public');
+        }
+
+        $field->update([
+            'name' => $validated['name'],
+            'category_field_id' => $validated['category_field_id'],
+            'description' => $validated['description'],
+            'price_per_hour' => $validated['price_per_hour'],
+            'open_time' => $validated['open_time'],
+            'close_time' => $validated['close_time'],
+            'status' => $validated['status'],
+            'image' => $validated['image'] ?? $field->image,
+        ]);
+
+        return redirect()
+            ->route('admin.fields')
+            ->with('success', 'Field berhasil diperbarui.');
     }
+
 
     // Hapus field
     public function destroy($id)
