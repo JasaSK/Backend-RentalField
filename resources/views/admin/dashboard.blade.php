@@ -170,10 +170,10 @@
                     <div class="flex items-center gap-3">
                         <div class="p-2 bg-purple-100 rounded-lg">
                             <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                viewBox="0 0 24 24">
+                                <!-- Ikon user sederhana dari Heroicons -->
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z">
-                                </path>
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
                         </div>
                         <div>
@@ -275,41 +275,79 @@
                                 <td class="py-4 px-6">
                                     @php
                                         $roleConfig = [
-                                            'admin' => [
-                                                'bg' => 'bg-red-100',
-                                                'text' => 'text-red-800',
-                                                'border' => 'border border-red-200',
+                                            'superadmin' => [
+                                                'bg' => 'bg-red-50',
+                                                'text' => 'text-red-700',
+                                                'border' => 'border border-red-100',
                                                 'icon' =>
                                                     'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+                                                'hover' => 'hover:bg-red-100',
                                             ],
-                                            'user' => [
-                                                'bg' => 'bg-blue-100',
-                                                'text' => 'text-blue-800',
-                                                'border' => 'border border-blue-200',
+                                            'admin' => [
+                                                'bg' => 'bg-blue-50',
+                                                'text' => 'text-blue-700',
+                                                'border' => 'border border-blue-100',
                                                 'icon' =>
                                                     'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+                                                'hover' => 'hover:bg-blue-100',
                                             ],
-                                            'customer' => [
-                                                'bg' => 'bg-green-100',
-                                                'text' => 'text-green-800',
-                                                'border' => 'border border-green-200',
+                                            'user' => [
+                                                'bg' => 'bg-green-50',
+                                                'text' => 'text-green-700',
+                                                'border' => 'border border-green-100',
                                                 'icon' =>
-                                                    'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z',
+                                                    'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+                                                'hover' => 'hover:bg-green-100',
                                             ],
                                         ];
+
                                         $config = $roleConfig[$customer['role']] ?? $roleConfig['user'];
                                     @endphp
 
-                                    <div
-                                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full {{ $config['bg'] }} {{ $config['text'] }} {{ $config['border'] }}">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="{{ $config['icon'] }}"></path>
-                                        </svg>
-                                        <span class="text-sm font-medium capitalize">{{ $customer['role'] }}</span>
-                                    </div>
+                                    {{-- 🔐 Hanya Super Admin --}}
+                                    @if (auth()->user()->role === 'superadmin')
+                                        <form action="{{ route('user.update', $customer['id']) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+
+                                            <select name="role" onchange="this.form.submit()"
+                                                class="px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ease-in-out 
+                       {{ $config['bg'] }} {{ $config['text'] }} {{ $config['border'] }} 
+                       focus:outline-none focus:ring-2 focus:ring-opacity-50 
+                       focus:ring-{{ explode('-', $config['text'])[1] }}-500 
+                       cursor-pointer appearance-none">
+                                                <option value="superadmin"
+                                                    {{ $customer['role'] === 'superadmin' ? 'selected' : '' }}>
+                                                    Super Admin
+                                                </option>
+                                                <option value="admin"
+                                                    {{ $customer['role'] === 'admin' ? 'selected' : '' }}>
+                                                    Admin
+                                                </option>
+                                                <option value="user"
+                                                    {{ $customer['role'] === 'user' ? 'selected' : '' }}>
+                                                    User
+                                                </option>
+                                            </select>
+                                        </form>
+                                    @else
+                                        {{-- 🔒 Read-only Badge --}}
+                                        <div
+                                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full
+                   {{ $config['bg'] }} {{ $config['text'] }} {{ $config['border'] }}
+                   transition-all duration-200 ease-in-out">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="{{ $config['icon'] }}"></path>
+                                            </svg>
+                                            <span class="text-sm font-medium capitalize tracking-wide">
+                                                {{ str_replace('_', ' ', $customer['role']) }}
+                                            </span>
+                                        </div>
+                                    @endif
                                 </td>
+
 
                                 <td class="py-4 px-6">
                                     <div
