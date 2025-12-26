@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Booking\StoreRequest;
 use App\Models\Booking;
 use App\Models\Field;
 use App\Models\Payment;
@@ -49,27 +50,9 @@ class BookingController extends Controller
         ], 200);
     }
 
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        $request->validate([
-            'field_id' => 'required|exists:fields,id',
-            'user_id' => 'required|exists:users,id',
-            'date' => 'required|date',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-        ], [
-            'field_id.required' => 'Field ID wajib diisi',
-            'field_id.exists' => 'Field tidak ditemukan',
-            'user_id.required' => 'User ID wajib diisi',
-            'user_id.exists' => 'User tidak ditemukan',
-            'date.required' => 'Tanggal wajib diisi',
-            'date.date' => 'Format tanggal tidak valid',
-            'start_time.required' => 'Waktu mulai wajib diisi',
-            'start_time.date_format' => 'Format waktu mulai tidak valid (HH:MM)',
-            'end_time.required' => 'Waktu selesai wajib diisi',
-            'end_time.date_format' => 'Format waktu selesai tidak valid (HH:MM)',
-            'end_time.after' => 'Waktu selesai harus setelah waktu mulai'
-        ]);
+        $request->validated();
 
         $bookingDateTime = Carbon::parse($request->date . ' ' . $request->start_time);
 
@@ -161,95 +144,95 @@ class BookingController extends Controller
         ], 201);
     }
 
-    public function update(Request $request, $id)
-    {
-        $booking = Booking::find($id);
+    // public function update(Request $request, $id)
+    // {
+    //     $booking = Booking::find($id);
 
-        if (!$booking) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Booking tidak ditemukan'
-            ], 404);
-        }
+    //     if (!$booking) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Booking tidak ditemukan'
+    //         ], 404);
+    //     }
 
-        $request->validate([
-            'field_id' => 'sometimes|exists:fields,id',
-            'user_id' => 'sometimes|exists:users,id',
-            'date' => 'sometimes|date',
-            'start_time' => 'sometimes|date_format:H:i',
-            'end_time' => 'sometimes|date_format:H:i|after:start_time',
-        ], [
-            'field_id.exists' => 'Field tidak ditemukan',
-            'user_id.exists' => 'User tidak ditemukan',
-            'date.date' => 'Format tanggal tidak valid',
-            'start_time.date_format' => 'Format waktu mulai tidak valid (HH:MM)',
-            'end_time.date_format' => 'Format waktu selesai tidak valid (HH:MM)',
-            'end_time.after' => 'Waktu selesai harus setelah waktu mulai'
-        ]);
+    //     $request->validate([
+    //         'field_id' => 'sometimes|exists:fields,id',
+    //         'user_id' => 'sometimes|exists:users,id',
+    //         'date' => 'sometimes|date',
+    //         'start_time' => 'sometimes|date_format:H:i',
+    //         'end_time' => 'sometimes|date_format:H:i|after:start_time',
+    //     ], [
+    //         'field_id.exists' => 'Field tidak ditemukan',
+    //         'user_id.exists' => 'User tidak ditemukan',
+    //         'date.date' => 'Format tanggal tidak valid',
+    //         'start_time.date_format' => 'Format waktu mulai tidak valid (HH:MM)',
+    //         'end_time.date_format' => 'Format waktu selesai tidak valid (HH:MM)',
+    //         'end_time.after' => 'Waktu selesai harus setelah waktu mulai'
+    //     ]);
 
-        $conflict = Booking::where('field_id', $request->field_id)
-            ->where('date', $request->date)
-            ->where('id', '!=', $booking->id)
-            ->where(function ($q) use ($request) {
-                $q->where('start_time', '<', $request->end_time)
-                    ->where('end_time', '>', $request->start_time);
-            })
-            ->exists();
+    //     $conflict = Booking::where('field_id', $request->field_id)
+    //         ->where('date', $request->date)
+    //         ->where('id', '!=', $booking->id)
+    //         ->where(function ($q) use ($request) {
+    //             $q->where('start_time', '<', $request->end_time)
+    //                 ->where('end_time', '>', $request->start_time);
+    //         })
+    //         ->exists();
 
-        if ($conflict) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Jadwal bentrok, lapangan sudah dibooking pada waktu tersebut'
-            ], 409);
-        }
+    //     if ($conflict) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Jadwal bentrok, lapangan sudah dibooking pada waktu tersebut'
+    //         ], 409);
+    //     }
 
-        $maintenanceConflict = Schedule::where('field_id', $request->field_id)
-            ->where('date', $request->date)
-            ->where(function ($q) use ($request) {
-                $q->where('start_time', '<', $request->end_time)
-                    ->where('end_time', '>', $request->start_time);
-            })
-            ->exists();
+    //     $maintenanceConflict = Schedule::where('field_id', $request->field_id)
+    //         ->where('date', $request->date)
+    //         ->where(function ($q) use ($request) {
+    //             $q->where('start_time', '<', $request->end_time)
+    //                 ->where('end_time', '>', $request->start_time);
+    //         })
+    //         ->exists();
 
-        if ($maintenanceConflict) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Lapangan sedang maintenance pada jam tersebut'
-            ], 409);
-        }
+    //     if ($maintenanceConflict) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Lapangan sedang maintenance pada jam tersebut'
+    //         ], 409);
+    //     }
 
-        $field = Field::find($request->field_id);
+    //     $field = Field::find($request->field_id);
 
-        if ($request->start_time && $request->start_time < $field->open_time) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Booking tidak boleh sebelum lapangan dibuka (' . $field->open_time . ')'
-            ], 400);
-        }
+    //     if ($request->start_time && $request->start_time < $field->open_time) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Booking tidak boleh sebelum lapangan dibuka (' . $field->open_time . ')'
+    //         ], 400);
+    //     }
 
-        if ($request->end_time && $request->end_time > $field->close_time) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Booking tidak boleh melewati jam tutup lapangan (' . $field->close_time . ')'
-            ], 400);
-        }
+    //     if ($request->end_time && $request->end_time > $field->close_time) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Booking tidak boleh melewati jam tutup lapangan (' . $field->close_time . ')'
+    //         ], 400);
+    //     }
 
-        $duration = (strtotime($request->end_time) - strtotime($request->start_time)) / 3600;
-        $totalPrice = $field->price_per_hour * $duration;
+    //     $duration = (strtotime($request->end_time) - strtotime($request->start_time)) / 3600;
+    //     $totalPrice = $field->price_per_hour * $duration;
 
-        $data = $request->all();
-        if ($request->start_time && $request->end_time) {
-            $data['total_price'] = $totalPrice;
-        }
+    //     $data = $request->all();
+    //     if ($request->start_time && $request->end_time) {
+    //         $data['total_price'] = $totalPrice;
+    //     }
 
-        $booking->update($data);
+    //     $booking->update($data);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Booking berhasil diperbarui',
-            'data' => $booking
-        ], 200);
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Booking berhasil diperbarui',
+    //         'data' => $booking
+    //     ], 200);
+    // }
 
     public function destroy($id)
     {
