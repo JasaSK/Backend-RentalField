@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Booking;
+use App\Http\Requests\Ticket\VerifyRequest;
 use App\Models\Ticket;
-use Illuminate\Http\Request;
 
 class TicketController extends Controller
 {
@@ -15,19 +14,10 @@ class TicketController extends Controller
         return view('admin.verifyTicket', compact('verify'));
     }
 
-    public function verifyTicket(Request $request)
+    public function verifyTicket(VerifyRequest $request)
     {
         // Validasi input
-        $request->validate([
-            // 'booking_id'   => 'required|exists:bookings,id',
-            'ticket_code'  => 'required|string|exists:ticket,ticket_code',
-        ], [
-            // 'booking_id.required' => 'ID booking wajib diisi.',
-            // 'booking_id.exists' => 'ID booking tidak ditemukan.',
-            'ticket_code.required' => 'Kode tiket wajib diisi.',
-            'ticket_code.string' => 'Format kode tiket tidak valid.',
-            'ticket_code.exists' => 'Kode tiket tidak ditemukan.',
-        ]);
+        $request->validated();
 
         $ticket = Ticket::where('ticket_code', $request->ticket_code)->first();
 
