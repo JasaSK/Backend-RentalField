@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Refund\RefundRequest;
 use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\Refund;
@@ -11,32 +12,9 @@ use Illuminate\Support\Facades\Auth;
 
 class RefundController extends Controller
 {
-    public function requestRefund(Request $request)
+    public function requestRefund(RefundRequest $request)
     {
-        $request->validate([
-            'user_id'       => 'required|integer|exists:users,id',
-            'booking_id'    => 'required|integer|exists:bookings,id',
-            'amount_paid'   => 'required|integer',
-            'reason'        => 'required|string',
-            'refund_method' => 'nullable|string',
-            'account_number' => 'nullable|string',
-        ], [
-            'user_id.required'  => 'User ID wajib diisi.',
-            'user_id.integer'   => 'User ID harus berupa angka.',
-            'user_id.exists'    => 'User ID tidak ditemukan.',
-
-            'booking_id.required' => 'Booking ID wajib diisi.',
-            'booking_id.integer'  => 'Booking ID harus berupa angka.',
-            'booking_id.exists'   => 'Booking ID tidak ditemukan.',
-
-            'amount_paid.required' => 'Jumlah yang dibayar wajib diisi.',
-            'amount_paid.integer'  => 'Jumlah yang dibayar harus berupa angka.',
-
-            'reason.required' => 'Alasan wajib diisi.',
-            'reason.string'   => 'Alasan harus berupa teks.',
-
-            'refund_method.string' => 'Metode refund harus berupa teks.',
-        ]);
+        $request->validated();
 
         $booking = Booking::find($request->booking_id);
         $payment = Payment::where('booking_id', $booking->id)->first();

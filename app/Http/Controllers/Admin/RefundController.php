@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Refund\AcceptRefundRequest;
 use App\Models\Refund;
 use Illuminate\Http\Request;
 
@@ -16,19 +17,9 @@ class RefundController extends Controller
         return view('admin.refund', compact('refunds'));
     }
 
-    public function acceptRefund(Request $request, $id)
+    public function acceptRefund(AcceptRefundRequest $request, $id)
     {
-        $request->validate([
-            'refund_amount' => 'required|integer',
-            'proof' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-        ], [
-            'refund_amount.required' => 'Jumlah refund wajib diisi.',
-            'refund_amount.integer' => 'Jumlah refund harus berupa angka.',
-            'proof.required' => 'Bukti wajib diisi.',
-            'proof.image' => 'Bukti harus berupa gambar.',
-            'proof.mimes' => 'Format gambar harus JPG, JPEG, atau PNG.',
-            'proof.max' => 'Ukuran gambar maksimal 2MB.',
-        ]);
+        $request->validated();
 
         $refund = Refund::find($id);
 
