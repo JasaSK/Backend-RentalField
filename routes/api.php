@@ -33,7 +33,7 @@ Route::get('/fields/{id}', [FieldController::class, 'show']);
 Route::post('/fields/search', [FieldController::class, 'search']);
 
 Route::get('/schedule', [ScheduleController::class, 'index']);
-Route::get('/schedule/{id}', [ScheduleController::class, 'show']);
+Route::get('/schedule/{fieldId}', [ScheduleController::class, 'show']);
 
 Route::get('/category-fields', [CategoryFieldController::class, 'index']);
 Route::get('/category-fields/{id}', [CategoryFieldController::class, 'show']);

@@ -21,9 +21,9 @@ class ScheduleController extends Controller
     }
 
 
-    public function show($id)
+    public function show($fieldId)
     {
-        $schedule = Schedule::with('field')->find($id);
+        $schedule = Schedule::where('field_id', $fieldId)->get();
 
         if (!$schedule) {
             return response()->json([
