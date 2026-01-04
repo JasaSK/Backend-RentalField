@@ -101,7 +101,7 @@ class PaymentController extends Controller
         ]);
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'qris_url' => $qrisUrl,
             'expires_at' => $payment->expires_at
         ]);
@@ -116,7 +116,7 @@ class PaymentController extends Controller
 
         if (!$payment) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => 'Payment tidak ditemukan'
             ], 404);
         }
@@ -135,7 +135,7 @@ class PaymentController extends Controller
         }
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'message' => 'Payment expired, booking dibatalkan'
         ]);
     }

@@ -48,11 +48,11 @@ class TicketController extends Controller
         $ticket = Ticket::with('booking')->where('booking_id', $bookingId)->first();
 
         if (!$ticket) {
-            return response()->json(['success' => false, 'message' => 'Booking not found'], 404);
+            return response()->json(['status' => false, 'message' => 'Booking not found'], 404);
         }
 
         if ($ticket->booking->status !== 'approved') {
-            return response()->json(['success' => false, 'message' => 'Tiket hanya bisa diunduh setelah pembayaran berhasil'], 403);
+            return response()->json(['status' => false, 'message' => 'Tiket hanya bisa diunduh setelah pembayaran berhasil'], 403);
         }
 
         // === QR CODE (Endroid QR v6 ENUMS) ===

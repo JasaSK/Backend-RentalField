@@ -1,458 +1,3298 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.0.3",
   "info": {
-    "title": "API Layanan Pemesanan Lapangan Futsal",
-    "version": "1.0.0",
-    "description": "OpenAPI 3.0 JSON untuk layanan pemesanan lapangan futsal — User, Admin, Field, Booking, Payment."
+    "title": "SportField Booking API",
+    "description": "API untuk sistem booking lapangan olahraga dengan fitur autentikasi, pembayaran QRIS, dan manajemen booking",
+    "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "https://api.example.com/v1",
-      "description": "Production server"
+      "url": "http://localhost:8000/api",
+      "description": "Local API Server"
     },
     {
-      "url": "http://localhost:3000/v1",
-      "description": "Local server"
+      "url": "https://api.example.com/api",
+      "description": "Production API Server"
     }
   ],
-  "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    },
-    "schemas": {
-      "Error": {
-        "type": "object",
-        "properties": {
-          "status": { "type": "string", "example": "error" },
-          "message": { "type": "string", "example": "Invalid request" },
-          "errors": {
-            "type": "array",
-            "items": { "type": "string" }
-          }
-        }
-      },
-      "User": {
-        "type": "object",
-        "required": ["username", "email", "password"],
-        "properties": {
-          "userId": { "type": "integer", "example": 1 },
-          "username": { "type": "string", "example": "johndoe" },
-          "email": { "type": "string", "format": "email", "example": "john@example.com" },
-          "password": { "type": "string", "example": "P@ssw0rd!" },
-          "phoneNumber": { "type": "string", "example": "+628123456789" },
-          "role": { "type": "string", "example": "user" }
-        }
-      },
-      "Admin": {
-        "type": "object",
-        "required": ["username", "email", "password"],
-        "properties": {
-          "adminId": { "type": "integer", "example": 1 },
-          "username": { "type": "string", "example": "admin1" },
-          "email": { "type": "string", "format": "email", "example": "admin@example.com" },
-          "password": { "type": "string", "example": "AdminP@ss" },
-          "phoneNumber": { "type": "string", "example": "+628987654321" },
-          "role": { "type": "string", "example": "admin" }
-        }
-      },
-      "Field": {
-        "type": "object",
-        "required": ["adminId", "fieldName", "pricePerHour"],
-        "properties": {
-          "fieldId": { "type": "integer", "example": 10 },
-          "adminId": { "type": "integer", "example": 1 },
-          "fieldName": { "type": "string", "example": "Lapangan A" },
-          "pricePerHour": { "type": "number", "format": "double", "example": 150000.0 },
-          "status": { "type": "string", "example": "available" }
-        }
-      },
-      "Booking": {
-        "type": "object",
-        "required": ["userId", "fieldId", "bookingDate", "startTime", "endTime"],
-        "properties": {
-          "bookingId": { "type": "integer", "example": 100 },
-          "userId": { "type": "integer", "example": 2 },
-          "fieldId": { "type": "integer", "example": 10 },
-          "bookingDate": { "type": "string", "format": "date-time", "example": "2025-10-22T18:00:00Z" },
-          "startTime": { "type": "string", "example": "18:00" },
-          "endTime": { "type": "string", "example": "20:00" },
-          "totalPayment": { "type": "number", "format": "double", "example": 300000.0 },
-          "bookingStatus": { "type": "string", "example": "pending" }
-        }
-      },
-      "Payment": {
-        "type": "object",
-        "required": ["bookingId", "paymentStatus"],
-        "properties": {
-          "paymentId": { "type": "integer", "example": 500 },
-          "bookingId": { "type": "integer", "example": 100 },
-          "paymentProof": { "type": "string", "example": "https://storage.example.com/proofs/abc123.jpg" },
-          "paymentStatus": { "type": "string", "example": "paid" },
-          "paymentDate": { "type": "string", "format": "date-time", "example": "2025-10-22T19:10:00Z" }
-        }
-      },
-      "AuthRequest": {
-        "type": "object",
-        "properties": {
-          "email": { "type": "string", "format": "email" },
-          "password": { "type": "string" }
-        }
-      },
-      "AuthResponse": {
-        "type": "object",
-        "properties": {
-          "accessToken": { "type": "string", "example": "jwt.token.here" },
-          "tokenType": { "type": "string", "example": "Bearer" },
-          "expiresIn": { "type": "integer", "example": 3600 }
-        }
-      }
-    }
-  },
   "tags": [
-    { "name": "Auth", "description": "Authentication endpoints" },
-    { "name": "Users", "description": "End points for users" },
-    { "name": "Admins", "description": "End points for admins" },
-    { "name": "Fields", "description": "Lapangan management" },
-    { "name": "Bookings", "description": "Booking endpoints" },
-    { "name": "Payments", "description": "Payment endpoints" }
+    {
+      "name": "Authentication",
+      "description": "Register, Login, Verifikasi Email, Reset Password"
+    },
+    {
+      "name": "Banner",
+      "description": "Manajemen data banner"
+    },
+    {
+      "name": "Category Gallery",
+      "description": "Manajemen kategori galeri"
+    },
+    {
+      "name": "Gallery",
+      "description": "Manajemen data galeri"
+    },
+    {
+      "name": "Category Field",
+      "description": "Manajemen kategori lapangan"
+    },
+    {
+      "name": "Field",
+      "description": "Manajemen dan pencarian lapangan"
+    },
+    {
+      "name": "Booking",
+      "description": "Manajemen booking lapangan"
+    },
+    {
+      "name": "Payment",
+      "description": "Manajemen pembayaran booking (QRIS Midtrans)"
+    },
+    {
+      "name": "Ticket",
+      "description": "Manajemen tiket booking"
+    },
+    {
+      "name": "Refund",
+      "description": "Manajemen refund booking"
+    },
+    {
+      "name": "Schedule",
+      "description": "Manajemen jadwal maintenance lapangan"
+    }
   ],
   "paths": {
-    "/auth/login": {
+    "/register": {
       "post": {
-        "tags": ["Auth"],
-        "summary": "Login (User/Admin)",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Register user baru",
+        "description": "Mendaftarkan pengguna baru dengan email verifikasi",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/AuthRequest" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Login success",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/AuthResponse" }
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              },
+              "example": {
+                "name": "John Doe",
+                "email": "john@example.com",
+                "no_telp": "081234567890",
+                "password": "password123"
               }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
-            }
-          }
-        }
-      }
-    },
-
-    "/users": {
-      "get": {
-        "tags": ["Users"],
-        "summary": "Get list of users",
-        "security": [{ "bearerAuth": [] }],
-        "responses": {
-          "200": {
-            "description": "Array of users",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/User" }
-                }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
-        }
-      },
-      "post": {
-        "tags": ["Users"],
-        "summary": "Create new user",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/User" }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "User created",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } }
+            "description": "Registrasi berhasil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessUserResponse"
+                }
+              }
+            }
           },
-          "400": { "description": "Bad Request", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+          "422": {
+            "description": "Validasi gagal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          }
         }
       }
     },
-
-    "/users/{userId}": {
-      "parameters": [
-        {
-          "name": "userId",
-          "in": "path",
-          "required": true,
-          "schema": { "type": "integer" }
-        }
-      ],
-      "get": {
-        "tags": ["Users"],
-        "summary": "Get user by id",
-        "security": [{ "bearerAuth": [] }],
-        "responses": {
-          "200": { "description": "User found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } },
-          "404": { "description": "Not Found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
-        }
-      },
-      "put": {
-        "tags": ["Users"],
-        "summary": "Update user",
-        "security": [{ "bearerAuth": [] }],
+    "/verify-email": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Verifikasi email",
+        "description": "Verifikasi email menggunakan kode OTP yang dikirim",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailRequest"
+              },
+              "example": {
+                "email": "john@example.com",
+                "code": "123456"
+              }
+            }
+          }
         },
         "responses": {
-          "200": { "description": "User updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } },
-          "400": { "description": "Bad Request", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
-        }
-      },
-      "delete": {
-        "tags": ["Users"],
-        "summary": "Delete user",
-        "security": [{ "bearerAuth": [] }],
-        "responses": {
-          "204": { "description": "User deleted" },
-          "404": { "description": "Not Found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
-        }
-      }
-    },
-
-    "/admins": {
-      "get": {
-        "tags": ["Admins"],
-        "summary": "Get list of admins",
-        "security": [{ "bearerAuth": [] }],
-        "responses": {
-          "200": { "description": "Array of admins", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Admin" } } } } }
-        }
-      },
-      "post": {
-        "tags": ["Admins"],
-        "summary": "Create admin",
-        "security": [{ "bearerAuth": [] }],
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Admin" } } } },
-        "responses": {
-          "201": { "description": "Admin created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Admin" } } } },
-          "400": { "description": "Bad Request", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+          "200": {
+            "description": "Email berhasil diverifikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Kode salah / kadaluarsa / email tidak valid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data verifikasi tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
         }
       }
     },
-
-    "/fields": {
-      "get": {
-        "tags": ["Fields"],
-        "summary": "Get list of fields (lapangan)",
-        "responses": {
-          "200": { "description": "Array of fields", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Field" } } } } }
-        }
-      },
+    "/resend-verification": {
       "post": {
-        "tags": ["Fields"],
-        "summary": "Create field (admin only)",
-        "security": [{ "bearerAuth": [] }],
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Kirim ulang kode verifikasi",
+        "description": "Mengirim ulang kode verifikasi email",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Field" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              },
+              "example": {
+                "email": "john@example.com"
+              }
+            }
+          }
         },
         "responses": {
-          "201": { "description": "Field created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Field" } } } },
-          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+          "200": {
+            "description": "Kode berhasil dikirim ulang",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Email sudah diverifikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Email / data verifikasi tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Terlalu sering mengirim kode",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
         }
       }
     },
-
-    "/fields/{fieldId}": {
-      "parameters": [
-        { "name": "fieldId", "in": "path", "required": true, "schema": { "type": "integer" } }
-      ],
-      "get": {
-        "tags": ["Fields"],
-        "summary": "Get field by id",
+    "/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login user",
+        "description": "Login dengan email dan password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              },
+              "example": {
+                "email": "khilmilutfan76@gmail.com",
+                "password": "baru123"
+              }
+            }
+          }
+        },
         "responses": {
-          "200": { "description": "Field found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Field" } } } },
-          "404": { "description": "Not Found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
-        }
-      },
-      "put": {
-        "tags": ["Fields"],
-        "summary": "Update field (admin)",
-        "security": [{ "bearerAuth": [] }],
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Field" } } } },
-        "responses": {
-          "200": { "description": "Field updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Field" } } } },
-          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
-        }
-      },
-      "delete": {
-        "tags": ["Fields"],
-        "summary": "Delete field (admin)",
-        "security": [{ "bearerAuth": [] }],
-        "responses": {
-          "204": { "description": "Field deleted" },
-          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+          "200": {
+            "description": "Login berhasil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Email atau password salah",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Email belum diverifikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
         }
       }
     },
-
-    "/bookings": {
-      "get": {
-        "tags": ["Bookings"],
-        "summary": "Get list of bookings (filterable)",
-        "parameters": [
-          { "name": "userId", "in": "query", "schema": { "type": "integer" } },
-          { "name": "fieldId", "in": "query", "schema": { "type": "integer" } },
-          { "name": "status", "in": "query", "schema": { "type": "string" } }
+    "/logout": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logout user",
+        "description": "Logout dan menghapus token autentikasi",
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "responses": {
-          "200": { "description": "Array of bookings", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Booking" } } } } }
+          "200": {
+            "description": "Logout berhasil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
         }
-      },
+      }
+    },
+    "/forgot-password": {
       "post": {
-        "tags": ["Bookings"],
-        "summary": "Create a booking (user)",
-        "security": [{ "bearerAuth": [] }],
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Kirim kode reset password",
+        "description": "Mengirim kode reset password ke email",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": ["userId", "fieldId", "bookingDate", "startTime", "endTime"],
-                "properties": {
-                  "userId": { "type": "integer" },
-                  "fieldId": { "type": "integer" },
-                  "bookingDate": { "type": "string", "format": "date-time" },
-                  "startTime": { "type": "string" },
-                  "endTime": { "type": "string" }
-                }
+                "$ref": "#/components/schemas/EmailRequest"
+              },
+              "example": {
+                "email": "john@example.com"
               }
             }
           }
         },
         "responses": {
-          "201": { "description": "Booking created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Booking" } } } },
-          "400": { "description": "Bad Request", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+          "200": {
+            "description": "Kode reset dikirim",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessUserResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Email tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Terlalu sering mengirim kode reset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
         }
       }
     },
-
-    "/bookings/{bookingId}": {
-      "parameters": [
-        { "name": "bookingId", "in": "path", "required": true, "schema": { "type": "integer" } }
-      ],
-      "get": {
-        "tags": ["Bookings"],
-        "summary": "Get booking by id",
-        "security": [{ "bearerAuth": [] }],
-        "responses": {
-          "200": { "description": "Booking found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Booking" } } } },
-          "404": { "description": "Not Found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
-        }
-      },
-      "put": {
-        "tags": ["Bookings"],
-        "summary": "Update booking status (admin/user)",
-        "security": [{ "bearerAuth": [] }],
+    "/verify-reset-code": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Verifikasi kode reset password",
+        "description": "Memverifikasi kode reset password sebelum mengubah password",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "type": "object", "properties": { "bookingStatus": { "type": "string" } } } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyResetRequest"
+              },
+              "example": {
+                "email": "john@example.com",
+                "reset_code": "654321"
+              }
+            }
+          }
         },
         "responses": {
-          "200": { "description": "Booking updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Booking" } } } }
+          "200": {
+            "description": "Kode reset valid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Kode reset salah / kadaluarsa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reset-password": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Reset password",
+        "description": "Mengatur ulang password dengan kode reset yang valid",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              },
+              "example": {
+                "email": "john@example.com",
+                "reset_code": "654321",
+                "password": "newpassword123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password berhasil diubah",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Kode reset tidak valid / kadaluarsa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Email / kode reset tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/banners": {
+      "get": {
+        "tags": [
+          "Banner"
+        ],
+        "summary": "Menampilkan semua banner",
+        "description": "Mengambil semua data banner aktif",
+        "responses": {
+          "200": {
+            "description": "List data banner",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BannerListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Banner tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BannerNotFoundResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/banners/{id}": {
+      "get": {
+        "tags": [
+          "Banner"
+        ],
+        "summary": "Detail banner berdasarkan ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID banner"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail data banner",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BannerDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Banner tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BannerNotFoundResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/category-gallery": {
+      "get": {
+        "tags": [
+          "Category Gallery"
+        ],
+        "summary": "Menampilkan semua kategori galeri",
+        "responses": {
+          "200": {
+            "description": "List data kategori galeri",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryGalleryListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tidak ada data kategori galeri",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryGalleryEmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/category-gallery/{id}": {
+      "get": {
+        "tags": [
+          "Category Gallery"
+        ],
+        "summary": "Detail kategori galeri berdasarkan ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID kategori galeri"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail data kategori galeri",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryGalleryDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kategori galeri tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryGalleryNotFoundResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/galleries": {
+      "get": {
+        "tags": [
+          "Gallery"
+        ],
+        "summary": "Menampilkan semua data galeri",
+        "responses": {
+          "200": {
+            "description": "List data galeri",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GalleryListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data galeri kosong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GalleryEmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/galleries/{id}": {
+      "get": {
+        "tags": [
+          "Gallery"
+        ],
+        "summary": "Detail galeri berdasarkan ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID galeri"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail data galeri",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GalleryDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Galeri tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GalleryNotFoundResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/category-fields": {
+      "get": {
+        "tags": [
+          "Category Field"
+        ],
+        "summary": "Menampilkan semua kategori lapangan",
+        "responses": {
+          "200": {
+            "description": "List data kategori lapangan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryFieldListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tidak ada data kategori lapangan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryFieldEmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/category-fields/{id}": {
+      "get": {
+        "tags": [
+          "Category Field"
+        ],
+        "summary": "Detail kategori lapangan berdasarkan ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID kategori lapangan"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail data kategori lapangan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryFieldDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kategori lapangan tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryFieldNotFoundResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fields": {
+      "get": {
+        "tags": [
+          "Field"
+        ],
+        "summary": "Menampilkan semua data lapangan",
+        "responses": {
+          "200": {
+            "description": "List data lapangan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data lapangan kosong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldEmptyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fields/{id}": {
+      "get": {
+        "tags": [
+          "Field"
+        ],
+        "summary": "Detail lapangan berdasarkan ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID lapangan"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail lapangan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Lapangan tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldNotFoundResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fields/search": {
+      "post": {
+        "tags": [
+          "Field"
+        ],
+        "summary": "Pencarian lapangan berdasarkan kategori, jam, dan tanggal",
+        "parameters": [
+          {
+            "name": "category_field_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter kategori lapangan"
+          },
+          {
+            "name": "open_time",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "08:00"
+            },
+            "description": "Jam mulai main"
+          },
+          {
+            "name": "close_time",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "10:00"
+            },
+            "description": "Jam selesai main"
+          },
+          {
+            "name": "tanggal_main",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Tanggal main (default: hari ini)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Hasil pencarian lapangan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldSearchResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/booking": {
+      "post": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Membuat booking lapangan",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingCreateRequest"
+              },
+              "example": {
+                "field_id": 1,
+                "user_id": 5,
+                "date": "2024-01-15",
+                "start_time": "08:00",
+                "end_time": "10:00"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Booking berhasil dibuat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Waktu tidak valid / lapangan tidak tersedia",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Jadwal bentrok / maintenance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validasi request gagal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/booking/{id}": {
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Detail booking berdasarkan ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID booking"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail booking",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Tidak berhak mengakses booking",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingNotFoundResponse"
+                }
+              }
+            }
+          }
         }
       },
       "delete": {
-        "tags": ["Bookings"],
-        "summary": "Cancel booking",
-        "security": [{ "bearerAuth": [] }],
+        "tags": [
+          "Booking"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 7
+          }
+        ],
+        "summary": "Batalkan semua booking yang belum dibayar",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "204": { "description": "Booking cancelled" }
+          "200": {
+            "description": "Booking berhasil dihapus",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                },
+                "example": {
+                  "status": true,
+                  "message": "Booking berhasil dihapus"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "status": false,
+                  "message": "Booking tidak ditemukan"
+                }
+              }
+            }
+          }
         }
       }
     },
-
-    "/payments": {
+    "/booking-history": {
       "get": {
-        "tags": ["Payments"],
-        "summary": "Get payments (admin)",
-        "security": [{ "bearerAuth": [] }],
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Daftar booking user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "200": { "description": "Array of payments", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Payment" } } } } }
-        }
-      },
-      "post": {
-        "tags": ["Payments"],
-        "summary": "Create payment for booking (user uploads proof)",
-        "security": [{ "bearerAuth": [] }],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["bookingId", "paymentStatus"],
-                "properties": {
-                  "bookingId": { "type": "integer" },
-                  "paymentProof": { "type": "string", "description": "URL or base64 reference to proof" },
-                  "paymentStatus": { "type": "string", "example": "paid" }
+          "200": {
+            "description": "Daftar booking untuk user ini",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Daftar booking untuk user ini"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Booking"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": true,
+                  "message": "Daftar booking untuk user ini",
+                  "data": [
+                    {
+                      "id": 6,
+                      "code_booking": "BK-TCQBAJFH",
+                      "field_id": 1,
+                      "user_id": 2,
+                      "date": "2026-01-05",
+                      "start_time": "09:00:00",
+                      "end_time": "10:00:00",
+                      "total_price": 35000,
+                      "status": "refunded",
+                      "created_at": "2026-01-04T12:58:00.000000Z",
+                      "updated_at": "2026-01-04T13:02:32.000000Z",
+                      "field": {
+                        "id": 1,
+                        "name": "Lapangan 1",
+                        "category_field_id": 1,
+                        "image": "fields/p4anx6SZvFpvFy1vpqUrDlXOTOVdSR5DETl3yfvA.jpg",
+                        "description": "sdfihsilodfhoilasflkasdhfilashdfljk",
+                        "price_per_hour": 35000,
+                        "open_time": "09:00:00",
+                        "close_time": "22:00:00",
+                        "status": "available",
+                        "created_at": "2025-12-15T03:18:37.000000Z",
+                        "updated_at": "2025-12-15T04:41:10.000000Z"
+                      },
+                      "ticket": {
+                        "id": 2,
+                        "booking_id": 6,
+                        "payment_id": 3,
+                        "ticket_code": "TCK-QZHQF4W8VC",
+                        "status_ticket": "refunded",
+                        "created_at": "2026-01-04T13:00:58.000000Z",
+                        "updated_at": "2026-01-04T13:02:32.000000Z"
+                      },
+                      "refunds": [
+                        {
+                          "id": 1,
+                          "booking_id": 6,
+                          "user_id": 2,
+                          "payment_id": 3,
+                          "amount_paid": 35000,
+                          "refund_amount": 35000,
+                          "refund_method": "BRI",
+                          "account_number": "19829189128",
+                          "reason": "kjaksajkajskjakjs",
+                          "proof": "refunds/wH74ADp1N9fr83Z5LLb9biPZRpYpB7sqzKGSIBsz.png",
+                          "refund_status": "approved",
+                          "created_at": "2026-01-04T13:01:55.000000Z",
+                          "updated_at": "2026-01-04T13:02:32.000000Z"
+                        }
+                      ]
+                    }
+                  ]
                 }
               }
             }
           }
         },
-        "responses": {
-          "201": { "description": "Payment created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Payment" } } } },
-          "400": { "description": "Bad Request", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        "401": {
+          "description": "User belum login",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErrorResponse"
+              },
+              "example": {
+                "status": false,
+                "message": "User belum login"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Tidak ada booking untuk user ini",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErrorResponse"
+              },
+              "example": {
+                "status": false,
+                "message": "Tidak ada booking untuk user ini"
+              }
+            }
+          }
         }
       }
     },
-
-    "/payments/{paymentId}/verify": {
-      "parameters": [
-        { "name": "paymentId", "in": "path", "required": true, "schema": { "type": "integer" } }
-      ],
+    "/booking/status/{id}": {
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Cek status booking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID booking"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status booking",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "paid",
+                        "completed",
+                        "cancelled",
+                        "expired"
+                      ]
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "status": "pending"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payment/create-qris/{booking_id}": {
       "post": {
-        "tags": ["Payments"],
-        "summary": "Admin verifies/rejects a payment",
-        "security": [{ "bearerAuth": [] }],
+        "tags": [
+          "Payment"
+        ],
+        "summary": "Generate QRIS payment untuk booking",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID booking"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "QRIS sudah tersedia (reuse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QrisReuseResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "QRIS berhasil dibuat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QrisCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Payment expired / booking tidak valid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Tidak berhak mengakses booking",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking / payment tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Gagal membuat QRIS",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payment/{booking_id}": {
+      "get": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "Ambil detail QRIS berdasarkan booking",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID booking"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail data pembayaran",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Tidak berhak mengakses booking",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Pembayaran tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payment/{booking_id}/expire": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "Expire payment & batalkan booking",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID booking"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment expired, booking dibatalkan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Payment belum expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Tidak berhak mengakses booking",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payment tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payment/midtrans/callback": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "Callback Midtrans (Server to Server)",
+        "description": "Endpoint untuk menerima callback dari Midtrans",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "action": { "type": "string", "description": "verify | reject", "example": "verify" },
-                  "note": { "type": "string" }
-                }
+                "$ref": "#/components/schemas/MidtransCallbackRequest"
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Payment verification result", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Payment" } } } },
-          "403": { "description": "Forbidden (not admin)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+          "200": {
+            "description": "Callback berhasil diproses"
+          },
+          "403": {
+            "description": "Invalid signature"
+          },
+          "404": {
+            "description": "Payment tidak ditemukan"
+          }
+        }
+      }
+    },
+    "/ticket/{booking_id}": {
+      "get": {
+        "tags": [
+          "Ticket"
+        ],
+        "summary": "Ambil tiket dan QR Code (Base64) berdasarkan booking",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID booking"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail tiket dan QR Code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketQrResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Tidak berhak mengakses booking",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tiket tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/booking/{id}/ticket": {
+      "get": {
+        "tags": [
+          "Ticket"
+        ],
+        "summary": "Download tiket dalam format PDF",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID booking"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File PDF tiket",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Tiket belum bisa diunduh (belum dibayar) / tidak berhak",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking / tiket tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/refund/request": {
+      "post": {
+        "tags": [
+          "Refund"
+        ],
+        "summary": "Ajukan refund booking",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundRequest"
+              },
+              "example": {
+                "booking_id": 1,
+                "reason": "Ada perubahan jadwal",
+                "amount": 150000,
+                "bank_name": "BCA",
+                "account_number": "1234567890",
+                "account_name": "John Doe"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Refund berhasil diajukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Booking belum dibayar / jumlah tidak sesuai",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Tidak berhak mengajukan refund",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Refund sudah diajukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validasi request gagal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/refund/user": {
+      "get": {
+        "tags": [
+          "Refund"
+        ],
+        "summary": "Daftar refund user (approved)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar refund",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/refund/{id}": {
+      "get": {
+        "tags": [
+          "Refund"
+        ],
+        "summary": "Detail refund",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID refund"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail refund",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Tidak berhak mengakses refund",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Refund tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/schedule": {
+      "get": {
+        "tags": [
+          "Schedule"
+        ],
+        "summary": "Menampilkan semua jadwal maintenance",
+        "responses": {
+          "200": {
+            "description": "List data jadwal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tidak ada data jadwal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/schedule/{fieldId}": {
+      "get": {
+        "tags": [
+          "Schedule"
+        ],
+        "summary": "Detail jadwal maintenance berdasarkan lapangan",
+        "parameters": [
+          {
+            "name": "fieldId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID lapangan"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail data jadwal maintenance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Jadwal maintenance tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
         }
       }
     }
   },
-  "security": []
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token yang didapat dari endpoint login"
+      }
+    },
+    "schemas": {
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "no_telp",
+          "password"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "John Doe",
+            "minLength": 3,
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@example.com"
+          },
+          "no_telp": {
+            "type": "string",
+            "example": "081234567890",
+            "pattern": "^[0-9+\\-\\s]+$"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "password123",
+            "minLength": 6
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@example.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "password123"
+          }
+        }
+      },
+      "EmailRequest": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@example.com"
+          }
+        }
+      },
+      "VerifyEmailRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "code"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@example.com"
+          },
+          "code": {
+            "type": "string",
+            "example": "123456",
+            "minLength": 6,
+            "maxLength": 6
+          }
+        }
+      },
+      "VerifyResetRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "reset_code"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@example.com"
+          },
+          "reset_code": {
+            "type": "string",
+            "example": "654321",
+            "minLength": 6,
+            "maxLength": 6
+          }
+        }
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "reset_code",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@example.com"
+          },
+          "reset_code": {
+            "type": "string",
+            "example": "654321"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "newpassword123",
+            "minLength": 6
+          }
+        }
+      },
+      "BookingCreateRequest": {
+        "type": "object",
+        "required": [
+          "field_id",
+          "user_id",
+          "date",
+          "start_time",
+          "end_time"
+        ],
+        "properties": {
+          "field_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "user_id": {
+            "type": "integer",
+            "example": 5
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-01-15"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "time",
+            "example": "08:00"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "time",
+            "example": "10:00"
+          }
+        }
+      },
+      "RefundRequest": {
+        "type": "object",
+        "required": [
+          "booking_id",
+          "reason",
+          "amount",
+          "bank_name",
+          "account_number",
+          "account_name"
+        ],
+        "properties": {
+          "booking_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "reason": {
+            "type": "string",
+            "example": "Ada perubahan jadwal",
+            "minLength": 10
+          },
+          "amount": {
+            "type": "number",
+            "example": 150000,
+            "minimum": 0
+          },
+          "bank_name": {
+            "type": "string",
+            "example": "BCA"
+          },
+          "account_number": {
+            "type": "string",
+            "example": "1234567890"
+          },
+          "account_name": {
+            "type": "string",
+            "example": "John Doe"
+          }
+        }
+      },
+      "MidtransCallbackRequest": {
+        "type": "object",
+        "description": "Request body dari callback Midtrans",
+        "properties": {
+          "transaction_time": {
+            "type": "string"
+          },
+          "transaction_status": {
+            "type": "string"
+          },
+          "transaction_id": {
+            "type": "string"
+          },
+          "status_message": {
+            "type": "string"
+          },
+          "status_code": {
+            "type": "string"
+          },
+          "signature_key": {
+            "type": "string"
+          },
+          "settlement_time": {
+            "type": "string"
+          },
+          "payment_type": {
+            "type": "string"
+          },
+          "order_id": {
+            "type": "string"
+          },
+          "merchant_id": {
+            "type": "string"
+          },
+          "gross_amount": {
+            "type": "string"
+          },
+          "fraud_status": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "john@example.com"
+          },
+          "no_telp": {
+            "type": "string",
+            "example": "081234567890"
+          },
+          "role": {
+            "type": "string",
+            "example": "user",
+            "enum": [
+              "user",
+              "admin"
+            ]
+          },
+          "email_verified_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Operation successful"
+          }
+        }
+      },
+      "SuccessUserResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Operation successful"
+          },
+          "data": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "UserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Login successful"
+          },
+          "data": {
+            "$ref": "#/components/schemas/User"
+          },
+          "token": {
+            "type": "string",
+            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+          },
+          "role": {
+            "type": "string",
+            "example": "user"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "examples": {
+          "booking_conflict": {
+            "summary": "Jadwal bentrok",
+            "value": {
+              "success": false,
+              "message": "Jadwal bentrok, lapangan sudah dibooking pada waktu tersebut"
+            }
+          },
+          "past_time": {
+            "summary": "Booking waktu lampau",
+            "value": {
+              "success": false,
+              "message": "Tidak boleh booking waktu yang sudah lewat"
+            }
+          }
+        }
+      },
+      "ValidationErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Field wajib diisi. (and 4 more errors)"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": {
+              "field_id": [
+                "Field wajib diisi."
+              ],
+              "user_id": [
+                "User wajib diisi."
+              ],
+              "date": [
+                "Tanggal wajib diisi."
+              ],
+              "start_time": [
+                "Waktu mulai wajib diisi."
+              ],
+              "end_time": [
+                "Waktu selesai wajib diisi."
+              ]
+            }
+          }
+        }
+      },
+      "Banner": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "non-active"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BannerListResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Banner"
+            }
+          }
+        }
+      },
+      "BannerDetailResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Banner"
+          }
+        }
+      },
+      "BannerNotFoundResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Banner tidak ditemukan"
+          }
+        }
+      },
+      "CategoryGallery": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CategoryGalleryListResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "List data kategori galery"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryGallery"
+            }
+          }
+        }
+      },
+      "CategoryGalleryDetailResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "List data kategori galery"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CategoryGallery"
+          }
+        }
+      },
+      "CategoryGalleryEmptyResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Tidak ada data kategori galery"
+          }
+        }
+      },
+      "CategoryGalleryNotFoundResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Kategori galery tidak ditemukan"
+          }
+        }
+      },
+      "Gallery": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "category_gallery_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "category_gallery": {
+            "$ref": "#/components/schemas/CategoryGallery"
+          }
+        }
+      },
+      "GalleryListResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "List data galery"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Gallery"
+            }
+          }
+        }
+      },
+      "GalleryDetailResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Gallery"
+          }
+        }
+      },
+      "GalleryEmptyResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Data galery kosong"
+          }
+        }
+      },
+      "GalleryNotFoundResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Galery tidak ditemukan"
+          }
+        }
+      },
+      "CategoryField": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CategoryFieldListResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "List data kategori lapangan"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryField"
+            }
+          }
+        }
+      },
+      "CategoryFieldDetailResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Detail data kategori lapangan"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CategoryField"
+          }
+        }
+      },
+      "CategoryFieldEmptyResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Tidak ada data kategori lapangan"
+          }
+        }
+      },
+      "CategoryFieldNotFoundResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Kategori lapangan tidak ditemukan"
+          }
+        }
+      },
+      "Field": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Lapangan 1"
+          },
+          "category_field_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "image": {
+            "type": "string",
+            "example": "fields/p4anx6SZvFpvFy1vpqUrDlXOTOVdSR5DETl3yfvA.jpg"
+          },
+          "description": {
+            "type": "string",
+            "example": "Lapangan futsal indoor"
+          },
+          "price_per_hour": {
+            "type": "number",
+            "example": 35000
+          },
+          "open_time": {
+            "type": "string",
+            "example": "09:00:00"
+          },
+          "close_time": {
+            "type": "string",
+            "example": "22:00:00"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "booked",
+              "maintenance",
+              "closed"
+            ],
+            "example": "available"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-12-15T03:18:37.000000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-12-15T04:41:10.000000Z"
+          },
+          "category_field": {
+            "$ref": "#/components/schemas/CategoryField"
+          },
+          "schedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Schedule"
+            }
+          },
+          "bookings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Booking"
+            }
+          }
+        }
+      },
+      "FieldListResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "List data lapangan"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Field"
+            }
+          }
+        }
+      },
+      "FieldDetailResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Field"
+          }
+        }
+      },
+      "FieldEmptyResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Data lapangan kosong"
+          }
+        }
+      },
+      "FieldNotFoundResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Lapangan tidak ditemukan"
+          }
+        }
+      },
+      "FieldSearchResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Field"
+            }
+          }
+        }
+      },
+      "Booking": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 7
+          },
+          "user_id": {
+            "type": "integer",
+            "example": 2
+          },
+          "field_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "code_booking": {
+            "type": "string",
+            "example": "BK-HYURK8V2"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-01-15"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "time",
+            "example": "09:00"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "time",
+            "example": "10:00"
+          },
+          "total_price": {
+            "type": "number",
+            "example": 35000
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "paid",
+              "completed",
+              "cancelled",
+              "expired"
+            ],
+            "example": "pending"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "field": {
+            "$ref": "#/components/schemas/Field"
+          }
+        }
+      },
+      "BookingListResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Booking"
+            }
+          }
+        }
+      },
+      "BookingDetailResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Booking"
+          }
+        }
+      },
+      "BookingCreateResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Booking created successfully"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Booking"
+          }
+        }
+      },
+      "BookingEmptyResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "No booking data found"
+          }
+        }
+      },
+      "BookingNotFoundResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Booking not found"
+          }
+        }
+      },
+      "Payment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "booking_id": {
+            "type": "integer"
+          },
+          "payment_method": {
+            "type": "string",
+            "example": "qris"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "settlement",
+              "expire",
+              "cancel",
+              "deny"
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "transaction_id": {
+            "type": "string"
+          },
+          "qr_code_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "qr_code_base64": {
+            "type": "string",
+            "nullable": true
+          },
+          "expired_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "settlement_time": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PaymentDetailResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Payment"
+          }
+        }
+      },
+      "QrisCreateResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "QRIS created successfully"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Payment"
+          }
+        }
+      },
+      "QrisReuseResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Using existing QRIS"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Payment"
+          }
+        }
+      },
+      "Ticket": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "booking_id": {
+            "type": "integer"
+          },
+          "ticket_code": {
+            "type": "string"
+          },
+          "qr_code_base64": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "booking": {
+            "$ref": "#/components/schemas/Booking"
+          }
+        }
+      },
+      "TicketQrResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "booking": {
+                "$ref": "#/components/schemas/Booking"
+              },
+              "qr_code_base64": {
+                "type": "string",
+                "description": "Base64 encoded QR Code image"
+              },
+              "ticket_code": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Refund": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "booking_id": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected",
+              "processed"
+            ]
+          },
+          "bank_name": {
+            "type": "string"
+          },
+          "account_number": {
+            "type": "string"
+          },
+          "account_name": {
+            "type": "string"
+          },
+          "processed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "booking": {
+            "$ref": "#/components/schemas/Booking"
+          }
+        }
+      },
+      "RefundListResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Refund"
+            }
+          }
+        }
+      },
+      "RefundDetailResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Refund"
+          }
+        }
+      },
+      "RefundCreateResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Refund request submitted successfully"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Refund"
+          }
+        }
+      },
+      "Schedule": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "field_id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "maintenance",
+              "event",
+              "holiday"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "field": {
+            "$ref": "#/components/schemas/Field"
+          }
+        }
+      },
+      "ScheduleListResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Schedule"
+            }
+          }
+        }
+      },
+      "ScheduleDetailResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Schedule"
+            }
+          }
+        }
+      }
+    }
+  }
 }

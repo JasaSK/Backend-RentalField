@@ -14,33 +14,27 @@ class FieldController extends Controller
     {
         $query = Field::query();
 
-        // Filter kategori lapangan
         if ($request->filled('category_field_id')) {
             $query->where('category_field_id', $request->category_field_id);
         }
 
-        // Ambil jam pencarian (boleh kosong)
         $searchStart = $request->open_time;
         $searchEnd = $request->close_time;
 
-        // Ambil tanggal pencarian, default hari ini
         $searchDate = $request->tanggal_main ?? now()->toDateString();
 
-        // Ambil data lapangan beserta relasi
         $fields = $query->with(['categoryField', 'schedules', 'bookings'])->get();
 
         $fields = $fields->map(function ($field) use ($searchStart, $searchEnd, $searchDate) {
 
-            $status = 'available'; // default
+            $status = 'available';
 
-            // Cek jika jam tersedia, apakah di luar jam operasional
             if ($searchStart && $searchEnd) {
                 if ($searchStart < $field->open_time || $searchEnd > $field->close_time) {
                     $status = 'closed';
                 }
             }
 
-            // Cek maintenance hanya jika jam diisi
             $maintenance = false;
             if ($searchStart && $searchEnd) {
                 $maintenance = $field->schedules()
@@ -57,7 +51,6 @@ class FieldController extends Controller
                 $status = 'maintenance';
             }
 
-            // Cek booking hanya jika jam diisi
             $booking = false;
             if ($searchStart && $searchEnd) {
                 $booking = $field->bookings()
@@ -79,7 +72,7 @@ class FieldController extends Controller
         });
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'message' => 'Hasil pencarian lapangan',
             'data' => $fields
         ], 200);
@@ -91,14 +84,13 @@ class FieldController extends Controller
 
         if ($fields->isEmpty()) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => 'Data lapangan kosong',
-                'data' => []
             ], 404);
         }
         $fields->load('categoryField');
         return response()->json([
-            'success' => true,
+            'status' => true,
             'message' => 'List data lapangan',
             'data' => $fields
         ], 200);
@@ -109,7 +101,7 @@ class FieldController extends Controller
 
         if (!$field) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => 'Lapangan tidak ditemukan'
             ], 404);
         }
@@ -117,176 +109,8 @@ class FieldController extends Controller
         $field->load('categoryField');
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $field
         ], 200);
     }
-
-
-    // public function store(Request $request)
-    // {
-    //     $request->validate(
-    //         [
-    //             'name' => 'required|string|max:100',
-    //             'category_field_id' => 'required|exists:category_fields,id',
-    //             'description' => 'required|string',
-    //             'price_per_hour' => 'required|integer',
-    //             'open_time' => 'required|date_format:H:i',
-    //             'close_time' => 'required|date_format:H:i|after:open_time',
-    //             'status' => 'required|in:available,closed,maintenance,booked,pending',
-    //             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-
-    //         ],
-    //         [
-    //             'name.required' => 'Nama lapangan wajib diisi.',
-    //             'name.string' => 'Nama lapangan harus berupa teks.',
-    //             'name.max' => 'Nama lapangan maksimal 100 karakter.',
-
-    //             'category_field_id.required' => 'Kategori lapangan wajib diisi.',
-    //             'category_field_id.exists' => 'Kategori lapangan tidak ditemukan.',
-
-    //             'description.required' => 'Deskripsi lapangan wajib diisi.',
-    //             'description.string' => 'Deskripsi harus berupa teks.',
-
-    //             'price_per_hour.required' => 'Harga per jam wajib diisi.',
-    //             'price_per_hour.integer' => 'Harga per jam harus berupa angka.',
-
-    //             'open_time.required' => 'Jam buka wajib diisi.',
-    //             'open_time.date_format' => 'Format waktu buka tidak valid (HH:MM).',
-    //             'close_time.required' => 'Jam tutup wajib diisi.',
-    //             'close_time.after' => 'Jam tutup harus setelah jam buka.',
-    //             'close_time.date_format' => 'Format waktu tutup tidak valid (HH:MM).',
-
-    //             'status.required' => 'Status lapangan wajib diisi.',
-    //             'status.in' => 'Status harus bernilai "available", "closed", "maintenance", "booked", atau "pending".',
-
-    //             'image.image' => 'File yang diunggah harus berupa gambar.',
-    //             'image.mimes' => 'Gambar harus berformat JPG, JPEG, atau PNG.',
-    //             'image.max' => 'Ukuran gambar maksimal 2MB.',
-    //         ]
-    //     );
-
-    //     // Upload image jika ada
-    //     $imagePath = null;
-    //     if ($request->hasFile('image')) {
-    //         $imagePath = $request->file('image')->store('fields', 'public');
-    //     }
-
-    //     $field = Field::create([
-    //         'name' => $request->name,
-    //         'category_field_id' => $request->category_field_id,
-    //         'description' => $request->description,
-    //         'price_per_hour' => $request->price_per_hour,
-    //         'open_time' => $request->open_time,
-    //         'close_time' => $request->close_time,
-    //         'status' => $request->status,
-    //         'image' => $imagePath,
-    //     ]);
-
-    //     $field->load('categoryField');
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Lapangan berhasil ditambahkan',
-    //         'data' => $field
-    //     ], 201);
-    // }
-
-    // public function update(Request $request, $id)
-    // {
-    //     $field = Field::find($id);
-
-    //     if (!$field) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Lapangan tidak ditemukan'
-    //         ], 404);
-    //     }
-
-    //     $request->validate(
-    //         [
-    //             'name' => 'required|string|max:100',
-    //             'category_field_id' => 'required|exists:category_fields,id',
-    //             'price_per_hour' => 'required|integer',
-    //             'open_time' => 'required|date_format:H:i',
-    //             'close_time' => 'required|date_format:H:i|after:open_time',
-    //             'status' => 'required|in:available,closed,maintenance,booked,pending',
-    //             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-    //         ],
-    //         [
-    //             'name.required' => 'Nama lapangan wajib diisi.',
-    //             'name.string' => 'Nama lapangan harus berupa teks.',
-    //             'name.max' => 'Nama lapangan maksimal 100 karakter.',
-
-    //             'category_field_id.required' => 'Kategori lapangan wajib diisi.',
-    //             'category_field_id.exists' => 'Kategori lapangan tidak ditemukan.',
-
-    //             'price_per_hour.required' => 'Harga per jam wajib diisi.',
-    //             'price_per_hour.integer' => 'Harga per jam harus berupa angka.',
-
-    //             'open_time.required' => 'Jam buka wajib diisi.',
-    //             'open_time.date_format' => 'Format waktu buka tidak valid (HH:MM).',
-    //             'close_time.required' => 'Jam tutup wajib diisi.',
-    //             'close_time.after' => 'Jam tutup harus setelah jam buka.',
-    //             'close_time.date_format' => 'Format waktu tutup tidak valid (HH:MM).',
-
-    //             'status.required' => 'Status lapangan wajib diisi.',
-    //             'status.in' => 'Status harus bernilai "available", "closed", "maintenance", "booked", atau "pending".',
-
-    //             'image.image' => 'File yang diunggah harus berupa gambar.',
-    //             'image.mimes' => 'Gambar harus berformat JPG, JPEG, atau PNG.',
-    //             'image.max' => 'Ukuran gambar maksimal 2MB.',
-    //         ]
-    //     );
-
-    //     // Update image jika ada
-    //     if ($request->hasFile('image')) {
-    //         if ($field->image && Storage::disk('public')->exists($field->image)) {
-    //             Storage::disk('public')->delete($field->image);
-    //         }
-    //         $field->image = $request->file('image')->store('fields', 'public');
-    //     }
-
-    //     $field->update($request->only([
-    //         'name',
-    //         'category_field_id',
-    //         'description',
-    //         'price_per_hour',
-    //         'open_time',
-    //         'close_time',
-    //         'status'
-    //     ]));
-    //     $field->load('categoryField');
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Lapangan berhasil diperbarui',
-    //         'data' => $field
-    //     ], 200);
-    // }
-
-    // public function destroy($id)
-    // {
-    //     $field = Field::find($id);
-
-    //     if (!$field) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Lapangan tidak ditemukan'
-    //         ], 404);
-    //     }
-
-    //     if ($field->image && Storage::disk('public')->exists($field->image)) {
-    //         Storage::disk('public')->delete($field->image);
-    //     }
-
-    //     $field->delete();
-
-    //     $field->load('categoryField');
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Lapangan berhasil dihapus'
-    //     ], 200);
-    // }
 }
