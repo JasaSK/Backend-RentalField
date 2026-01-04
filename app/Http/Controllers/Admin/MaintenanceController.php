@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Maintence\MaintenceRequest;
 use App\Models\Field;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
@@ -15,25 +16,9 @@ class MaintenanceController extends Controller
         $fields = Field::all();
         return view('admin.maintenance', compact('maintenances', 'fields'));
     }
-    public function store(Request $request)
+    public function store(MaintenceRequest $request)
     {
-        $request->validate([
-            'field_id' => 'required|exists:fields,id',
-            'date' => 'required|date',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'reason' => 'nullable|string',
-        ], [
-            'field_id.required' => 'Lapangan wajib diisi.',
-            'field_id.exists' => 'Lapangan tidak valid.',
-            'date.required' => 'Tanggal wajib diisi.',
-            'date.date' => 'Format tanggal tidak valid.',
-            'start_time.required' => 'Waktu mulai wajib diisi.',
-            'start_time.date_format' => 'Format waktu mulai tidak valid. Gunakan format HH:MM.',
-            'end_time.required' => 'Waktu selesai wajib diisi.',
-            'end_time.date_format' => 'Format waktu selesai tidak valid. Gunakan format HH:MM.',
-            'end_time.after' => 'Waktu selesai harus setelah waktu mulai.',
-        ]);
+        $request->validated();
 
         $field = Field::find($request->field_id);
 
@@ -64,7 +49,7 @@ class MaintenanceController extends Controller
 
         return redirect()->route('admin.maintenance')->with('success', 'Jadwal maintenance berhasil ditambahkan.');
     }
-    public function update(Request $request, $id)
+    public function update(MaintenceRequest $request, $id)
     {
         $schedule = Schedule::find($id);
 
@@ -72,28 +57,7 @@ class MaintenanceController extends Controller
             return redirect()->back()->with('error', 'Jadwal maintenance tidak ditemukan.');
         }
 
-        $request->validate(
-            [
-                'field_id' => 'required|exists:fields,id',
-                'date' => 'required|date',
-                'start_time' => 'required|date_format:H:i',
-                'end_time' => 'required|date_format:H:i|after:start_time',
-                'reason' => 'nullable|string',
-            ],
-            [
-                'field_id.required' => 'Lapangan wajib diisi.',
-                'field_id.exists' => 'Lapangan tidak valid.',
-                'date.required' => 'Tanggal wajib diisi.',
-                'date.date' => 'Format tanggal tidak valid.',
-                'start_time.required' => 'Waktu mulai wajib diisi.',
-                'start_time.date_format' => 'Format waktu mulai tidak valid. Gunakan format HH:MM.',
-                'end_time.required' => 'Waktu selesai wajib diisi.',
-                'end_time.date_format' => 'Format waktu selesai tidak valid. Gunakan format HH:MM.',
-                'end_time.after' => 'Waktu selesai harus setelah waktu mulai.',
-            ]
-        );
-
-        // dd($request->all());
+        $request->validated();
 
         $field_id = $request->field_id ?? $schedule->field_id;
         $date = $request->date ?? $schedule->date;
