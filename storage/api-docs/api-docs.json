@@ -11,7 +11,7 @@
       "description": "Local API Server"
     },
     {
-      "url": "https://api.example.com/api",
+      "url": "https://ezfutsal-panel.escdevstudio.com/api",
       "description": "Production API Server"
     }
   ],
