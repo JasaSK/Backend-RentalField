@@ -197,6 +197,7 @@ class PaymentController extends Controller
 
             if (!$ticketExists) {
                 Ticket::create([
+                    'user_id' => $payment->booking->user_id,
                     'booking_id' => $payment->booking_id,
                     'payment_id' => $payment->id,
                     'ticket_code' => 'TCK-' . strtoupper(Str::random(10)),

@@ -124,6 +124,7 @@
                             </th>
                             <th class="p-4 font-bold text-gray-700 text-sm uppercase tracking-wider text-left">Kode Tiket
                             </th>
+                            <th class="p-4 font-bold text-gray-700 text-sm uppercase tracking-wider text-left">Customer</th>
                             <th class="p-4 font-bold text-gray-700 text-sm uppercase tracking-wider text-left">Lapangan</th>
                             <th class="p-4 font-bold text-gray-700 text-sm uppercase tracking-wider text-left">Tanggal</th>
                             <th class="p-4 font-bold text-gray-700 text-sm uppercase tracking-wider text-left">Waktu</th>
@@ -147,6 +148,11 @@
                                     <div
                                         class="font-mono font-bold text-gray-800 bg-gray-100 px-3 py-1.5 rounded-lg inline-block">
                                         {{ $data->ticket_code }}
+                                    </div>
+                                </td>
+                                <td class="p-4">
+                                    <div class="font-medium text-gray-800 flex items-center gap-2">
+                                        {{ $data->user->name }}
                                     </div>
                                 </td>
                                 <td class="p-4">
@@ -212,7 +218,5 @@
 
     </div>
 
-    <script>
-        
-    </script>
+    <script></script>
 @endsection
