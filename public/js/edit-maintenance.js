@@ -1,30 +1,30 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Edit Modal Logic
     const editButtons = document.querySelectorAll(".editMaintenanceBtn");
     const editModal = document.getElementById("editMaintenanceModal");
     const modalContent = document.getElementById("modalContent");
     const closeButtons = document.querySelectorAll(
         "#closeMaintenanceModal, #closeMaintenanceModal2"
     );
+    const form = document.getElementById("editMaintenanceForm");
 
     editButtons.forEach((button) => {
         button.addEventListener("click", function () {
             const id = this.getAttribute("data-id");
-            const fieldId = this.getAttribute("data-field");
-            const date = this.getAttribute("data-date");
-            const startTime = this.getAttribute("data-start");
-            const endTime = this.getAttribute("data-end");
-            const reason = this.getAttribute("data-reason");
+
+            // ✅ ACTION DITAMBAHKAN
+            form.action = `/admin/maintenance/update/${id}`;
 
             document.getElementById("maintenance_edit_id").value = id;
             document.getElementById("maintenance_edit_field_id").value =
-                fieldId;
-            document.getElementById("maintenance_edit_date").value = date;
+                this.getAttribute("data-field");
+            document.getElementById("maintenance_edit_date").value =
+                this.getAttribute("data-date");
             document.getElementById("maintenance_edit_start_time").value =
-                startTime;
+                this.getAttribute("data-start");
             document.getElementById("maintenance_edit_end_time").value =
-                endTime;
-            document.getElementById("maintenance_edit_reason").value = reason;
+                this.getAttribute("data-end");
+            document.getElementById("maintenance_edit_reason").value =
+                this.getAttribute("data-reason");
 
             editModal.classList.remove("hidden");
             setTimeout(() => {
@@ -35,46 +35,18 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     closeButtons.forEach((button) => {
-        button.addEventListener("click", function () {
-            modalContent.classList.remove("scale-100", "opacity-100");
-            modalContent.classList.add("scale-95", "opacity-0");
-            setTimeout(() => {
-                editModal.classList.add("hidden");
-            }, 300);
-        });
+        button.addEventListener("click", closeModal);
     });
 
-    // Close modal on outside click
     editModal.addEventListener("click", function (e) {
-        if (e.target === editModal) {
-            modalContent.classList.remove("scale-100", "opacity-100");
-            modalContent.classList.add("scale-95", "opacity-0");
-            setTimeout(() => {
-                editModal.classList.add("hidden");
-            }, 300);
-        }
+        if (e.target === editModal) closeModal();
     });
 
-    // Form submit handler for edit
-    document
-        .getElementById("editMaintenanceForm")
-        .addEventListener("submit", function (e) {
-            e.preventDefault();
-            // Add your form submission logic here
-            // For now, just close the modal
-            modalContent.classList.remove("scale-100", "opacity-100");
-            modalContent.classList.add("scale-95", "opacity-0");
-            setTimeout(() => {
-                editModal.classList.add("hidden");
-            }, 300);
-
-            // Show success message
-            Swal.fire({
-                icon: "success",
-                title: "Berhasil!",
-                text: "Maintenance berhasil diperbarui",
-                timer: 2000,
-                showConfirmButton: false,
-            });
-        });
+    function closeModal() {
+        modalContent.classList.remove("scale-100", "opacity-100");
+        modalContent.classList.add("scale-95", "opacity-0");
+        setTimeout(() => {
+            editModal.classList.add("hidden");
+        }, 300);
+    }
 });

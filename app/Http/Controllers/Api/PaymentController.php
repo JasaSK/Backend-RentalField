@@ -33,14 +33,17 @@ class PaymentController extends Controller
         $booking = Booking::find($booking_id);
 
         if (!$booking) {
-            return response()->json(['message' => 'Booking tidak ditemukan'], 404);
+            return response()->json([
+                'status' => false,
+                'message' => 'Booking tidak ditemukan'
+            ], 404);
         }
 
-        // ❌ booking waktu lampau (date + time seharusnya, tapi aku fokus payment)
         if ($booking->status === 'approved') {
             return response()->json([
+                'status' => false,
                 'message' => 'Booking sudah dibayar'
-            ]);
+            ], 409);
         }
 
         $payment = Payment::where('booking_id', $booking_id)
@@ -49,13 +52,14 @@ class PaymentController extends Controller
 
         if (!$payment) {
             return response()->json([
+                'status' => false,
                 'message' => 'Payment tidak ditemukan atau sudah expired'
             ], 404);
         }
 
-        // ⏰ kalau payment sudah expired → STOP
         if ($payment->expires_at && now()->greaterThan($payment->expires_at)) {
             return response()->json([
+                'status' => false,
                 'message' => 'Payment sudah expired'
             ], 400);
         }
@@ -63,10 +67,11 @@ class PaymentController extends Controller
         // Sudah pernah generate QRIS
         if ($payment->qris_url) {
             return response()->json([
+                'status' => true,
                 'message' => 'Gunakan pembayaran yang sudah ada',
                 'qris_url' => $payment->qris_url,
                 'order_id' => $payment->payment_order_id
-            ]);
+            ], 200);
         }
 
         $orderId = $booking->code_booking . '-' . uniqid();
@@ -89,6 +94,7 @@ class PaymentController extends Controller
 
         if (!$response->successful()) {
             return response()->json([
+                'status' => false,
                 'message' => 'Gagal membuat QRIS'
             ], 500);
         }
@@ -124,6 +130,7 @@ class PaymentController extends Controller
         // VALIDASI EXPIRED
         if (now()->diffInMilliseconds($payment->expires_at, false) > 0) {
             return response()->json([
+                'status' => false,
                 'message' => 'Payment belum expired'
             ], 400);
         }
@@ -137,7 +144,7 @@ class PaymentController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Payment expired, booking dibatalkan'
-        ]);
+        ], 200);
     }
 
 
@@ -162,14 +169,20 @@ class PaymentController extends Controller
         );
 
         if ($signatureKey !== $expectedSignature) {
-            return response()->json(['message' => 'Invalid signature'], 403);
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid signature'
+            ], 403);
         }
 
         // Cari booking
         $payment = Payment::where('payment_order_id', $orderId)->first();
 
         if (!$payment) {
-            return response()->json(['message' => 'Pembayaran tidak ditemukan, silahkan coba lagi'], 404);
+            return response()->json([
+                'status' => false,
+                'message' => 'Pembayaran tidak ditemukan, silahkan coba lagi'
+            ], 404);
         }
 
 
@@ -213,10 +226,11 @@ class PaymentController extends Controller
         }
 
         return response()->json([
+            'status' => true,
             'message' => 'Callback processed',
             'order_id' => $orderId,
             'status' => $payment->status
-        ]);
+        ], 200);
     }
 
     public function getQris($booking_id)
@@ -232,6 +246,6 @@ class PaymentController extends Controller
             'status' => true,
             'message' => 'Detail data pembayaran',
             'data' => $payment
-        ]);
+        ], 200);
     }
 }

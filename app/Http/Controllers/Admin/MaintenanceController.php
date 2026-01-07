@@ -7,6 +7,7 @@ use App\Http\Requests\Maintence\MaintenceRequest;
 use App\Models\Field;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class MaintenanceController extends Controller
 {
@@ -20,12 +21,22 @@ class MaintenanceController extends Controller
     {
         $request->validated();
 
-        $field = Field::find($request->field_id);
+        $field = Field::findOrFail($request->field_id);
 
-        if ($request->start_time < $field->open_time || $request->end_time > $field->close_time) {
-            return redirect()->back()->with(
+        $openTime  = Carbon::createFromFormat('H:i:s', $field->open_time);
+        $closeTime = Carbon::createFromFormat('H:i:s', $field->close_time);
+        $startTime = Carbon::createFromFormat('H:i', $request->start_time);
+        $endTime   = Carbon::createFromFormat('H:i', $request->end_time);
+
+        if (Carbon::parse($request->date)->lt(Carbon::today())) {
+            return back()->with('error', 'Tanggal maintenance tidak boleh lewat.');
+        }
+
+        if ($startTime->lt($openTime) || $endTime->gt($closeTime)) {
+            return back()->with(
                 'error',
-                'Waktu harus sesuai jam operasional (' . $field->open_time . ' - ' . $field->close_time . ')'
+                'Waktu harus sesuai jam operasional (' .
+                    $openTime->format('H:i') . ' - ' . $closeTime->format('H:i') . ')'
             );
         }
 
@@ -42,35 +53,58 @@ class MaintenanceController extends Controller
             ->exists();
 
         if ($overlap) {
-            return redirect()->back()->with('error', 'Jadwal maintenance bentrok dengan jadwal lain.');
+            return back()->with('error', 'Jadwal maintenance bentrok dengan jadwal lain.');
         }
 
         Schedule::create($request->all());
 
-        return redirect()->route('admin.maintenance')->with('success', 'Jadwal maintenance berhasil ditambahkan.');
+        return redirect()
+            ->route('admin.maintenance')
+            ->with('success', 'Jadwal maintenance berhasil ditambahkan.');
     }
+
+
     public function update(MaintenceRequest $request, $id)
     {
+        // dd($request->all());
         $schedule = Schedule::find($id);
 
         if (!$schedule) {
-            return redirect()->back()->with('error', 'Jadwal maintenance tidak ditemukan.');
+            return back()->with('error', 'Jadwal maintenance tidak ditemukan.');
         }
 
         $request->validated();
 
-        $field_id = $request->field_id ?? $schedule->field_id;
-        $date = $request->date ?? $schedule->date;
+        // fallback ke data lama jika tidak dikirim
+        $field_id   = $request->field_id   ?? $schedule->field_id;
+        $date       = $request->date       ?? $schedule->date;
         $start_time = $request->start_time ?? $schedule->start_time;
-        $end_time = $request->end_time ?? $schedule->end_time;
+        $end_time   = $request->end_time   ?? $schedule->end_time;
 
-        $field = Field::find($field_id);
+        $field = Field::findOrFail($field_id);
 
-        if ($start_time < $field->open_time || $end_time > $field->close_time) {
-            return redirect()->back()->with(
+        if (Carbon::parse($date)->lt(Carbon::today())) {
+            return back()->with('error', 'Tanggal maintenance tidak boleh kurang dari hari ini.');
+        }
+
+        $openTime  = Carbon::createFromFormat('H:i:s', $field->open_time);
+        $closeTime = Carbon::createFromFormat('H:i:s', $field->close_time);
+
+        $startTime = Carbon::createFromFormat('H:i', $start_time);
+        $endTime   = Carbon::createFromFormat('H:i', $end_time);
+
+        // jam di luar operasional
+        if ($startTime->lt($openTime) || $endTime->gt($closeTime)) {
+            return back()->with(
                 'error',
-                'Waktu harus sesuai jam operasional (' . $field->open_time . ' - ' . $field->close_time . ').'
+                'Waktu harus sesuai jam operasional (' .
+                    $openTime->format('H:i') . ' - ' . $closeTime->format('H:i') . ')'
             );
+        }
+
+        // jika tanggal hari ini, jam tidak boleh lewat sekarang
+        if ($date === now()->toDateString() && $startTime->lt(now())) {
+            return back()->with('error', 'Jam maintenance tidak boleh kurang dari waktu sekarang.');
         }
 
         $overlap = Schedule::where('field_id', $field_id)
@@ -87,19 +121,22 @@ class MaintenanceController extends Controller
             ->exists();
 
         if ($overlap) {
-            return redirect()->back()->with('error', 'Jadwal maintenance bentrok dengan jadwal lain.');
+            return back()->with('error', 'Jadwal maintenance bentrok dengan jadwal lain.');
         }
 
         $schedule->update([
-            'field_id' => $field_id,
-            'date' => $date,
+            'field_id'   => $field_id,
+            'date'       => $date,
             'start_time' => $start_time,
-            'end_time' => $end_time,
-            'reason' => $request->reason ?? $schedule->reason,
+            'end_time'   => $end_time,
+            'reason'     => $request->reason ?? $schedule->reason,
         ]);
 
-        return redirect()->route('admin.maintenance')->with('success', 'Jadwal berhasil diperbarui.');
+        return redirect()
+            ->route('admin.maintenance')
+            ->with('success', 'Jadwal maintenance berhasil diperbarui.');
     }
+
     public function destroy($id)
     {
         $schedule = Schedule::find($id);

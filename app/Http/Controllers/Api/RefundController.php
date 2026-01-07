@@ -8,6 +8,7 @@ use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\Refund;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class RefundController extends Controller
@@ -26,7 +27,7 @@ class RefundController extends Controller
                 'message' => $refund->refund_status === 'approved'
                     ? 'Refund sudah diterima.'
                     : 'Refund sedang dalam proses.',
-            ]);
+            ], 409);
         }
 
         if ($booking->user_id !== $request->user_id) {
@@ -40,13 +41,24 @@ class RefundController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Booking belum dibayar.',
-            ], 400);
+            ], 409);
         }
 
         if ($request->amount_paid != $booking->total_price) {
             return response()->json([
                 'status' => false,
                 'message' => 'Jumlah yang dibayar harus sama dengan total harga.',
+            ], 400);
+        }
+
+        $bookingStart = Carbon::parse(
+            $booking->date . ' ' . $booking->start_time
+        );
+
+        if (Carbon::now()->diffInMinutes($bookingStart, false) < 60) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Refund hanya bisa diajukan minimal 1 jam sebelum jadwal bermain.',
             ], 400);
         }
 
@@ -102,7 +114,14 @@ class RefundController extends Controller
     public function getRefund()
     {
         $user = Auth::user();
-        $refunds = Refund::where('user_id', $user->id)->where('refund_status', 'approved')->get();;
+        $refunds = Refund::where('user_id', $user->id)->where('refund_status', 'approved')->get();
+
+        if ($refunds->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Refund tidak ditemukan',
+            ], 404);
+        }
         return response()->json([
             'status' => true,
             'message' => 'Daftar refund',

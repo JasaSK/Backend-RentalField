@@ -14,11 +14,20 @@ class MaintenceRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
+    public function prepareForValidation()
+    {
+        if ($this->start_time) {
+            $this->merge([
+                'start_time' => substr($this->start_time, 0, 5),
+            ]);
+        }
+
+        if ($this->end_time) {
+            $this->merge([
+                'end_time' => substr($this->end_time, 0, 5),
+            ]);
+        }
+    }
     public function rules(): array
     {
         return [

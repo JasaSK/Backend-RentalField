@@ -100,29 +100,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Delete confirmation
-// function confirmDelete(event) {
-//     const form = event.target.closest("form");
-//     event.preventDefault();
-
-//     Swal.fire({
-//         title: "Apakah Anda yakin?",
-//         text: "Lapangan ini akan dihapus permanen!",
-//         icon: "warning",
-//         showCancelButton: true,
-//         confirmButtonColor: "#d33",
-//         cancelButtonColor: "#3085d6",
-//         confirmButtonText: "Ya, hapus!",
-//         cancelButtonText: "Batal",
-//         reverseButtons: true,
-//     }).then((result) => {
-//         if (result.isConfirmed) {
-//             form.submit();
-//         }
-//     });
-
-//     return false;
-// }
 
 // Image modal functions
 function openImageModal(src) {

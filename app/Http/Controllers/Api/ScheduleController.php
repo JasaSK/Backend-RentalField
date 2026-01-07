@@ -16,12 +16,12 @@ class ScheduleController extends Controller
         if ($schedules->isEmpty()) {
             return response()->json([
                 'status' => false,
-                'message' => 'Tidak ada data jadwal',
+                'message' => 'Tidak ada data jadwal maintenance',
             ], 404);
         }
         return response()->json([
             'status' => true,
-            'message' => 'List data jadwal',
+            'message' => 'List data jadwal maintenance',
             'data' => $schedules
         ], 200);
     }
@@ -31,7 +31,7 @@ class ScheduleController extends Controller
     {
         $schedule = Schedule::where('field_id', $fieldId)->get();
 
-        if (!$schedule) {
+        if ($schedule->isEmpty()) {
             return response()->json([
                 'status' => false,
                 'message' => 'Jadwal maintenance tidak ditemukan'

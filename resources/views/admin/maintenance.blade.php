@@ -257,6 +257,7 @@
                                     <td class="py-4 px-6">
                                         <div class="flex items-center justify-center gap-2">
                                             <!-- Edit Button -->
+
                                             <button
                                                 class="editMaintenanceBtn flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105"
                                                 data-id="{{ $m->id }}" data-field="{{ $m->field_id }}"
@@ -273,19 +274,20 @@
 
                                             <!-- Delete Button -->
                                             <form action="{{ route('admin.maintenance.destroy', $m->id) }}"
-                                                method="POST" class="deleteForm"
-                                                onsubmit="return confirmDelete(event)>
+                                                method="POST" onsubmit="return confirmDelete(event)" class="deleteForm">
                                                 @csrf
                                                 @method('DELETE')
-                                                 <button type="submit"
-                                                class="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm hover:shadow transition-all duration-200 flex items-center gap-2">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                    </path>
-                                                </svg>
-                                                Hapus
+
+                                                <button type="submit"
+                                                    class="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm hover:shadow transition-all duration-200 flex items-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
+                                                    Hapus
                                                 </button>
                                             </form>
                                         </div>
@@ -392,7 +394,7 @@
                         class="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-all duration-300">
                         Batal
                     </button>
-                    
+
                     <button type="submit"
                         class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
                         Simpan Perubahan

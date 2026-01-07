@@ -93,7 +93,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Kode verifikasi sudah kadaluarsa.'
-            ], 400);
+            ], 410);
         }
 
         $user->update([
@@ -129,7 +129,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Email sudah terverifikasi.'
-            ], 400);
+            ], 409);
         }
 
         $verification = $user->emailVerification;
@@ -232,6 +232,13 @@ class AuthController extends Controller
             ], 404);
         }
 
+        if (!$user->email_verified_at) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Email belum diverifikasi. Silakan verifikasi terlebih dahulu.'
+            ], 403);
+        }
+
         $reset = $user->passwordReset;
 
         if ($reset && $reset->last_sent_at && $reset->last_sent_at->diffInSeconds(now()) < 60) {
@@ -281,15 +288,15 @@ class AuthController extends Controller
         if (!$user) {
             return response()->json([
                 'status' => false,
-                'message' => 'Kode reset tidak valid. atau email tidak ditemukan.'
-            ], 400);
+                'message' => 'Email tidak ditemukan.'
+            ], 404);
         }
 
         if (!$user->email_verified_at) {
             return response()->json([
                 'status' => false,
                 'message' => 'Email belum diverifikasi. Silakan verifikasi terlebih dahulu.'
-            ]);
+            ], 403);
         }
 
         $resetVerification = $user->passwordReset;
@@ -297,13 +304,13 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Kode reset tidak ditemukan.'
-            ]);
+            ], 404);
         }
         if (Carbon::now()->greaterThan($resetVerification->expires_at)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Kode reset telah kadaluarsa.'
-            ], 400);
+            ], 410);
         }
         if ($resetVerification->code != $request->reset_code) {
             return response()->json([
@@ -343,7 +350,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Kode reset telah kadaluarsa.'
-            ], 400);
+            ], 410);
         }
 
         if ($resetVerification->code != $request->reset_code) {
