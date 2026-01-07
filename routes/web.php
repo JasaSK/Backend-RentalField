@@ -5,7 +5,6 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FieldController;
 use App\Http\Controllers\Admin\GalleryController;
-use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\RefundController;
 use App\Http\Controllers\Admin\FieldCategoryController;
 use App\Http\Controllers\Admin\GalleryCategoryController;
@@ -13,7 +12,6 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\MaintenanceController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\admin\UserController;
-use App\Http\Middleware\CheckLogin;
 
 Route::get('/',  function () {
     return redirect()->route('admin.page.login');
