@@ -50,8 +50,6 @@ Route::middleware('checkLogin:admin,superadmin')->group(function () {
     Route::put('/admin/fields/update/{id}', [FieldController::class, 'update'])->name('admin.fields.update');
     Route::delete('/admin/fields/destroy/{id}', [FieldController::class, 'destroy'])->name('admin.fields.destroy');
 
-    Route::get('/admin/order', [OrderController::class, 'index'])->name('admin.order');
-
     Route::get('/admin/field-categories', [FieldCategoryController::class, 'index'])->name('admin.field-categories');
     Route::post('/admin/field-categories/store', [FieldCategoryController::class, 'store'])->name('admin.field-categories.store');
     Route::put('/admin/field-categories/update/{id}', [FieldCategoryController::class, 'update'])->name('admin.field-categories.update');
