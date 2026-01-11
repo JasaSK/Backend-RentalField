@@ -50,7 +50,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/booking/{id}', [BookingController::class, 'destroy']);
     Route::get('/booking-history', [BookingController::class, 'history']);
     //    
-    Route::put('/booking/{id}', [BookingController::class, 'update']);
+    // Route::put('/booking/{id}', [BookingController::class, 'update']);
     //
     
     Route::post('/refund/request', [RefundController::class, 'requestRefund']);
