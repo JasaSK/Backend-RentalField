@@ -73,14 +73,6 @@
                         @enderror
                     </div>
 
-                    <!-- Remember me -->
-                    <div class="flex justify-start items-center text-sm mt-1 w-full px-1 gap-4">
-                        <label class="flex items-center gap-2">
-                            <input type="checkbox" class="accent-green-500">
-                            <span class="text-black">Remember me</span>
-                        </label>
-                    </div>
-
                     <!-- Tombol Login -->
                     <div class="flex justify-center mt-4">
                         <button type="submit"

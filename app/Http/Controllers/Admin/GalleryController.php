@@ -40,20 +40,25 @@ class GalleryController extends Controller
     public function update(GalleryRequest $request, $id)
     {
         $gallery = Gallery::findOrFail($id);
-        $request->validated();
+
+        $validated = $request->validated();
+
+        $imagePath = $gallery->image;
 
         if ($request->hasFile('image')) {
             if ($gallery->image && Storage::disk('public')->exists($gallery->image)) {
                 Storage::disk('public')->delete($gallery->image);
             }
-            $imagepath = $request->file('image')->store('galleries', 'public');
+
+            $imagePath = $request->file('image')->store('galleries', 'public');
         }
 
-        $gallery->name = $request->name;
-        $gallery->description = $request->description;
-        $gallery->category_gallery_id = $request->category_gallery_id;
-        $gallery->image = $imagepath;
-        $gallery->save();
+        $gallery->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'category_gallery_id' => $validated['category_gallery_id'],
+            'image' => $imagePath,
+        ]);
 
         return redirect()->back()->with('success', 'Gallery berhasil diperbarui!');
     }

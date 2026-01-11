@@ -29,6 +29,8 @@ Route::middleware('checkLogin:superadmin')->group(function () {
 
 Route::middleware('checkLogin:admin,superadmin')->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/booking', [DashboardController::class, 'Booking'])->name('admin.booking');
+
     Route::get('/admin/banner', [BannerController::class, 'index'])->name('admin.banner');
     Route::post('/admin/banner/store', [BannerController::class, 'store'])->name('admin.banner.store');
     Route::put('/admin/banner/update/{id}', [BannerController::class, 'update'])->name('admin.banner.update');

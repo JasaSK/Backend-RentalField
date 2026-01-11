@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Storage;
 
 class BannerController extends Controller
 {
-    // Tampilkan semua banner
     public function index()
     {
         $banners = Banner::orderBy('created_at', 'desc')->get();
@@ -18,7 +17,6 @@ class BannerController extends Controller
         return view('admin.banner', compact('banners', 'options'));
     }
 
-    // Tambah banner baru
     public function store(BannerRequest $request)
     {
         $request->validated();
@@ -37,39 +35,39 @@ class BannerController extends Controller
 
         return redirect()->back()->with('success', 'Banner berhasil ditambahkan!');
     }
-
-    // Update banner
     public function update(BannerRequest $request, $id)
     {
         $banner = Banner::findOrFail($id);
-        if (!$banner) {
-            return redirect()->back()->with('error', 'Banner tidak ditemukan!');
-        }
-        $request->validated();
+
+        $validated = $request->validated();
+
+        $imagePath = $banner->image;
+
         if ($request->hasFile('image')) {
             if ($banner->image && Storage::disk('public')->exists($banner->image)) {
                 Storage::disk('public')->delete($banner->image);
             }
+
             $imagePath = $request->file('image')->store('banners', 'public');
         }
 
-        $banner->name = $request->name;
-        $banner->description = $request->description;
-        $banner->status = $request->status;
-        $banner->image = $imagePath;
-        $banner->save();
+        $banner->update([
+            'name'        => $validated['name'],
+            'description' => $validated['description'],
+            'status'      => $validated['status'],
+            'image'       => $imagePath,
+        ]);
 
         return redirect()->back()->with('success', 'Banner berhasil diperbarui!');
     }
 
-    // Hapus banner
+
     public function destroy($id)
     {
         $banner = Banner::findOrFail($id);
         if (!$banner) {
             return redirect()->back()->with('error', 'Banner tidak ditemukan!');
         }
-        // hapus file gambar
         if ($banner->image && Storage::disk('public')->exists($banner->image)) {
             Storage::disk('public')->delete($banner->image);
         }

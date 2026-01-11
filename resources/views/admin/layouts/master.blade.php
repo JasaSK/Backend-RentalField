@@ -6,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin</title>
 
-      
-
     <!-- Load Tailwind CSS and other styles -->
     @include('admin.layouts.head')
 

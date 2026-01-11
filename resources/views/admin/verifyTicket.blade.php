@@ -215,8 +215,6 @@
                 </table>
             </div>
         </div>
-
     </div>
-
-    <script></script>
+    <script src="{{ asset('js/verifyTicket.js') }}"></script>
 @endsection

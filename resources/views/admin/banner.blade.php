@@ -258,19 +258,6 @@
                                     <p class="text-gray-600 text-sm mt-1">Total {{ $banners->count() }} banner tersedia</p>
                                 </div>
                             </div>
-                            <div class="mt-3 sm:mt-0">
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                        </svg>
-                                    </div>
-                                    <input type="text" placeholder="Cari banner..." id="searchBanner"
-                                        class="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 w-full sm:w-64">
-                                </div>
-                            </div>
                         </div>
                     </div>
 
@@ -582,4 +569,6 @@
             <img id="modalImage" class="max-w-full max-h-[90vh] object-contain">
         </div>
     </div>
+
+    <script src="{{ asset('js/edit-banner.js') }}"></script>
 @endsection

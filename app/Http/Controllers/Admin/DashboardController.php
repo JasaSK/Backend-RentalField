@@ -50,6 +50,10 @@ class DashboardController extends Controller
             ->groupBy('week')
             ->pluck('total');
 
+        $bookings = Booking::with(['user', 'field'])
+            ->latest()
+            ->take(10)
+            ->get();
         // dd($percentageChange);
         return view('admin.dashboard', compact(
             'user',
@@ -60,7 +64,14 @@ class DashboardController extends Controller
             'incomeThisMonth',
             'percentageChange',
             'weeklyOrders',
-            'weeklyIncome'
+            'weeklyIncome',
+            'bookings'
         ));
+    }
+
+    public function Booking()
+    {
+        $bookings = Booking::with(['user', 'field'])->latest()->get();
+        return view('admin.listBooking', compact('bookings'));
     }
 }

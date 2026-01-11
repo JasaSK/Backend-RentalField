@@ -18,19 +18,30 @@ document.addEventListener("DOMContentLoaded", function () {
     // Open modal on edit button click
     editButtons.forEach((button) => {
         button.addEventListener("click", function () {
-            const id = this.getAttribute("data-id");
-            const amount = this.getAttribute("data-amount");
-            const proof = this.getAttribute("data-proof");
+            const id = this.dataset.id;
+            const amount = this.dataset.amount;
+            const proof = this.dataset.proof;
+            const code = this.dataset.code;
+            const reason = this.dataset.reason;
 
-            // Set form action
+            // Form action
             document.getElementById(
                 "editRefundForm"
             ).action = `/admin/refund/accept/${id}`;
 
-            // Set amount
+            // DISPLAY DATA
+            document.getElementById("modalBookingCode").textContent =
+                code || "-";
+            document.getElementById("modalTotalPrice").textContent =
+                "Rp " + Number(amount || 0).toLocaleString("id-ID");
+
+            document.getElementById("modalRefundReason").textContent =
+                reason || "Tidak disebutkan";
+
+            // INPUT VALUE
             document.getElementById("refundAmount").value = amount || "";
 
-            // Show current proof if exists
+            // Proof image
             if (proof) {
                 currentProofImage.src = proof;
                 currentProofContainer.classList.remove("hidden");
@@ -87,3 +98,48 @@ function closeImageModal() {
     document.getElementById("imageModal").classList.add("hidden");
     document.body.style.overflow = "auto";
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Search functionality
+    const searchInput = document.getElementById("searchRefund");
+    const tableBody = document.getElementById("refundTableBody");
+    const refundRows = document.querySelectorAll(".refund-row");
+    const noResultsMessage = document.getElementById("noResultsMessage");
+    const emptyStateRow = document.getElementById("noRefundResult");
+
+    // Sembunyikan empty state awal jika ada data
+    if (emptyStateRow && refundRows.length > 0) {
+        emptyStateRow.style.display = "none";
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener("input", function () {
+            const keyword = this.value.toLowerCase().trim();
+            let visibleRows = 0;
+
+            // Cari di semua baris refund
+            refundRows.forEach((row) => {
+                const searchData = row.getAttribute("data-refund") || "";
+                if (keyword === "" || searchData.includes(keyword)) {
+                    row.style.display = "";
+                    visibleRows++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            // Tampilkan/sembunyikan pesan tidak ditemukan
+            if (noResultsMessage) {
+                if (keyword !== "" && visibleRows === 0) {
+                    noResultsMessage.classList.remove("hidden");
+                    if (emptyStateRow) emptyStateRow.style.display = "none";
+                } else {
+                    noResultsMessage.classList.add("hidden");
+                    if (emptyStateRow && refundRows.length === 0) {
+                        emptyStateRow.style.display = "";
+                    }
+                }
+            }
+        });
+    }
+});

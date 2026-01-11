@@ -162,393 +162,400 @@
             </div>
         </div>
 
-        <!-- Customer Section -->
-        <div class="bg-white border border-gray-200 shadow-xl rounded-2xl overflow-hidden">
-            <!-- Header -->
-            <div class="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white px-6 py-5">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between">
+        <!-- Two Columns Section -->
+        <div class="grid grid-cols-1 gap-6 mb-8">
+            <!-- Recent Bookings -->
+            <div class="bg-white border border-gray-200 shadow-xl rounded-2xl overflow-hidden">
+                <div class="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white px-6 py-5">
                     <div class="flex items-center gap-3">
-                        <div class="p-2 bg-purple-100 rounded-lg">
-                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <!-- Ikon user sederhana dari Heroicons -->
+                        <div class="p-2 bg-blue-100 rounded-lg">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                </path>
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold text-gray-800">Daftar Customer</h3>
-                            <p class="text-gray-600 text-sm mt-1">Total {{ count($user) }} customer terdaftar</p>
-                        </div>
-                    </div>
-                    <div class="mt-3 sm:mt-0">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                            </div>
-                            <input type="text" placeholder="Cari customer..." id="searchCustomer"
-                                class="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 w-full sm:w-64">
+                            <h3 class="text-xl font-bold text-gray-800">Booking Terbaru</h3>
+                            <p class="text-gray-600 text-sm mt-1">{{ count($bookings) }} booking hari ini</p>
                         </div>
                     </div>
                 </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr class="border-b border-gray-200">
+                                <th class="py-4 px-6 text-left">
+                                    <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">No</span>
+                                </th>
+                                <th class="py-4 px-6 text-left">
+                                    <span
+                                        class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer</span>
+                                </th>
+                                <th class="py-4 px-6 text-left">
+                                    <span
+                                        class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Lapangan</span>
+                                </th>
+                                <th class="py-4 px-6 text-left">
+                                    <span
+                                        class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Tanggal</span>
+                                </th>
+                                <th class="py-4 px-6 text-left">
+                                    <span
+                                        class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse ($bookings as $index => $booking)
+                                <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center">
+                                            <div
+                                                class="w-8 h-8 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg flex items-center justify-center">
+                                                <span
+                                                    class="text-sm font-semibold text-blue-700">{{ $index + 1 }}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-10 h-10 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-full flex items-center justify-center">
+                                                <span class="font-semibold text-blue-600 text-sm">
+                                                    {{ strtoupper(substr($booking['user']['name'] ?? 'GU', 0, 2)) }}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="font-medium text-gray-800 block">{{ $booking['user']['name'] ?? 'Guest' }}</span>
+                                                <span
+                                                    class="text-xs text-gray-500 mt-1">{{ $booking['user']['email'] ?? '' }}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <span
+                                            class="font-medium text-gray-700">{{ $booking['field']['name'] ?? 'N/A' }}</span>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <div class="space-y-1">
+                                            <div class="text-sm text-gray-700">
+                                                {{ $booking['date'] ? \Carbon\Carbon::parse($booking['date'])->format('d M Y') : 'N/A' }}
+                                            </div>
+                                            <div class="text-xs text-gray-500">{{ $booking['start_time'] }} -
+                                                {{ $booking['end_time'] }}</div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        @php
+                                            $statusConfig = [
+                                                'pending' => [
+                                                    'bg' => 'bg-yellow-100',
+                                                    'text' => 'text-yellow-800',
+                                                    'border' => 'border-yellow-200',
+                                                ],
+                                                'approved' => [
+                                                    'bg' => 'bg-green-100',
+                                                    'text' => 'text-green-800',
+                                                    'border' => 'border-green-200',
+                                                ],
+                                                'refunded' => [
+                                                    'bg' => 'bg-blue-100',
+                                                    'text' => 'text-blue-800',
+                                                    'border' => 'border-blue-200',
+                                                ],
+                                                'rejected' => [
+                                                    'bg' => 'bg-red-100',
+                                                    'text' => 'text-red-800',
+                                                    'border' => 'border-red-200',
+                                                ],
+                                            ];
+                                            $config = $statusConfig[$booking['status']] ?? $statusConfig['pending'];
+                                        @endphp
+                                        <div
+                                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full {{ $config['bg'] }} {{ $config['text'] }} border {{ $config['border'] }}">
+                                            <div
+                                                class="w-2 h-2 rounded-full {{ str_replace('text-', 'bg-', $config['text']) }}">
+                                            </div>
+                                            <span class="text-sm font-medium capitalize">{{ $booking['status'] }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="py-12 text-center">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <div
+                                                class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4">
+                                                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                    </path>
+                                                </svg>
+                                            </div>
+                                            <h3 class="text-lg font-bold text-gray-500 mb-2">Belum ada booking</h3>
+                                            <p class="text-gray-400 max-w-md text-center">
+                                                Tidak ada booking untuk hari ini
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                    <div class="px-6 py-4 border-t border-gray-200 text-right">
+                        <a href="{{ route('admin.booking') }}" class="text-sm font-medium text-blue-600 hover:underline">
+                            Lihat semua booking →
+                        </a>
+                    </div>
+
+                </div>
             </div>
 
-            <!-- Table Container -->
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50">
-                        <tr class="border-b border-gray-200">
-                            <th class="py-4 px-6 text-left">
-                                <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">No</span>
-                            </th>
-                            <th class="py-4 px-6 text-left">
-                                <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer</span>
-                            </th>
-                            <th class="py-4 px-6 text-left">
-                                <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Kontak</span>
-                            </th>
-                            <th class="py-4 px-6 text-left">
-                                <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</span>
-                            </th>
-                            <th class="py-4 px-6 text-left">
-                                <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</span>
-                            </th>
-                        </tr>
-                    </thead>
+            <!-- Customer Section -->
+            <div class="bg-white border border-gray-200 shadow-xl rounded-2xl overflow-hidden">
+                <div class="border-b border-gray-200 bg-gradient-to-r from-purple-50 to-white px-6 py-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-purple-100 rounded-lg">
+                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800">Daftar Customer</h3>
+                                <p class="text-gray-600 text-sm mt-1">Total {{ count($user) }} customer terdaftar</p>
+                            </div>
+                        </div>
+                        <div class="mt-3 sm:mt-0">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </div>
+                                <input type="text" placeholder="Cari customer..." id="searchCustomer"
+                                    class="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 w-full sm:w-64">
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                    <tbody class="divide-y divide-gray-100" id="customerTableBody">
-                        @forelse ($user as $index => $customer)
-                            <tr class="hover:bg-gray-50 transition-colors duration-150"
-                                data-customer-name="{{ strtolower($customer['name']) }}">
-                                <td class="py-4 px-6">
-                                    <div class="flex items-center">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr class="border-b border-gray-200">
+                                <th class="py-4 px-6 text-left">
+                                    <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">No</span>
+                                </th>
+                                <th class="py-4 px-6 text-left">
+                                    <span
+                                        class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer</span>
+                                </th>
+                                <th class="py-4 px-6 text-left">
+                                    <span
+                                        class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Kontak</span>
+                                </th>
+                                <th class="py-4 px-6 text-left">
+                                    <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</span>
+                                </th>
+                                <th class="py-4 px-6 text-left">
+                                    <span
+                                        class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100" id="customerTableBody">
+                            @forelse ($user as $index => $customer)
+                                <tr class="hover:bg-gray-50 transition-colors duration-150"
+                                    data-customer-name="{{ strtolower($customer['name']) }}">
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center">
+                                            <div
+                                                class="w-8 h-8 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center">
+                                                <span
+                                                    class="text-sm font-semibold text-purple-700">{{ $index + 1 }}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-10 h-10 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-full flex items-center justify-center">
+                                                <span class="font-semibold text-blue-600 text-sm">
+                                                    {{ strtoupper(substr($customer['name'], 0, 2)) }}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="font-medium text-gray-800 block">{{ $customer['name'] }}</span>
+                                                <span class="text-xs text-gray-500 mt-1">ID: {{ $customer['id'] }}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td class="py-4 px-6">
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                                    </path>
+                                                </svg>
+                                                <span class="text-sm text-gray-700">{{ $customer['email'] }}</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
+                                                    </path>
+                                                </svg>
+                                                <span
+                                                    class="text-sm text-gray-700">{{ $customer['no_telp'] ?: 'Belum diisi' }}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td class="py-4 px-6">
+                                        @php
+                                            $roleConfig = [
+                                                'superadmin' => [
+                                                    'bg' => 'bg-red-50',
+                                                    'text' => 'text-red-700',
+                                                    'border' => 'border border-red-100',
+                                                    'icon' =>
+                                                        'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+                                                ],
+                                                'admin' => [
+                                                    'bg' => 'bg-blue-50',
+                                                    'text' => 'text-blue-700',
+                                                    'border' => 'border border-blue-100',
+                                                    'icon' =>
+                                                        'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+                                                ],
+                                                'user' => [
+                                                    'bg' => 'bg-green-50',
+                                                    'text' => 'text-green-700',
+                                                    'border' => 'border border-green-100',
+                                                    'icon' =>
+                                                        'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+                                                ],
+                                            ];
+
+                                            $config = $roleConfig[$customer['role']] ?? $roleConfig['user'];
+                                        @endphp
+
+                                        @if (auth()->user()->role === 'superadmin')
+                                            <form action="{{ route('user.update', $customer['id']) }}" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <select name="role" onchange="this.form.submit()"
+                                                    class="px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ease-in-out 
+                                                           {{ $config['bg'] }} {{ $config['text'] }} {{ $config['border'] }} 
+                                                           focus:outline-none focus:ring-2 focus:ring-opacity-50 
+                                                           focus:ring-{{ explode('-', $config['text'])[1] }}-500 
+                                                           cursor-pointer appearance-none">
+                                                    <option value="superadmin"
+                                                        {{ $customer['role'] === 'superadmin' ? 'selected' : '' }}>
+                                                        Super Admin
+                                                    </option>
+                                                    <option value="admin"
+                                                        {{ $customer['role'] === 'admin' ? 'selected' : '' }}>
+                                                        Admin
+                                                    </option>
+                                                    <option value="user"
+                                                        {{ $customer['role'] === 'user' ? 'selected' : '' }}>
+                                                        User
+                                                    </option>
+                                                </select>
+                                            </form>
+                                        @else
+                                            <div
+                                                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full
+                                                       {{ $config['bg'] }} {{ $config['text'] }} {{ $config['border'] }}
+                                                       transition-all duration-200 ease-in-out">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="{{ $config['icon'] }}"></path>
+                                                </svg>
+                                                <span class="text-sm font-medium capitalize tracking-wide">
+                                                    {{ str_replace('_', ' ', $customer['role']) }}
+                                                </span>
+                                            </div>
+                                        @endif
+                                    </td>
+
+                                    <td class="py-4 px-6">
+                                        @php
+                                            $statusStyles = [
+                                                'active' => [
+                                                    'bg' => 'bg-green-100',
+                                                    'text' => 'text-green-800',
+                                                    'border' => 'border-green-200',
+                                                ],
+                                                'inactive' => [
+                                                    'bg' => 'bg-gray-100',
+                                                    'text' => 'text-gray-800',
+                                                    'border' => 'border-gray-200',
+                                                ],
+                                                'suspended' => [
+                                                    'bg' => 'bg-red-100',
+                                                    'text' => 'text-red-800',
+                                                    'border' => 'border-red-200',
+                                                ],
+                                            ];
+
+                                            $userStatus = $customer->email_verified_at ? 'active' : 'inactive';
+                                            $style = $statusStyles[$userStatus] ?? $statusStyles['inactive'];
+                                        @endphp
+
                                         <div
-                                            class="w-8 h-8 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center">
-                                            <span class="text-sm font-semibold text-purple-700">{{ $index + 1 }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                <td class="py-4 px-6">
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-10 h-10 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-full flex items-center justify-center">
-                                            <span class="font-semibold text-blue-600 text-sm">
-                                                {{ strtoupper(substr($customer['name'], 0, 2)) }}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span class="font-medium text-gray-800 block">{{ $customer['name'] }}</span>
-                                            <span class="text-xs text-gray-500 mt-1">ID: {{ $customer['id'] }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                <td class="py-4 px-6">
-                                    <div class="space-y-1">
-                                        <div class="flex items-center gap-2">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                                </path>
-                                            </svg>
-                                            <span class="text-sm text-gray-700">{{ $customer['email'] }}</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
-                                                </path>
-                                            </svg>
+                                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full {{ $style['bg'] }} {{ $style['text'] }} border {{ $style['border'] }}">
+                                            <div
+                                                class="w-2 h-2 rounded-full {{ str_replace('text-', 'bg-', $style['text']) }}">
+                                            </div>
                                             <span
-                                                class="text-sm text-gray-700">{{ $customer['no_telp'] ?: 'Belum diisi' }}</span>
+                                                class="text-sm font-medium capitalize">{{ $userStatus == 'active' ? 'Aktif' : 'Nonaktif' }}</span>
                                         </div>
-                                    </div>
-                                </td>
-
-                                <td class="py-4 px-6">
-                                    @php
-                                        $roleConfig = [
-                                            'superadmin' => [
-                                                'bg' => 'bg-red-50',
-                                                'text' => 'text-red-700',
-                                                'border' => 'border border-red-100',
-                                                'icon' =>
-                                                    'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
-                                                'hover' => 'hover:bg-red-100',
-                                            ],
-                                            'admin' => [
-                                                'bg' => 'bg-blue-50',
-                                                'text' => 'text-blue-700',
-                                                'border' => 'border border-blue-100',
-                                                'icon' =>
-                                                    'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-                                                'hover' => 'hover:bg-blue-100',
-                                            ],
-                                            'user' => [
-                                                'bg' => 'bg-green-50',
-                                                'text' => 'text-green-700',
-                                                'border' => 'border border-green-100',
-                                                'icon' =>
-                                                    'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-                                                'hover' => 'hover:bg-green-100',
-                                            ],
-                                        ];
-
-                                        $config = $roleConfig[$customer['role']] ?? $roleConfig['user'];
-                                    @endphp
-
-                                    {{-- 🔐 Hanya Super Admin --}}
-                                    @if (auth()->user()->role === 'superadmin')
-                                        <form action="{{ route('user.update', $customer['id']) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-
-                                            <select name="role" onchange="this.form.submit()"
-                                                class="px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ease-in-out 
-                       {{ $config['bg'] }} {{ $config['text'] }} {{ $config['border'] }} 
-                       focus:outline-none focus:ring-2 focus:ring-opacity-50 
-                       focus:ring-{{ explode('-', $config['text'])[1] }}-500 
-                       cursor-pointer appearance-none">
-                                                <option value="superadmin"
-                                                    {{ $customer['role'] === 'superadmin' ? 'selected' : '' }}>
-                                                    Super Admin
-                                                </option>
-                                                <option value="admin"
-                                                    {{ $customer['role'] === 'admin' ? 'selected' : '' }}>
-                                                    Admin
-                                                </option>
-                                                <option value="user"
-                                                    {{ $customer['role'] === 'user' ? 'selected' : '' }}>
-                                                    User
-                                                </option>
-                                            </select>
-                                        </form>
-                                    @else
-                                        {{-- 🔒 Read-only Badge --}}
-                                        <div
-                                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full
-                   {{ $config['bg'] }} {{ $config['text'] }} {{ $config['border'] }}
-                   transition-all duration-200 ease-in-out">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="{{ $config['icon'] }}"></path>
-                                            </svg>
-                                            <span class="text-sm font-medium capitalize tracking-wide">
-                                                {{ str_replace('_', ' ', $customer['role']) }}
-                                            </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="py-12 text-center">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <div
+                                                class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4">
+                                                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z">
+                                                    </path>
+                                                </svg>
+                                            </div>
+                                            <h3 class="text-lg font-bold text-gray-500 mb-2">Belum ada customer</h3>
+                                            <p class="text-gray-400 max-w-md text-center">
+                                                Data customer akan muncul setelah pendaftaran
+                                            </p>
                                         </div>
-                                    @endif
-                                </td>
-
-
-                                <td class="py-4 px-6">
-                                    <div
-                                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-100 text-green-800 border border-green-200">
-                                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                                        <span class="text-sm font-medium">Aktif</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="py-12 text-center">
-                                    <div class="flex flex-col items-center justify-center">
-                                        <div
-                                            class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4">
-                                            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z">
-                                                </path>
-                                            </svg>
-                                        </div>
-                                        <h3 class="text-lg font-bold text-gray-500 mb-2">Belum ada customer</h3>
-                                        <p class="text-gray-400 max-w-md text-center">
-                                            Data customer akan muncul setelah pendaftaran
-                                        </p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- JavaScript for Charts -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const weeklyOrders = @json($weeklyOrders);
-            const weeklyIncome = @json($weeklyIncome);
-            const searchInput = document.getElementById('searchCustomer');
-            const tableRows = document.querySelectorAll('#customerTableBody tr');
-
-            // Search functionality
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
-
-                    tableRows.forEach(row => {
-                        const customerName = row.getAttribute('data-customer-name') || '';
-                        if (customerName.includes(searchTerm)) {
-                            row.classList.remove('hidden');
-                        } else {
-                            row.classList.add('hidden');
-                        }
-                    });
-                });
-            }
-
-            // Chart 1: Pemesanan
-            const ctx1 = document.getElementById('chartPesanan').getContext('2d');
-            new Chart(ctx1, {
-                type: 'line',
-                data: {
-                    labels: Object.keys(weeklyOrders),
-                    datasets: [{
-                        label: 'Jumlah Pemesanan',
-                        data: Object.values(weeklyOrders),
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#3b82f6',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#3b82f6',
-                            borderWidth: 1,
-                            callbacks: {
-                                label: function(context) {
-                                    return `Pemesanan: ${context.raw}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            },
-                            ticks: {
-                                color: '#6b7280'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            },
-                            ticks: {
-                                color: '#6b7280'
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Chart 2: Pendapatan
-            const ctx2 = document.getElementById('chartPendapatan').getContext('2d');
-            new Chart(ctx2, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(weeklyIncome),
-                    datasets: [{
-                        label: 'Pendapatan (Rp)',
-                        data: Object.values(weeklyIncome),
-                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                        borderColor: '#10b981',
-                        borderWidth: 1,
-                        borderRadius: 6,
-                        hoverBackgroundColor: '#10b981'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#10b981',
-                            borderWidth: 1,
-                            callbacks: {
-                                label: function(context) {
-                                    return `Pendapatan: Rp ${context.raw.toLocaleString('id-ID')}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            },
-                            ticks: {
-                                color: '#6b7280',
-                                callback: function(value) {
-                                    return 'Rp ' + value.toLocaleString('id-ID');
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            },
-                            ticks: {
-                                color: '#6b7280'
-                            }
-                        }
-                    }
-                }
-            });
-        });
-    </script>
-
-    <style>
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
+    @include('admin.layouts.chart')
 @endsection

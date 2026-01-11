@@ -25,7 +25,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-600 font-medium">Total Refund</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-1">{{ $refunds->count() }}</p>
+                            <p class="text-2xl font-bold text-gray-800 mt-1">{{ $refunds->total() }}</p>
                         </div>
                         <div class="p-3 bg-gray-100 rounded-lg">
                             <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -126,7 +126,7 @@
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
                             </div>
-                            <input type="text" placeholder="Cari refund..."
+                            <input type="text" id="searchRefund" placeholder="Cari refund..."
                                 class="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64">
                         </div>
                     </div>
@@ -166,9 +166,22 @@
                         </tr>
                     </thead>
 
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-gray-100" id="refundTableBody">
                         @forelse ($refunds as $index => $refund)
-                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            @php
+                                $bookingCode =
+                                    $refund->booking->code_booking ??
+                                    'BOOK-' . str_pad($refund->id, 6, '0', STR_PAD_LEFT);
+                                $totalPrice = $refund->booking->total_price ?? ($refund->amount_paid ?? 0);
+                                $reason = $refund->reason ?? 'Tidak disebutkan';
+                                $paymentMethod = $refund->payment_method ?? 'Transfer Bank';
+                                $createdDate = $refund->created_at->format('d M Y H:i');
+                                $refundStatus = $refund->refund_status ?? 'pending';
+                            @endphp
+
+                            <tr class="hover:bg-gray-50 transition-colors duration-150 refund-row"
+                                data-refund="{{ strtolower($bookingCode . ' ' . $reason . ' ' . $refundStatus . ' ' . $paymentMethod) }}">
+
                                 <td class="py-4 px-6">
                                     <div class="flex items-center">
                                         <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -180,11 +193,14 @@
                                 <td class="py-4 px-6">
                                     <div class="flex flex-col">
                                         <span class="font-mono font-semibold text-gray-800">
-                                            {{ $refund->booking->code_booking ?? 'BOOK-' . str_pad($refund->id, 6, '0', STR_PAD_LEFT) }}
+                                            {{ $bookingCode }}
                                         </span>
                                         <span class="text-xs text-gray-500 mt-1">ID: {{ $refund->id }}</span>
                                         <span class="text-xs text-gray-400 mt-1">
-                                            {{ $refund->booking->created_at->format('d M Y H:i') ?? $refund->created_at->format('d M Y H:i') }}
+                                            {{ $createdDate }}
+                                        </span>
+                                        <span class="text-xs text-blue-600 mt-1">
+                                            {{ $refund->user->name ?? 'Guest' }}
                                         </span>
                                     </div>
                                 </td>
@@ -193,10 +209,9 @@
                                     <div class="flex flex-col">
                                         <div class="flex items-center gap-2">
                                             <span class="text-lg font-bold text-emerald-600">
-                                                Rp
-                                                {{ number_format($refund->booking->total_price ?? $refund->total_price, 0, ',', '.') }}
+                                                Rp {{ number_format($totalPrice, 0, ',', '.') }}
                                             </span>
-                                            @if (($refund->booking->total_price ?? $refund->total_price) >= 500000)
+                                            @if ($totalPrice >= 500000)
                                                 <span
                                                     class="text-xs px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full font-medium">
                                                     Large
@@ -211,7 +226,7 @@
                                                 </path>
                                             </svg>
                                             <span class="text-xs text-gray-500">
-                                                {{ $refund->payment_method ?? 'Transfer Bank' }}
+                                                {{ $paymentMethod }}
                                             </span>
                                         </div>
                                     </div>
@@ -219,8 +234,8 @@
 
                                 <td class="py-4 px-6">
                                     <div class="max-w-xs">
-                                        <div class="text-gray-700 line-clamp-2">
-                                            {{ $refund->reason ?? 'Tidak disebutkan' }}
+                                        <div class="text-gray-700 line-clamp-2" title="{{ $reason }}">
+                                            {{ $reason }}
                                         </div>
                                         <div class="flex items-center gap-1 mt-2">
                                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
@@ -230,7 +245,7 @@
                                                 </path>
                                             </svg>
                                             <span class="text-xs text-gray-500">
-                                                {{ $refund->created_at->format('d M Y H:i') }}
+                                                {{ $createdDate }}
                                             </span>
                                         </div>
                                     </div>
@@ -238,15 +253,16 @@
 
                                 <td class="py-4 px-6">
                                     @if ($refund->proof)
-                                        <div class="group relative">
+                                        <div class="group relative inline-block">
                                             <img src="{{ asset('storage/' . $refund->proof) }}"
                                                 class="w-20 h-14 object-cover rounded-lg shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-shadow duration-200"
-                                                onclick="openImageModal('{{ asset('storage/' . $refund->proof) }}')">
+                                                onclick="openImageModal('{{ asset('storage/' . $refund->proof) }}')"
+                                                alt="Bukti Transfer">
                                             <div
                                                 class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-lg transition-all duration-200">
                                             </div>
                                             <div
-                                                class="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded pointer-events-none transition-opacity duration-200">
+                                                class="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded pointer-events-none transition-opacity duration-200 whitespace-nowrap">
                                                 Klik untuk memperbesar
                                             </div>
                                         </div>
@@ -306,7 +322,7 @@
                                                 'label' => 'Diproses',
                                             ],
                                         ];
-                                        $config = $statusConfig[$refund->refund_status] ?? $statusConfig['pending'];
+                                        $config = $statusConfig[$refundStatus] ?? $statusConfig['pending'];
                                     @endphp
 
                                     <div
@@ -319,25 +335,23 @@
                                         <span class="text-sm font-medium">{{ $config['label'] }}</span>
                                     </div>
 
-                                    @if ($refund->refund_status === 'approved')
+                                    @if ($refundStatus === 'approved')
                                         <div class="mt-1 text-xs text-gray-500">
-                                            {{ $refund->created_at?->format('d M Y') }}
+                                            {{ $refund->updated_at->format('d M Y') }}
                                         </div>
                                     @endif
                                 </td>
 
                                 <td class="py-4 px-6">
-                                    <div class="flex items-center gap-2">
-                                        @if ($refund->refund_status === 'pending')
-                                            <!-- Accept Button -->
-                                            <button
-                                                class="editRefundBtn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm hover:shadow transition-all duration-200 flex items-center gap-2 group"
-                                                data-id="{{ $refund->id }}"
-                                                data-amount="{{ $refund->booking->amount ?? $refund->amount }}"
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                                        @if ($refundStatus === 'pending')
+                                            <!-- Process Button -->
+                                            <button type="button"
+                                                class="editRefundBtn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center gap-2 group w-full sm:w-auto"
+                                                data-id="{{ $refund->id }}" data-amount="{{ $totalPrice }}"
                                                 data-proof="{{ $refund->proof ? asset('storage/' . $refund->proof) : '' }}"
-                                                data-code="{{ $refund->booking->code_booking ?? 'BOOK-' . str_pad($refund->id, 6, '0', STR_PAD_LEFT) }}"
-                                                data-reason="{{ $refund->reason }}"
-                                                data-date="{{ $refund->created_at->format('d M Y H:i') }}">
+                                                data-code="{{ $bookingCode }}" data-reason="{{ $reason }}"
+                                                data-date="{{ $createdDate }}">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -348,10 +362,10 @@
 
                                             <!-- Reject Button -->
                                             <form action="{{ route('admin.refund.reject', $refund->id) }}" method="POST"
-                                                class="rejected inline">
+                                                class="w-full sm:w-auto rejected">
                                                 @csrf
                                                 <button type="submit"
-                                                    class="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm hover:shadow transition-all duration-200 flex items-center gap-2">
+                                                    class="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center gap-2 w-full">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -362,14 +376,14 @@
                                                     Tolak
                                                 </button>
                                             </form>
-                                        @elseif($refund->refund_status === 'approved')
+                                        @elseif($refundStatus === 'approved')
                                             <!-- View Approved Details -->
                                             <div class="flex flex-col gap-2">
                                                 <span class="text-xs text-green-600 font-medium">
                                                     ✓ Disetujui
                                                 </span>
                                                 <span class="text-xs text-gray-500">
-                                                    {{ $refund->created_at?->format('d M Y') }}
+                                                    {{ $refund->updated_at->format('d M Y') }}
                                                 </span>
                                                 @if ($refund->refund_proof)
                                                     <a href="{{ asset('storage/' . $refund->refund_proof) }}"
@@ -389,19 +403,22 @@
                                                     </a>
                                                 @endif
                                             </div>
-                                        @elseif($refund->refund_status === 'rejected')
+                                        @elseif($refundStatus === 'rejected')
                                             <!-- View Rejection Reason -->
                                             <div class="flex flex-col gap-2">
                                                 <span class="text-xs text-red-600 font-medium">
                                                     ✗ Ditolak
                                                 </span>
                                                 @if ($refund->rejection_reason)
-                                                    <button
+                                                    <button type="button"
                                                         onclick="showRejectionReason('{{ $refund->rejection_reason }}')"
-                                                        class="text-xs text-gray-600 hover:text-gray-800 underline">
+                                                        class="text-xs text-gray-600 hover:text-gray-800 underline text-left">
                                                         Lihat alasan
                                                     </button>
                                                 @endif
+                                                <span class="text-xs text-gray-500">
+                                                    {{ $refund->updated_at->format('d M Y') }}
+                                                </span>
                                             </div>
                                         @else
                                             <span class="text-gray-400 text-sm font-medium italic">
@@ -412,7 +429,8 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr>
+                            <!-- Empty state row - ditampilkan saat tidak ada data -->
+                            <tr id="noRefundResult">
                                 <td colspan="7" class="py-12 text-center">
                                     <div class="flex flex-col items-center justify-center">
                                         <div
@@ -435,6 +453,27 @@
                     </tbody>
                 </table>
 
+                <!-- No Results Message (hidden by default) - DIPINDAHKAN SETELAH TABEL -->
+                @if ($refunds->count() > 0)
+                    <div id="noResultsMessage" class="hidden px-6 py-12 text-center">
+                        <div class="flex flex-col items-center justify-center">
+                            <div
+                                class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4">
+                                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-500 mb-2">Tidak ditemukan</h3>
+                            <p class="text-gray-400 max-w-md text-center">
+                                Tidak ada data refund yang sesuai dengan pencarian Anda
+                            </p>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Pagination -->
                 @if ($refunds->hasPages())
                     <div class="px-6 py-4 border-t border-gray-200">
@@ -442,7 +481,6 @@
                     </div>
                 @endif
             </div>
-
         </div>
     </div>
 
@@ -461,7 +499,8 @@
                         <h3 class="text-xl font-bold text-gray-800">Konfirmasi Refund</h3>
                         <p class="text-gray-600 text-sm mt-1">Masukkan jumlah refund dan upload bukti transfer</p>
                     </div>
-                    <button id="refundCancel" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                    <button type="button" id="refundCancel"
+                        class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -473,24 +512,46 @@
                 <!-- Modal form -->
                 <form method="POST" id="editRefundForm" enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" id="refundId" name="refund_id">
+
+                    <!-- Refund Info -->
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <p class="text-gray-500">Kode Booking:</p>
+                                <p class="font-semibold text-gray-800" id="modalBookingCode"></p>
+                            </div>
+
+                            <div>
+                                <p class="text-gray-500">Total Harga:</p>
+                                <p class="font-semibold text-emerald-600" id="modalTotalPrice"></p>
+                            </div>
+
+                            <div class="col-span-2">
+                                <p class="text-gray-500">Alasan Refund:</p>
+                                <p class="font-medium text-gray-800" id="modalRefundReason"></p>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Current Proof Preview -->
-                    <div id="currentProofContainer" class="hidden mb-6">
-                        <p class="text-sm font-medium text-gray-700 mb-2">Bukti Transfer Saat Ini</p>
+                    <div id="currentProofContainer" class="mb-6">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Bukti Transfer Pengguna</p>
                         <img id="currentProofImage"
-                            class="w-full max-h-48 object-contain rounded-lg border border-gray-200 shadow-sm">
+                            class="w-full max-h-48 object-contain rounded-lg border border-gray-200 shadow-sm mb-2">
+                        <p class="text-xs text-gray-500">Bukti transfer yang diupload oleh pengguna</p>
                     </div>
 
                     <!-- Amount Input -->
                     <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="refundAmount" class="block text-sm font-medium text-gray-700 mb-2">
                             Jumlah Refund (Rp)
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-500 font-medium">Rp</span>
                             </div>
-                            <input type="number" id="refundAmount" name="refund_amount"
+                            <input type="number" id="refundAmount" name="refund_amount" min="0" step="1000"
                                 class="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                                 placeholder="0" required>
                         </div>
@@ -530,13 +591,13 @@
                     </div>
 
                     <!-- Modal footer -->
-                    <div class="flex justify-end gap-3 pt-6 border-t border-gray-200">
+                    <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
                         <button type="button" id="modalCancel"
-                            class="px-5 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors duration-200">
+                            class="px-5 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors duration-200 w-full sm:w-auto">
                             Batal
                         </button>
                         <button type="submit"
-                            class="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium shadow-sm hover:shadow transition-all duration-200 flex items-center gap-2">
+                            class="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
@@ -551,17 +612,45 @@
     </div>
 
     <!-- Image Modal -->
-    <div id="imageModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-        <div class="relative max-w-4xl max-h-[90vh]">
-            <button onclick="closeImageModal()" class="absolute -top-10 right-0 text-white hover:text-gray-300">
+    <div id="imageModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4">
+        <div class="relative max-w-4xl w-full">
+            <button onclick="closeImageModal()" class="absolute -top-10 right-0 text-white hover:text-gray-300 z-10">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                     </path>
                 </svg>
             </button>
-            <img id="modalImage" class="max-w-full max-h-[90vh] object-contain">
+            <div class="bg-white rounded-lg overflow-hidden">
+                <img id="modalImage" class="w-full max-h-[80vh] object-contain">
+            </div>
         </div>
     </div>
 
+    <!-- Rejection Reason Modal -->
+    <div id="rejectionModal"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4">
+        <div class="bg-white rounded-xl max-w-md w-full p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Alasan Penolakan</h3>
+                <button onclick="closeRejectionModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-4 bg-red-50 rounded-lg">
+                <p id="rejectionReasonText" class="text-gray-700"></p>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeRejectionModal()"
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors duration-200">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ asset('js/edit-refund.js') }}"></script>
 @endsection
