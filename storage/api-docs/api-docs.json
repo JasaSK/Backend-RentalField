@@ -3103,14 +3103,13 @@
                 ],
                 "parameters": [
                     {
-                        "name": "detail",
-                        "in": "query",
-                        "required": false,
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
                         "schema": {
-                            "type": "boolean",
-                            "example": true
+                            "type": "integer"
                         },
-                        "description": "Jika true, response akan menyertakan relasi user dan field"
+                        "example": 7
                     }
                 ],
                 "responses": {
@@ -3537,7 +3536,8 @@
                         "in": "path",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 8
                         },
                         "description": "ID booking"
                     }
