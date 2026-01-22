@@ -22,15 +22,15 @@ class GalleryController extends Controller
     // Tambah gallery baru
     public function store(GalleryRequest $request)
     {
-        $request->validated();
+        $validated = $request->validated();
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('galleries', 'public');
         }
         Gallery::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'category_gallery_id' => $request->category_gallery_id,
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'category_gallery_id' => $validated['category_gallery_id'],
             'image' => $imagePath
         ]);
         return redirect()->back()->with('success', 'Gallery berhasil ditambahkan!');

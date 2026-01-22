@@ -19,7 +19,7 @@ class RefundController extends Controller
 
     public function acceptRefund(AcceptRefundRequest $request, $id)
     {
-        $request->validated();
+        $validated = $request->validated();
 
         $refund = Refund::find($id);
 
@@ -36,7 +36,7 @@ class RefundController extends Controller
 
         // Update refund
         $refund->update([
-            'refund_amount' => $request->refund_amount,
+            'refund_amount' => $validated['refund_amount'],
             'proof' => $imagePath,
             'refund_status' => 'approved',
             'refunded_at' => now(),

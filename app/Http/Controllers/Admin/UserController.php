@@ -21,20 +21,20 @@ class UserController extends Controller
             return back()->with('error', 'Anda tidak dapat mengubah data akun sendiri');
         }
         
-        $validatedData = $request->validated();
+        $validated = $request->validated();
 
-        if (!empty($validatedData['password'])) {
-            $validatedData['password'] = bcrypt($validatedData['password']);
+        if (!empty($validated['password'])) {
+            $validated['password'] = bcrypt($validated['password']);
         } else {
-            unset($validatedData['password']);
+            unset($validated['password']);
         }
 
-        if (isset($validatedData['role'])) {
+        if (isset($validated['role'])) {
             if (Auth::user()->role !== 'superadmin') {
                 return back()->with('error', 'Anda tidak memiliki izin mengubah role');
             }
         }
-        $user->update($validatedData);
+        $user->update($validated);
 
         return redirect()->route('admin.dashboard')->with('success', 'User updated successfully');
     }

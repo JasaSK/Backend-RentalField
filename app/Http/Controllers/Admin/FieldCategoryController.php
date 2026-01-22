@@ -23,10 +23,10 @@ class FieldCategoryController extends Controller
     // Simpan kategori baru
     public function store(NameRequest $request)
     {
-        $request->validated();
+        $validated = $request->validated();
 
         CategoryField::create([
-            'name' => $request->name,
+            'name' => $validated['name'],
         ]);
 
         return redirect()->back()->with('success', 'Kategori berhasil ditambahkan.');
@@ -35,11 +35,11 @@ class FieldCategoryController extends Controller
     // Update kategori
     public function update(NameRequest $request, $id)
     {
-        $request->validated();
+        $validated = $request->validated();
 
         $category = CategoryField::findOrFail($id);
         $category->update([
-            'name' => $request->name,
+            'name' => $validated['name'],
         ]);
 
         return redirect()->back()->with('success', 'Kategori berhasil diupdate.');

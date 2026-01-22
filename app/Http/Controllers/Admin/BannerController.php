@@ -19,7 +19,7 @@ class BannerController extends Controller
 
     public function store(BannerRequest $request)
     {
-        $request->validated();
+        $validated = $request->validated();
 
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -27,9 +27,9 @@ class BannerController extends Controller
         }
 
         Banner::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'status' => $request->status,
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'status' => $validated['status'],
             'image' => $imagePath
         ]);
 

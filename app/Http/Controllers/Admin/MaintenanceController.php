@@ -19,17 +19,20 @@ class MaintenanceController extends Controller
     }
     public function store(MaintenceRequest $request)
     {
-        $request->validated();
+        $validated = $request->validated();
 
-        $field = Field::findOrFail($request->field_id);
+        $field = Field::findOrFail($validated['field_id']);
 
         $openTime  = Carbon::createFromFormat('H:i:s', $field->open_time);
         $closeTime = Carbon::createFromFormat('H:i:s', $field->close_time);
-        $startTime = Carbon::createFromFormat('H:i', $request->start_time);
-        $endTime   = Carbon::createFromFormat('H:i', $request->end_time);
+        $startTime = Carbon::createFromFormat('H:i', $validated['start_time']);
+        $endTime   = Carbon::createFromFormat('H:i', $validated['end_time']);
 
-        if (Carbon::parse($request->date)->lt(Carbon::today())) {
+        if (Carbon::parse($validated['date'])->lt(Carbon::today())) {
             return back()->with('error', 'Tanggal maintenance tidak boleh lewat.');
+        }
+        if ($startTime->gte($endTime)) {
+            return back()->with('error', 'Jam mulai harus lebih kecil dari jam selesai.');
         }
 
         if ($startTime->lt($openTime) || $endTime->gt($closeTime)) {
@@ -40,14 +43,14 @@ class MaintenanceController extends Controller
             );
         }
 
-        $overlap = Schedule::where('field_id', $request->field_id)
-            ->where('date', $request->date)
-            ->where(function ($q) use ($request) {
-                $q->whereBetween('start_time', [$request->start_time, $request->end_time])
-                    ->orWhereBetween('end_time', [$request->start_time, $request->end_time])
-                    ->orWhere(function ($q2) use ($request) {
-                        $q2->where('start_time', '<=', $request->start_time)
-                            ->where('end_time', '>=', $request->end_time);
+        $overlap = Schedule::where('field_id', $validated['field_id'])
+            ->where('date', $validated['date'])
+            ->where(function ($q) use ($validated) {
+                $q->whereBetween('start_time', [$validated['start_time'], $validated['end_time']])
+                    ->orWhereBetween('end_time', [$validated['start_time'], $validated['end_time']])
+                    ->orWhere(function ($q2) use ($validated) {
+                        $q2->where('start_time', '<=', $validated['start_time'])
+                            ->where('end_time', '>=', $validated['end_time']);
                     });
             })
             ->exists();
@@ -56,7 +59,7 @@ class MaintenanceController extends Controller
             return back()->with('error', 'Jadwal maintenance bentrok dengan jadwal lain.');
         }
 
-        Schedule::create($request->all());
+        Schedule::create($validated);
 
         return redirect()
             ->route('admin.maintenance')
@@ -73,13 +76,13 @@ class MaintenanceController extends Controller
             return back()->with('error', 'Jadwal maintenance tidak ditemukan.');
         }
 
-        $request->validated();
+        $validated = $request->validated();
 
         // fallback ke data lama jika tidak dikirim
-        $field_id   = $request->field_id   ?? $schedule->field_id;
-        $date       = $request->date       ?? $schedule->date;
-        $start_time = $request->start_time ?? $schedule->start_time;
-        $end_time   = $request->end_time   ?? $schedule->end_time;
+        $field_id   = $validated['field_id']   ?? $schedule->field_id;
+        $date       = $validated['date']       ?? $schedule->date;
+        $start_time = $validated['start_time'] ?? $schedule->start_time;
+        $end_time   = $validated['end_time']   ?? $schedule->end_time;
 
         $field = Field::findOrFail($field_id);
 
@@ -92,6 +95,10 @@ class MaintenanceController extends Controller
 
         $startTime = Carbon::createFromFormat('H:i', $start_time);
         $endTime   = Carbon::createFromFormat('H:i', $end_time);
+
+        if ($startTime->gte($endTime)) {
+            return back()->with('error', 'Jam mulai harus lebih kecil dari jam selesai.');
+        }
 
         // jam di luar operasional
         if ($startTime->lt($openTime) || $endTime->gt($closeTime)) {
@@ -129,7 +136,7 @@ class MaintenanceController extends Controller
             'date'       => $date,
             'start_time' => $start_time,
             'end_time'   => $end_time,
-            'reason'     => $request->reason ?? $schedule->reason,
+            'reason'     => $validated['reason'] ?? $schedule->reason,
         ]);
 
         return redirect()

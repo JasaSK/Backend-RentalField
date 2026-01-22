@@ -16,10 +16,10 @@ class GalleryCategoryController extends Controller
 
     public function store(NameRequest $request)
     {
-        $request->validated();
+        $validated = $request->validated();
 
         CategoryGallery::create([
-            'name' => $request->name,
+            'name' => $validated['name'],
         ]);
 
         return redirect()->back()->with('success', 'Kategori berhasil ditambahkan!');
@@ -27,11 +27,11 @@ class GalleryCategoryController extends Controller
 
     public function update(NameRequest $request, $id)
     {
-        $request->validated();
+        $validated = $request->validated();
 
         $category = CategoryGallery::findOrFail($id);
         $category->update([
-            'name' => $request->name,
+            'name' => $validated['name'],
         ]);
 
         return redirect()->back()->with('success', 'Kategori berhasil diperbarui!');

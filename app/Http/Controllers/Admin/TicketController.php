@@ -17,9 +17,9 @@ class TicketController extends Controller
     public function verifyTicket(VerifyRequest $request)
     {
         // Validasi input
-        $request->validated();
+        $validated = $request->validated();
 
-        $ticket = Ticket::where('ticket_code', $request->ticket_code)->first();
+        $ticket = Ticket::where('ticket_code', $validated['ticket_code'])->first();
 
         if (!$ticket) {
             return back()->with('error', 'Kode tiket tidak ditemukan.');
@@ -36,12 +36,6 @@ class TicketController extends Controller
         }
 
         $ticket->update(['status_ticket' => 'used']);
-
-        // Ticket::create([
-        //     'ticket_code' => $request->ticket_code,
-        //     'booking_id'  => $ticket->id,
-        //     'verified_at' => now(),
-        // ]);
 
         return back()->with('success', 'Tiket berhasil diverifikasi.');
     }

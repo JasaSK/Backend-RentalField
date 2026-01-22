@@ -23,7 +23,7 @@ class FieldController extends Controller
     // Simpan field baru
     public function store(FieldRequest $request)
     {
-        $request->validated();
+        $validated = $request->validated();
         // dd($request->all());
         if ($request->open_time > $request->close_time) {
             return redirect()->back()->with('error', 'Waktu buka tidak boleh lebih besar dari waktu tutup.');
@@ -36,13 +36,13 @@ class FieldController extends Controller
 
 
         Field::create([
-            'name' => $request->name,
-            'category_field_id' => $request->category_field_id,
-            'description' => $request->description,
-            'price_per_hour' => $request->price_per_hour,
-            'open_time' => $request->open_time,
-            'close_time' => $request->close_time,
-            'status' => $request->status,
+            'name' => $validated['name'],
+            'category_field_id' => $validated['category_field_id'],
+            'description' => $validated['description'],
+            'price_per_hour' => $validated['price_per_hour'],
+            'open_time' => $validated['open_time'],
+            'close_time' => $validated['close_time'],
+            'status' => $validated['status'],
             'image' => $imagePath
         ]);
 
